@@ -439,7 +439,16 @@ body {
 }
 
 .note-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 10px;
+}
+
+/* Підтвердження збереження: кнопка на дві секунди стає зеленою. */
+.btn--saved {
+  border-color: var(--success);
+  color: var(--success);
 }
 
 /* ---------- Editor ---------- */

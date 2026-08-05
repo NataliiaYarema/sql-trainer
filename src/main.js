@@ -151,6 +151,10 @@ function renderNoteBlock() {
       onToggle: (open) => {
         noteOpen = open;
       },
+      // Нотатка й так зберігається сама через 400 мс після набору. Кнопка
+      // потрібна не для збереження, а для підтвердження: без неї користувач
+      // не має жодної ознаки, що текст уже в сховищі.
+      onSave: saveCurrentNote,
       onInsertQuery: handleInsertQuery,
     }
   );

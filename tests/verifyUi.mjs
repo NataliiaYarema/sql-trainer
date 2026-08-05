@@ -9,7 +9,7 @@ import { renderTaskCard } from '../src/ui/taskCard.js';
 import { renderHints } from '../src/ui/hintPanel.js';
 import { renderResultTable } from '../src/ui/resultTable.js';
 import { progressHtml } from '../src/ui/progressBar.js';
-import { notePanelHtml } from '../src/ui/notePanel.js';
+import { notePanelHtml, saveButtonLabel } from '../src/ui/notePanel.js';
 import { notesScreenHtml } from '../src/ui/notesScreen.js';
 import { sandboxControlsHtml } from '../src/ui/sandbox.js';
 import { confirmDialogHtml } from '../src/ui/confirmDialog.js';
@@ -377,6 +377,13 @@ check('порожня нотатка згорнута', !/<details[^>]*\bopen\b/
 check('порожня нотатка не має позначки', !emptyNote.includes('note-panel__dot'));
 check('панель нотатки має поле вводу', emptyNote.includes('note-panel__text'));
 check('панель нотатки має кнопку вставки запиту', emptyNote.includes('data-action="insert-query"'));
+check('панель нотатки має кнопку збереження', emptyNote.includes('data-action="save-note"'));
+
+// Підпис кнопки — окрема чиста функція, бо підтвердження «Збережено» ставиться
+// точковою заміною тексту, а не перерендером панелі (див. коментар у notePanel.js).
+check('кнопка збереження підписана «Зберегти»', saveButtonLabel(false).includes('Зберегти'));
+check('після збереження підпис змінюється', saveButtonLabel(true).includes('Збережено'));
+check('підпис «Збережено» не лишає старого слова', !saveButtonLabel(true).includes('>Зберегти<'));
 
 const filledNote = notePanelHtml({ text: '1 < 2 & "лапки"', isOpen: true });
 check('нотатка розгортається', /<details[^>]*\bopen\b/.test(filledNote));
