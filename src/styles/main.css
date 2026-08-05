@@ -1,0 +1,1794 @@
+:root {
+  --bg: #0e1117;
+  --bg-panel: #161b26;
+  --bg-elevated: #1d2432;
+  --bg-input: #11151d;
+  --border: #262d3d;
+  --border-strong: #333d52;
+  --text: #e6eaf2;
+  --text-muted: #8b95a8;
+  --text-dim: #626c80;
+  --accent: #4f9cf9;
+  --accent-soft: rgba(79, 156, 249, 0.12);
+  --success: #35c98b;
+  --success-soft: rgba(53, 201, 139, 0.12);
+  --danger: #f4726b;
+  --danger-soft: rgba(244, 114, 107, 0.12);
+  --warning: #f0b23f;
+  --warning-soft: rgba(240, 178, 63, 0.12);
+  --violet: #a78bfa;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.icon {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+.app-shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 24px 60px;
+}
+
+/* ---------- Topbar ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar__logo {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 22px;
+}
+
+.topbar__title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.topbar__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.topbar__progress {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* ---------- Progress ---------- */
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.progress__level {
+  font-size: 13.5px;
+  font-weight: 550;
+  color: var(--text-muted);
+}
+
+.btn--back {
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 64px;
+}
+
+.stat__value {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 18px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.stat__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+/* ---------- Layout ---------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(340px, 0.85fr) minmax(420px, 1.15fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* Екран вибору рівнів і екран завершення займають усю ширину. */
+.layout--single {
+  grid-template-columns: 1fr;
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+.panel--work {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Клас перебиває стандартний display:none від атрибута hidden, тому вимикаємо
+   панель явно — інакше на екрані вибору рівнів вона лишається видимою. */
+.panel--work[hidden] {
+  display: none;
+}
+
+/* ---------- Task card ---------- */
+
+.task-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.level-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.task-counter {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.solved-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--success);
+}
+
+.task-card__title {
+  margin: 0 0 20px;
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.case-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: -12px 0 20px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.task-section {
+  margin-bottom: 18px;
+}
+
+.task-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+  margin-bottom: 7px;
+}
+
+.section-label .icon {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.task-section__body {
+  color: var(--text);
+}
+
+.task-section__body--muted {
+  color: var(--text-muted);
+}
+
+.schema-block {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 0;
+  color: #b8c4dc;
+}
+
+.schema-table + .schema-table {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.schema-table__name {
+  padding: 0 13px 6px;
+  font-weight: 650;
+  color: var(--accent);
+}
+
+.schema-table__columns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.schema-column {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 3px 13px 3px 26px;
+  position: relative;
+}
+
+.schema-column::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0.75em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+.schema-column:hover {
+  background: rgba(79, 156, 249, 0.05);
+}
+
+.schema-column__name {
+  color: #d5deee;
+}
+
+.schema-column__type {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.column-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.column-chip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--violet);
+}
+
+/* ---------- Hints ---------- */
+
+.hint-panel {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.hint-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--warning-soft);
+  border: 1px solid rgba(240, 178, 63, 0.25);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  font-size: 14px;
+  animation: slide-in 0.25s ease;
+}
+
+.hint-item:last-child {
+  margin-bottom: 0;
+}
+
+.hint-item__icon {
+  color: var(--warning);
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.hint-item__text {
+  flex: 1;
+}
+
+.hint-item__text code,
+.hint-item__text strong {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+/* ---------- Нотатка до завдання ---------- */
+
+.note-panel {
+  /* Блок стоїть останнім у робочій панелі — відступ потрібен зверху,
+     від таблиці результату, а не знизу. */
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+}
+
+.note-panel__summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.note-panel__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--violet);
+}
+
+.note-panel__text {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.note-panel__text:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.note-panel__actions {
+  margin-top: 10px;
+}
+
+/* ---------- Editor ---------- */
+
+.editor-block__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.editor-block__head .section-label {
+  margin-bottom: 0;
+}
+
+.editor-block__hint {
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+
+.editor-host {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-input);
+}
+
+.editor-host .cm-editor {
+  min-height: 170px;
+  font-size: 13.5px;
+}
+
+.editor-host .cm-editor.cm-focused {
+  outline: none;
+}
+
+.editor-host .cm-scroller {
+  font-family: var(--font-mono);
+  line-height: 1.6;
+}
+
+/* ---------- Controls ---------- */
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn .icon {
+  font-size: 15px;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #0b1220;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #6aabfa;
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-muted);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  border-color: var(--text-dim);
+  color: var(--text);
+}
+
+/* Вихід на головну — не така сама дія, як решта переходів, тому має власний
+   колір: акцентний текст на приглушеному акцентному тлі. Суцільна заливка була
+   б зайвою — вона змагалася б за увагу з «Продовжити».
+
+   Гачок — сам data-action, а не окремий клас: кнопок «На головну» шість у
+   різних модулях, і клас рано чи пізно забули б дописати сьомій. Селектор
+   складений навмисно й ще й тому, що .btn--ghost оголошений вище: при
+   однаковій специфічності перемагає пізніше правило. */
+.btn--ghost[data-action='to-home'] {
+  background: var(--accent-soft);
+  border-color: rgba(79, 156, 249, 0.35);
+  color: var(--accent);
+}
+
+.btn--ghost[data-action='to-home']:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn--hint {
+  background: var(--warning-soft);
+  border-color: rgba(240, 178, 63, 0.3);
+  color: var(--warning);
+}
+
+.btn--hint:hover:not(:disabled) {
+  background: rgba(240, 178, 63, 0.2);
+}
+
+/* Обидві кнопки переходу лежать в одній групі праворуч, тому вони не
+   роз'їжджаються по різних рядках, коли ряд кнопок переноситься. */
+.controls__nav {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* Вихід на головну — окремим рядом під кнопками завдання, щоб не потрапляти
+   під руку між «Перевірити» і «Наступне». */
+.controls-home {
+  display: flex;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.btn--nav {
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.btn--nav:hover:not(:disabled) {
+  background: #263145;
+}
+
+.btn--next {
+  background: var(--success);
+  border-color: transparent;
+  color: #06231a;
+}
+
+.btn--next:hover:not(:disabled) {
+  background: #4ad79c;
+}
+
+/* ---------- Смужка завдань рівня ---------- */
+
+.task-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.task-nav__item {
+  position: relative;
+  flex: 1 1 30px;
+  width: auto;
+  min-width: 20px;
+  max-width: 40px;
+  height: 34px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.task-nav__item:hover {
+  border-color: var(--text-dim);
+  color: var(--text);
+}
+
+.task-nav__item--solved {
+  background: var(--success-soft);
+  border-color: rgba(53, 201, 139, 0.3);
+  color: var(--success);
+}
+
+.task-nav__item--revealed {
+  background: var(--warning-soft);
+  border-color: rgba(240, 178, 63, 0.3);
+  color: var(--warning);
+}
+
+.task-nav__item--current {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.task-nav__item--noted::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--violet);
+}
+
+/* ---------- Feedback ---------- */
+
+.feedback {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px 18px;
+  animation: slide-in 0.3s ease;
+}
+
+.feedback--success {
+  background: var(--success-soft);
+  border-color: rgba(53, 201, 139, 0.3);
+}
+
+.feedback--error {
+  background: var(--danger-soft);
+  border-color: rgba(244, 114, 107, 0.3);
+}
+
+.feedback--warning {
+  background: var(--warning-soft);
+  border-color: rgba(240, 178, 63, 0.3);
+}
+
+.feedback__head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15.5px;
+  font-weight: 650;
+  margin-bottom: 6px;
+}
+
+.feedback--success .feedback__head {
+  color: var(--success);
+}
+
+.feedback--error .feedback__head {
+  color: var(--danger);
+}
+
+.feedback--warning .feedback__head {
+  color: var(--warning);
+}
+
+.feedback__text {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.feedback__text:last-child {
+  margin-bottom: 0;
+}
+
+.feedback__section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.feedback__explanation {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ---------- SQL code blocks ---------- */
+
+/* Кольори — ті самі, що в темі редактора (one-dark), щоб той самий запит
+   виглядав однаково і в підсвітці теорії, і в полі вводу. */
+.solution-sql,
+.sql-block,
+.theory-example__sql {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin: 0;
+  overflow-x: auto;
+  color: #abb2bf;
+  white-space: pre;
+}
+
+.sql-keyword {
+  color: #c678dd;
+}
+
+.sql-function {
+  color: #61afef;
+}
+
+.sql-string {
+  color: #98c379;
+}
+
+.sql-number {
+  color: #d19a66;
+}
+
+.sql-comment {
+  color: #7d8799;
+  font-style: italic;
+}
+
+.sql-punct {
+  color: #8b95a8;
+}
+
+/* ---------- Result table ---------- */
+
+.result-block__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.result-block__meta {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  max-height: 320px;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+
+.result-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  text-align: left;
+  font-weight: 600;
+  padding: 9px 13px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.result-table td {
+  padding: 8px 13px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.result-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.result-table tbody tr:hover td {
+  background: rgba(79, 156, 249, 0.05);
+}
+
+.cell--null {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.cell--number {
+  color: var(--violet);
+  text-align: right;
+}
+
+/* ---------- Final screen ---------- */
+
+.final-screen {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.final-screen__icon {
+  font-size: 52px;
+  color: var(--warning);
+  margin-bottom: 16px;
+}
+
+.final-screen__title {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 650;
+}
+
+.final-screen__text {
+  color: var(--text-muted);
+  margin: 0 0 24px;
+}
+
+.final-screen__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tier-pill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+}
+
+.tier-pill--basic {
+  color: var(--text-dim);
+  border-color: var(--border-strong);
+}
+
+.tier-pill--medium {
+  color: var(--warning);
+  background: var(--warning-soft);
+  border-color: rgba(240, 178, 63, 0.3);
+}
+
+.tier-pill--complex {
+  color: var(--violet);
+  border-color: color-mix(in srgb, var(--violet) 40%, transparent);
+  background: color-mix(in srgb, var(--violet) 12%, transparent);
+}
+
+/* ---------- Level select ---------- */
+
+.level-select__title {
+  margin: 0 0 22px;
+  font-size: 22px;
+  font-weight: 650;
+}
+
+.level-select__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.level-card {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 18px;
+  text-align: left;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.level-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.level-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.level-card__number {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.level-card__done {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--success);
+}
+
+.level-card__name {
+  font-size: 16.5px;
+  font-weight: 600;
+}
+
+.level-card__bar {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--bg-input);
+  overflow: hidden;
+}
+
+.level-card__fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.35s ease;
+}
+
+.level-card--done .level-card__fill {
+  background: var(--success);
+}
+
+.level-card__progress {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.level-card__notes {
+  font-size: 12.5px;
+  color: var(--violet);
+}
+
+.progress__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ---------- Theory ---------- */
+
+.theory-list {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.theory-list__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.theory-list__title .icon {
+  color: var(--violet);
+}
+
+.theory-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theory-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  text-align: left;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.theory-item:hover {
+  border-color: var(--violet);
+}
+
+.theory-item__level {
+  flex: none;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--violet);
+}
+
+.theory-item__name {
+  flex: 1;
+  font-size: 14.5px;
+  font-weight: 550;
+}
+
+/* Перелік конструкцій у заголовку теми — тим самим кольором, що й ключові
+   слова в прикладах SQL, щоб назва рівня й код читалися як одне ціле. */
+.theory-item__keywords,
+.theory-topic__keywords {
+  color: #c678dd;
+  font-weight: 500;
+}
+
+.theory-item__go {
+  flex: none;
+  display: flex;
+  color: var(--text-dim);
+}
+
+.theory-topic__head {
+  margin-bottom: 12px;
+}
+
+.theory-topic__title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 650;
+}
+
+.theory-topic__summary {
+  margin: 0 0 22px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.theory-topic__points {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.theory-topic__points li + li {
+  margin-top: 4px;
+}
+
+/* Коли summaryBlocks закінчується списком (а не приміткою), гап перед
+   наступною секцією має бути такий самий, як після примітки — інакше
+   останній блок притискається до "Як це виглядає" тісніше за інші теми. */
+.theory-topic__points:has(+ .task-section) {
+  margin-bottom: 22px;
+}
+
+.theory-topic__note {
+  margin: 0 0 22px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.theory-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.theory-example {
+  padding: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.theory-example__label {
+  margin-bottom: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.theory-example__result {
+  margin-top: 10px;
+  padding-left: 12px;
+  border-left: 2px solid var(--accent);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.theory-cases {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.theory-case {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  padding: 18px;
+}
+
+.theory-case__title {
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.theory-case__meta dt {
+  margin-top: 8px;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.theory-case__meta dd {
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.theory-case__question {
+  margin: 14px 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--accent);
+  font-size: 13.5px;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.theory-case__reading,
+.theory-case__steps {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.theory-case__steps {
+  padding-left: 20px;
+  color: var(--text-muted);
+}
+
+.theory-case__steps li {
+  margin-bottom: 4px;
+}
+
+.theory-case__watch {
+  margin-top: 16px;
+  padding-left: 12px;
+  border-left: 3px solid var(--warning);
+}
+
+.theory-case__watch-label {
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--warning);
+}
+
+.theory-case__watch ul {
+  padding-left: 20px;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.theory-case__watch li {
+  margin-bottom: 6px;
+}
+
+.theory-pitfalls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.theory-pitfall {
+  padding: 12px 14px;
+  background: var(--warning-soft);
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.theory-pitfall__title {
+  margin-bottom: 5px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--warning);
+}
+
+.theory-pitfall__text {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.pitfall-snippet {
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 3px solid var(--border);
+}
+
+.pitfall-snippet--wrong {
+  border-left-color: var(--danger);
+}
+
+.pitfall-snippet--right {
+  border-left-color: var(--success);
+}
+
+.theory-tips {
+  padding-left: 20px;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.theory-tips li {
+  margin-bottom: 14px;
+}
+
+.theory-topic__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbar__progress {
+    min-width: 0;
+  }
+
+  .progress {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell {
+    padding: 14px 14px 40px;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .controls__nav {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .controls__nav .btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ---------- Екран нотаток ---------- */
+
+.notes-screen__head {
+  margin-bottom: 10px;
+}
+
+.notes-screen__title {
+  margin: 0 0 22px;
+  font-size: 22px;
+  font-weight: 650;
+}
+
+.notes-screen__empty {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.notes-group {
+  margin-bottom: 26px;
+}
+
+.notes-group__title {
+  margin: 0 0 12px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.note-entry {
+  margin-bottom: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+}
+
+.note-entry__head {
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.note-entry__note {
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.note-entry__condition {
+  margin-bottom: 12px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.note-entry__condition summary {
+  cursor: pointer;
+  color: var(--text-dim);
+}
+
+.note-entry__block {
+  margin-top: 10px;
+}
+
+.note-entry__text {
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+.notes-screen__actions {
+  margin-top: 22px;
+}
+
+/* ---------- Dashboard ---------- */
+
+.dashboard__head {
+  margin-bottom: 10px;
+}
+
+.dashboard__title {
+  margin: 0 0 22px;
+  font-size: 22px;
+  font-weight: 650;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.stat-tile__label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+/* «Розв'язано» і «Днів активності» — однакового кеглю: це два показники одного
+   рівня важливості, і різниця між ними читалася б як підказка «дивись сюди».
+   Табличних цифр тут немає навмисно — на такому кеглі вони роблять число
+   розрідженим. */
+.stat-tile__value,
+.stat-tile__hero {
+  font-size: 32px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.stat-tile--hero {
+  border-color: var(--border-strong);
+}
+
+.stat-tile__note {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+/* Смужка тонка й заокруглена лише з боку зростання: біля основи вона має
+   лишатися прямою, інакше нуль виглядає як маленьке значення. */
+.bar-track {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-input);
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: var(--accent);
+}
+
+.dashboard__empty {
+  margin: 18px 0 0;
+  color: var(--text-muted);
+}
+
+.dashboard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.panel {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+.panel__title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 620;
+}
+
+.panel__hint {
+  margin: -8px 0 14px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.rank-list,
+.hard-task-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Смужка на всю ширину сторінки читається гірше за коротку: на 1400 px очі
+   вже не порівнюють довжини. */
+.rank-list {
+  max-width: 640px;
+}
+
+.rank-row__action {
+  margin-top: 8px;
+}
+
+.stat-tile__value--sm {
+  font-size: 17px;
+}
+
+.stat-tile__action {
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.skill-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.skill-row__level {
+  min-width: 90px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.skill-row__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--success-soft);
+  color: var(--success);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.final-screen__skills {
+  margin: 22px auto 0;
+  max-width: 420px;
+  text-align: left;
+}
+
+.final-screen__skills-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 620;
+}
+
+.skill-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-item {
+  display: flex;
+  gap: 10px;
+  padding: 4px 0;
+  color: var(--text-dim);
+}
+
+.skill-item--done {
+  color: var(--text);
+}
+
+.skill-item--done .skill-item__mark {
+  color: var(--success);
+}
+
+.rank-row {
+  margin-bottom: 14px;
+}
+
+.rank-row__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 5px;
+}
+
+.rank-row__name--code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.rank-row__value {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.rank-row__note {
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.hard-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.hard-task:last-child {
+  border-bottom: none;
+}
+
+.hard-task__title {
+  font-weight: 600;
+}
+
+.hard-task__note {
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.sandbox-schema__title {
+  margin: 12px 0 6px;
+  font-size: 18px;
+}
+
+.sandbox-schema__hint {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+.sandbox-table {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  background: var(--bg-elevated);
+}
+
+.sandbox-table__name {
+  cursor: pointer;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--accent);
+}
+
+.sandbox-table__columns {
+  margin: 0;
+  padding: 0 12px 10px 28px;
+  list-style: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.sandbox-table__columns li {
+  padding: 2px 0;
+}
+
+.dashboard__danger {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.btn--danger {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: var(--danger);
+  color: var(--bg);
+}
+
+.note-entry__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.note-entry__delete {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.note-entry__delete:hover {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.notes-screen__danger {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(6, 9, 15, 0.7);
+}
+
+.modal__box {
+  width: min(420px, 100%);
+  padding: 24px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+.modal__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.modal__note {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}

@@ -1,0 +1,4 @@
+# Переноси рядків — завжди LF, і в репозиторії, і в робочій копії.
+# Без цього core.autocrlf=true на Windows підставляє CRLF при checkout,
+# і `npm run format:check` падає на всіх файлах після свіжого клону.
+* text=auto eol=lf
