@@ -173,6 +173,25 @@ check(
   topics.every((t) => t.keywords.every((k) => topicText(t).includes(k)))
 );
 
+// Згадки в тексті мало: конструкцію, винесену в назву теми, користувач має
+// побачити в роботі. Перевірка суворіша за попередню й дивиться лише в SQL
+// прикладів та кейсів.
+//
+// Тема 8 сюди не входить: у неї є subtitle, тож у назві стоять не конструкції,
+// а поняття («когорти», «воронки», «LTV»), і вимагати їх у тексті запиту
+// означало б вимагати коментаря з потрібним словом.
+const demoSql = (t) => [...(t.examples ?? []), ...(t.cases ?? [])].map((b) => b.sql).join(' ');
+const namedTopics = topics.filter((t) => !t.subtitle);
+namedTopics.forEach((t) => {
+  const missing = t.keywords.filter((k) => !demoSql(t).includes(k));
+  check(
+    `рівень ${t.level}: кожна конструкція з назви має приклад${
+      missing.length ? ' — немає: ' + missing.join(', ') : ''
+    }`,
+    missing.length === 0
+  );
+});
+
 // --- форматування прикладів ------------------------------------------------
 
 const allExamples = topics.flatMap((t) =>
