@@ -1398,11 +1398,29 @@ body {
   font-weight: 600;
 }
 
-.note-entry__note {
-  margin-bottom: 12px;
-  white-space: pre-wrap;
+.note-entry__edit {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  font-family: inherit;
   font-size: 14px;
   line-height: 1.6;
+  resize: vertical;
+}
+
+.note-entry__edit:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.note-entry__edit-actions {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 12px;
 }
 
 .note-entry__condition {

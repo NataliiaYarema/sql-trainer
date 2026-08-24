@@ -1,5 +1,6 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 import { askConfirm } from './confirmDialog.js';
+import { saveButtonLabel, SAVED_LABEL_MS } from './notePanel.js';
 
 // entries: [{ taskId, level, levelName, index, title, context, taskText, note }] —
 // уже відсортовані за рівнем і номером завдання, модуль лише групує.
@@ -73,7 +74,20 @@ function entryHtml({ taskId, level, index, title, context, taskText, note }) {
           aria-label="Видалити нотатку до завдання ${index + 1}"
         >${icon('i-x')}</button>
       </div>
-      <div class="note-entry__note">${escapeHtml(note)}</div>
+      <textarea
+        class="note-entry__edit"
+        data-action="edit-note"
+        data-note-id="${escapeHtml(taskId)}"
+        rows="3"
+        aria-label="Нотатка до завдання ${index + 1}"
+      >${escapeHtml(note)}</textarea>
+      <div class="note-entry__edit-actions">
+        <button
+          class="btn btn--ghost"
+          data-action="save-note"
+          data-note-id="${escapeHtml(taskId)}"
+        >${saveButtonLabel(false)}</button>
+      </div>
       <details class="note-entry__condition">
         <summary>Показати умову</summary>
         <div class="note-entry__block">
@@ -92,6 +106,26 @@ function entryHtml({ taskId, level, index, title, context, taskText, note }) {
   `;
 }
 
+// Таймерів стільки ж, скільки записів, тож тримаємо їх у мапі за кнопкою:
+// одна спільна змінна гасила б підтвердження на чужому записі.
+const savedTimers = new WeakMap();
+
+function resetSavedLabel(button) {
+  clearTimeout(savedTimers.get(button));
+  button.innerHTML = saveButtonLabel(false);
+  button.classList.remove('btn--saved');
+}
+
+function showSavedLabel(button) {
+  button.innerHTML = saveButtonLabel(true);
+  button.classList.add('btn--saved');
+  clearTimeout(savedTimers.get(button));
+  savedTimers.set(
+    button,
+    setTimeout(() => resetSavedLabel(button), SAVED_LABEL_MS)
+  );
+}
+
 export function renderNotesScreen(root, entries, handlers) {
   root.innerHTML = notesScreenHtml(entries);
 
@@ -99,6 +133,30 @@ export function renderNotesScreen(root, entries, handlers) {
     button.addEventListener('click', () =>
       handlers.onOpenTask(Number(button.dataset.level), Number(button.dataset.index))
     );
+  });
+
+  // Правка на місці. Екран навмисно не перемальовується на кожну літеру:
+  // перерендер підмінив би textarea новим вузлом, і фокус із позицією
+  // курсора злітали б просто під час набору.
+  root.querySelectorAll('[data-action="edit-note"]').forEach((textarea) => {
+    const saveButton = root.querySelector(
+      `[data-action="save-note"][data-note-id="${CSS.escape(textarea.dataset.noteId)}"]`
+    );
+    textarea.addEventListener('input', () => {
+      resetSavedLabel(saveButton);
+      handlers.onEditNote(textarea.dataset.noteId, textarea.value);
+    });
+  });
+
+  root.querySelectorAll('[data-action="save-note"]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const textarea = root.querySelector(
+        `[data-action="edit-note"][data-note-id="${CSS.escape(button.dataset.noteId)}"]`
+      );
+      handlers.onEditNote(button.dataset.noteId, textarea.value);
+      handlers.onSaveNote();
+      showSavedLabel(button);
+    });
   });
 
   // Одну нотатку прибираємо без підтвердження: втрата невелика й очевидна,

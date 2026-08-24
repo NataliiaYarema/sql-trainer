@@ -1,7 +1,7 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 
 // Скільки показувати підтвердження після натискання «Зберегти».
-const SAVED_LABEL_MS = 2000;
+export const SAVED_LABEL_MS = 2000;
 
 let savedTimer = null;
 

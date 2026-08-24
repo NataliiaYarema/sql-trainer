@@ -115,6 +115,7 @@ function saveCurrentNote() {
 function flushPending() {
   saveCurrentDraft();
   saveCurrentNote();
+  saveNotesScreenNote();
 }
 
 // Розділ, у якому ми зараз, пишемо в hash. Всередині сторінки переходи, як і
@@ -478,6 +479,25 @@ function noteEntries() {
   );
 }
 
+// Запис із екрана нотаток. Пара «яку нотатку правимо / який текст» лежить
+// поруч, бо на цьому екрані записів багато: одна змінна тексту, як у режимі
+// завдання, приписала б правку не тому завданню.
+let notesScreenEdit = null;
+let notesScreenTimer = null;
+
+function scheduleNotesScreenSave(taskId, text) {
+  notesScreenEdit = { taskId, text };
+  clearTimeout(notesScreenTimer);
+  notesScreenTimer = setTimeout(saveNotesScreenNote, 400);
+}
+
+function saveNotesScreenNote() {
+  clearTimeout(notesScreenTimer);
+  if (!notesScreenEdit) return;
+  gameState.saveNote(notesScreenEdit.taskId, notesScreenEdit.text);
+  notesScreenEdit = null;
+}
+
 // Окремий екран за зразком showTheory: та сама панель, робоча панель схована.
 function showNotes() {
   flushPending();
@@ -493,6 +513,11 @@ function showNotes() {
   renderNotesScreen(roots.taskCard, noteEntries(), {
     onOpenTask: openLevel,
     onToHome: showLevelSelect,
+    // Правка на екрані нотаток іде повз noteText: та змінна належить
+    // відкритому завданню, а тут завдання не відкрите — редагувати можна
+    // будь-який запис зі списку.
+    onEditNote: scheduleNotesScreenSave,
+    onSaveNote: saveNotesScreenNote,
     // Порожній текст — це і є видалення: окремого методу немає навмисно.
     onDeleteNote: (taskId) => {
       gameState.saveNote(taskId, '');

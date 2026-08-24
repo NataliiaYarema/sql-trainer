@@ -469,13 +469,29 @@ const notesHtml = notesScreenHtml(noteEntries);
 check('екран нотаток групує за рівнями', (notesHtml.match(/notes-group"/g) ?? []).length === 2);
 check('екран нотаток показує всі записи', (notesHtml.match(/note-entry"/g) ?? []).length === 3);
 check('запис нумерує завдання з одиниці', notesHtml.includes('Завдання 4 · Четверте завдання'));
-check('запис показує текст нотатки', notesHtml.includes('моя думка'));
+check('запис показує текст нотатки', /<textarea[^>]*>моя думка<[/]textarea>/.test(notesHtml));
 check('нотатка не вставляє сирий HTML', notesHtml.includes('через &lt;b&gt;JOIN&lt;/b&gt;'));
 check('запис ховає умову під розгортанням', notesHtml.includes('Показати умову'));
 check('запис містить бізнес-контекст', notesHtml.includes('Контекст четвертого'));
 check('запис містить текст завдання', notesHtml.includes('Умова четвертого'));
 check('запис веде до свого завдання', /data-level="3"\s+data-index="2"/.test(notesHtml));
 check('порядок рівнів збережено', notesHtml.indexOf('Рівень 1') < notesHtml.indexOf('Рівень 3'));
+
+// Нотатку можна правити прямо тут: текст лежить у textarea, а не в <div>.
+check(
+  'кожен запис редагується на місці',
+  (notesHtml.match(/class="note-entry__edit"/g) ?? []).length === 3
+);
+check(
+  'поле редагування знає свою нотатку',
+  /data-action="edit-note"[^>]*data-note-id="L3-03"/.test(notesHtml) ||
+    /data-note-id="L3-03"[^>]*data-action="edit-note"/.test(notesHtml)
+);
+check(
+  'кожен запис має кнопку збереження',
+  (notesHtml.match(/data-action="save-note"/g) ?? []).length === 3
+);
+check('кнопка збереження підписана', notesHtml.includes('Зберегти'));
 
 // Видалення: по одній кнопці на запис плюс одна на весь екран.
 check(
