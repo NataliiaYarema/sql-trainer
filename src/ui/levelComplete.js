@@ -9,7 +9,7 @@ function skillsHtml(skills) {
 
   return `
     <div class="final-screen__skills">
-      <h3 class="final-screen__skills-title">Ви тепер вмієте</h3>
+      <h3 class="final-screen__skills-title">Ти тепер вмієш</h3>
       <ul class="skill-items">
         ${skills
           .map(

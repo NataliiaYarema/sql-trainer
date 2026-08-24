@@ -25,7 +25,7 @@ export default [
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
     taskText:
-      "Позначте товари за залишком: менше 10 — 'critical', менше 30 — 'low'. Решта лишається без позначки.",
+      "Познач товари за залишком: менше 10 — 'critical', менше 30 — 'low'. Решта лишається без позначки.",
     expectedOutputColumns: ['product_name', 'stock', 'stock_alert'],
     orderMatters: false,
     referenceSql: `
@@ -58,7 +58,7 @@ export default [
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
     taskText:
-      "Розподіліть товари за ціною: до 50 — 'budget', до 200 — 'standard', решта — 'premium'.",
+      "Розподіли товари за ціною: до 50 — 'budget', до 200 — 'standard', решта — 'premium'.",
     expectedOutputColumns: ['product_name', 'price', 'price_tier'],
     orderMatters: false,
     referenceSql: `
@@ -92,7 +92,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      "Виведіть співробітників так, щоб замість порожнього департаменту стояло 'Not assigned'.",
+      "Виведи співробітників так, щоб замість порожнього департаменту стояло 'Not assigned'.",
     expectedOutputColumns: ['first_name', 'last_name', 'department'],
     orderMatters: false,
     referenceSql: `
@@ -122,7 +122,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Для кожного менеджера виведіть загальну кількість замовлень і скільки з них на 200 і більше.',
+      'Для кожного менеджера виведи загальну кількість замовлень і скільки з них на 200 і більше.',
     expectedOutputColumns: ['manager_id', 'orders_count', 'large_orders'],
     orderMatters: false,
     referenceSql: `
@@ -152,7 +152,7 @@ export default [
       'Відділ маркетингу планує програму лояльності й хоче знайти клієнтів, які лишаються активними другий квартал поспіль.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Знайдіть клієнтів, які замовляли і в першому кварталі 2024 року, і в другому.',
+    taskText: 'Знайди клієнтів, які замовляли і в першому кварталі 2024 року, і в другому.',
     expectedOutputColumns: ['customer_id'],
     orderMatters: false,
     referenceSql: `
@@ -182,7 +182,7 @@ export default [
       'Категорійний менеджер перевіряє каталог і хоче знайти товари, які жодного разу не продавалися, щоб вирішити їхню долю.',
     schemaDescription: `${PRODUCTS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}`,
     setupSql: PRODUCTS_SQL + ORDER_ITEMS_SQL,
-    taskText: 'Знайдіть товари, які не потрапили в жодне замовлення.',
+    taskText: 'Знайди товари, які не потрапили в жодне замовлення.',
     expectedOutputColumns: ['product_id'],
     orderMatters: false,
     referenceSql: `
@@ -211,7 +211,7 @@ export default [
     schemaDescription: `${EMPLOYEES_SCHEMA}\n${CUSTOMERS_SCHEMA}`,
     setupSql: EMPLOYEES_SQL + CUSTOMERS_SQL,
     taskText:
-      "Обʼєднайте в один список імена співробітників і клієнтів. Для співробітників у колонці source має бути 'employee', для клієнтів — 'customer'.",
+      "Обʼєднай в один список імена співробітників і клієнтів. Для співробітників у колонці source має бути 'employee', для клієнтів — 'customer'.",
     expectedOutputColumns: ['person_name', 'source'],
     orderMatters: false,
     referenceSql: `
@@ -231,7 +231,7 @@ export default [
       "Скелет: SELECT first_name AS person_name, 'employee' AS source FROM employees UNION ALL SELECT name, 'customer' FROM customers;",
     ],
     explanation:
-      'JOIN додає колонки, UNION — рядки. Обидва запити мусять мати однакову кількість колонок сумісних типів. UNION прибирає дублікати й тому виконує додаткову роботу (хешування чи сортування), UNION ALL просто склеює й працює швидше — беріть ALL, якщо дублікатів свідомо не боїтеся.',
+      'JOIN додає колонки, UNION — рядки. Обидва запити мусять мати однакову кількість колонок сумісних типів. UNION прибирає дублікати й тому виконує додаткову роботу (хешування чи сортування), UNION ALL просто склеює й працює швидше — бери ALL, якщо дублікатів свідомо не боїтеся.',
   },
   {
     id: 'L7-price-extremes',
@@ -244,7 +244,7 @@ export default [
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
     taskText:
-      "Обʼєднайте два списки: два найдешевші товари з позначкою 'cheapest' і два найдорожчі з позначкою 'priciest'.",
+      "Обʼєднай два списки: два найдешевші товари з позначкою 'cheapest' і два найдорожчі з позначкою 'priciest'.",
     expectedOutputColumns: ['product_name', 'price', 'label'],
     orderMatters: false,
     referenceSql: `
@@ -289,7 +289,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      'Виведіть співробітників із департаментом, впорядкувавши їх спершу за пріоритетом департаменту — IT, потім Sales, потім Marketing, потім решта, — а всередині кожного за спаданням зарплати.',
+      'Виведи співробітників із департаментом, впорядкувавши їх спершу за пріоритетом департаменту — IT, потім Sales, потім Marketing, потім решта, — а всередині кожного за спаданням зарплати.',
     expectedOutputColumns: ['first_name', 'department', 'salary'],
     orderMatters: true,
     referenceSql: `
@@ -327,7 +327,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      "Присвойте грейд: для IT це 'IT senior' від 7000 і 'IT regular' нижче, для решти — 'senior' від 5500 і 'regular' нижче.",
+      "Присвой грейд: для IT це 'IT senior' від 7000 і 'IT regular' нижче, для решти — 'senior' від 5500 і 'regular' нижче.",
     expectedOutputColumns: ['first_name', 'department', 'salary', 'grade'],
     orderMatters: false,
     referenceSql: `
@@ -363,7 +363,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Для кожного клієнта виведіть суму замовлень першого кварталу 2024 року і суму другого — двома сусідніми колонками.',
+      'Для кожного клієнта виведи суму замовлень першого кварталу 2024 року і суму другого — двома сусідніми колонками.',
     expectedOutputColumns: ['customer_id', 'q1', 'q2'],
     orderMatters: false,
     referenceSql: `
@@ -398,7 +398,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Порахуйте для кожного менеджера, скільки замовлень до 200 припадає на одне замовлення від 200, округливши до двох знаків.',
+      'Порахуй для кожного менеджера, скільки замовлень до 200 припадає на одне замовлення від 200, округливши до двох знаків.',
     expectedOutputColumns: ['manager_id', 'small_per_large'],
     orderMatters: false,
     referenceSql: `
@@ -432,7 +432,7 @@ export default [
     schemaDescription: `${ORDERS_SCHEMA}\n${EMPLOYEES_SCHEMA}`,
     setupSql: ORDERS_SQL + EMPLOYEES_SQL,
     taskText:
-      "Зберіть в одну стрічку замовлення від 1 червня 2024 року з позначкою 'order' і наймання від 1 січня 2024 року з позначкою 'hire'. Масштаб події: для замовлення 'large' від 200, інакше 'small'; для наймання 'senior' від зарплати 6000, інакше 'junior'.",
+      "Збери в одну стрічку замовлення від 1 червня 2024 року з позначкою 'order' і наймання від 1 січня 2024 року з позначкою 'hire'. Масштаб події: для замовлення 'large' від 200, інакше 'small'; для наймання 'senior' від зарплати 6000, інакше 'junior'.",
     expectedOutputColumns: ['event_date', 'event_type', 'scale'],
     orderMatters: false,
     referenceSql: `
@@ -469,7 +469,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      "Розподіліть клієнтів по сегментах: без замовлень — 'inactive', з виручкою від 1000 — 'key', від чотирьох замовлень — 'regular', решта — 'occasional'. Клієнти без замовлень мають показувати нульову виручку.",
+      "Розподіли клієнтів по сегментах: без замовлень — 'inactive', з виручкою від 1000 — 'key', від чотирьох замовлень — 'regular', решта — 'occasional'. Клієнти без замовлень мають показувати нульову виручку.",
     expectedOutputColumns: ['name', 'orders_count', 'revenue', 'segment'],
     orderMatters: false,
     referenceSql: `
@@ -507,7 +507,7 @@ export default [
     schemaDescription: `${PRODUCTS_SCHEMA}\n${ORDERS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}`,
     setupSql: PRODUCTS_SQL + ORDERS_SQL + ORDER_ITEMS_SQL,
     taskText:
-      "Покажіть, що змінилося в продажах між кварталами 2024 року: товари, які продавалися лише в першому, з позначкою 'only Q1', і ті, що зʼявилися лише в другому, з позначкою 'only Q2'.",
+      "Покажи, що змінилося в продажах між кварталами 2024 року: товари, які продавалися лише в першому, з позначкою 'only Q1', і ті, що зʼявилися лише в другому, з позначкою 'only Q2'.",
     expectedOutputColumns: ['product_name', 'period'],
     orderMatters: false,
     referenceSql: `

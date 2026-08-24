@@ -23,7 +23,7 @@ export default [
     context: 'Служба підтримки хоче бачити ім’я клієнта поруч із номером замовлення.',
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
-    taskText: 'Виведіть номер замовлення, ім’я клієнта та суму.',
+    taskText: 'Виведи номер замовлення, ім’я клієнта та суму.',
     expectedOutputColumns: ['order_id', 'name', 'amount'],
     orderMatters: false,
     referenceSql: `
@@ -52,7 +52,7 @@ export default [
     context: 'Комірник збирає замовлення і бачить у системі лише product_id замість назв.',
     schemaDescription: `${PRODUCTS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}`,
     setupSql: PRODUCTS_SQL + ORDER_ITEMS_SQL,
-    taskText: 'Виведіть номер замовлення, назву товару та кількість.',
+    taskText: 'Виведи номер замовлення, назву товару та кількість.',
     expectedOutputColumns: ['order_id', 'product_name', 'quantity'],
     orderMatters: false,
     referenceSql: `
@@ -66,7 +66,7 @@ export default [
     `,
     hints: [
       'Назва товару лежить у products, а кількість — в order_items.',
-      'Зʼєднайте таблиці за product_id.',
+      'Зʼєднай таблиці за product_id.',
       'Скелет: SELECT oi.order_id, p.product_name, oi.quantity FROM order_items oi JOIN products p ON p.product_id = oi.product_id;',
     ],
     explanation:
@@ -83,7 +83,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Виведіть усіх клієнтів разом із номерами їхніх замовлень. Клієнти без замовлень теж мають бути в результаті.',
+      'Виведи всіх клієнтів разом із номерами їхніх замовлень. Клієнти без замовлень теж мають бути в результаті.',
     expectedOutputColumns: ['name', 'order_id'],
     orderMatters: false,
     referenceSql: `
@@ -111,7 +111,7 @@ export default [
     context: 'Закупівлі переглядають асортимент і шукають позиції без жодного продажу.',
     schemaDescription: `${PRODUCTS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}`,
     setupSql: PRODUCTS_SQL + ORDER_ITEMS_SQL,
-    taskText: 'Виведіть товари, яких немає в жодному замовленні.',
+    taskText: 'Виведи товари, яких немає в жодному замовленні.',
     expectedOutputColumns: ['product_name', 'category'],
     orderMatters: false,
     referenceSql: `
@@ -124,12 +124,12 @@ export default [
       WHERE oi.order_item_id IS NULL;
     `,
     hints: [
-      'Спершу збережіть усі товари, а потім лишіть ті, для яких пари не знайшлося.',
+      'Спершу збережи всі товари, а потім лиши ті, для яких пари не знайшлося.',
       'Після LEFT JOIN «непарні» рядки мають NULL у колонках правої таблиці — за цим їх і фільтруємо.',
       'Скелет: SELECT p.product_name, p.category FROM products p LEFT JOIN order_items oi ON ... WHERE oi.order_item_id IS NULL;',
     ],
     explanation:
-      'Патерн anti-join: LEFT JOIN плюс WHERE ... IS NULL. Упізнавайте його за словами «ніколи не», «жодного разу», «відсутні в». Перевіряти треба саме через IS NULL — порівняння = NULL не працює ніколи.',
+      'Патерн anti-join: LEFT JOIN плюс WHERE ... IS NULL. Упізнавай його за словами «ніколи не», «жодного разу», «відсутні в». Перевіряти треба саме через IS NULL — порівняння = NULL не працює ніколи.',
   },
   {
     id: 'L3-join-using',
@@ -140,7 +140,7 @@ export default [
     context: 'Аналітик переписує довгий запит і хоче прибрати з нього зайвий шум.',
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
-    taskText: 'Виведіть номер замовлення, імʼя клієнта та суму, зʼєднавши таблиці через USING.',
+    taskText: 'Виведи номер замовлення, імʼя клієнта та суму, зʼєднавши таблиці через USING.',
     expectedOutputColumns: ['order_id', 'name', 'amount'],
     orderMatters: false,
     referenceSql: `
@@ -170,7 +170,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Виведіть усіх клієнтів і номери їхніх замовлень, поставивши orders першою таблицею у FROM. Клієнти без замовлень мають лишитися в результаті.',
+      'Виведи всіх клієнтів і номери їхніх замовлень, поставивши orders першою таблицею у FROM. Клієнти без замовлень мають лишитися в результаті.',
     expectedOutputColumns: ['name', 'order_id'],
     orderMatters: false,
     referenceSql: `
@@ -199,7 +199,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      'Виведіть імʼя кожного співробітника поруч з імʼям його керівника. Тих, у кого керівника немає, показувати не треба.',
+      'Виведи імʼя кожного співробітника поруч з імʼям його керівника. Тих, у кого керівника немає, показувати не треба.',
     expectedOutputColumns: ['employee', 'manager'],
     orderMatters: false,
     referenceSql: `
@@ -216,7 +216,7 @@ export default [
       'Скелет: SELECT e.first_name AS employee, m.first_name AS manager FROM employees e JOIN employees m ON m.employee_id = e.manager_id;',
     ],
     explanation:
-      'У self-join аліаси перестають бути зручністю й стають необхідністю: без них employees.employee_id не сказало б, про яку з двох копій таблиці йдеться. Зверніть увагу, що INNER JOIN сам відкинув топменеджерів — у них manager_id порожній, і пари для них не знайшлося. Якби їх треба було зберегти, знадобився б LEFT JOIN.',
+      'У self-join аліаси перестають бути зручністю й стають необхідністю: без них employees.employee_id не сказало б, про яку з двох копій таблиці йдеться. Зверни увагу, що INNER JOIN сам відкинув топменеджерів — у них manager_id порожній, і пари для них не знайшлося. Якби їх треба було зберегти, знадобився б LEFT JOIN.',
   },
   {
     id: 'L3-orders-per-customer-join',
@@ -228,7 +228,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Для кожного клієнта виведіть кількість його замовлень. Клієнти без замовлень мають показати 0.',
+      'Для кожного клієнта виведи кількість його замовлень. Клієнти без замовлень мають показати 0.',
     expectedOutputColumns: ['name', 'order_count'],
     orderMatters: false,
     referenceSql: `
@@ -258,7 +258,7 @@ export default [
       'Комірник друкує аркуші комплектації: у системі лише коди, а на складі потрібні назви.',
     schemaDescription: `${ORDERS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}\n${PRODUCTS_SCHEMA}`,
     setupSql: ORDERS_SQL + ORDER_ITEMS_SQL + PRODUCTS_SQL,
-    taskText: 'Виведіть номер і дату замовлення разом із назвою товару та кількістю.',
+    taskText: 'Виведи номер і дату замовлення разом із назвою товару та кількістю.',
     expectedOutputColumns: ['order_id', 'order_date', 'product_name', 'quantity'],
     orderMatters: false,
     referenceSql: `
@@ -292,7 +292,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${PRODUCTS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + PRODUCTS_SQL,
     taskText:
-      'Побудуйте всі можливі пари «країна клієнта — категорія товару», навіть якщо таких продажів ніколи не було. Кожна пара має зустрітися один раз.',
+      'Побудуй всі можливі пари «країна клієнта — категорія товару», навіть якщо таких продажів ніколи не було. Кожна пара має зустрітися один раз.',
     expectedOutputColumns: ['country', 'category'],
     orderMatters: false,
     referenceSql: `
@@ -319,7 +319,7 @@ export default [
     context: 'Керівництво вирішує, у які ринки інвестувати, і дивиться на виручку в розрізі країн.',
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
-    taskText: 'Порахуйте сумарну виручку по кожній країні.',
+    taskText: 'Порахуй сумарну виручку по кожній країні.',
     expectedOutputColumns: ['country', 'total_revenue'],
     orderMatters: false,
     referenceSql: `
@@ -333,7 +333,7 @@ export default [
     `,
     hints: [
       'Країна лежить в одній таблиці, суми — в іншій, тому спершу потрібен JOIN.',
-      'Після зʼєднання групуйте за колонкою з customers, а сумуйте колонку з orders.',
+      'Після зʼєднання групуй за колонкою з customers, а сумуй колонку з orders.',
       'Скелет: SELECT c.country, SUM(o.amount) AS total_revenue FROM orders o JOIN customers c ON ... GROUP BY c.country;',
     ],
     explanation:
@@ -349,7 +349,7 @@ export default [
       'Категорійний менеджер хоче бачити не кількість продажів, а гроші в розрізі напрямків.',
     schemaDescription: `${PRODUCTS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}`,
     setupSql: PRODUCTS_SQL + ORDER_ITEMS_SQL,
-    taskText: 'Порахуйте виручку кожної категорії як суму кількість × ціна.',
+    taskText: 'Порахуй виручку кожної категорії як суму кількість × ціна.',
     expectedOutputColumns: ['category', 'revenue'],
     orderMatters: false,
     referenceSql: `
@@ -379,7 +379,7 @@ export default [
       'Служба підтримки розбирає звернення і хоче бачити повний ланцюжок: клієнт, замовлення, товар.',
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}\n${PRODUCTS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL + ORDER_ITEMS_SQL + PRODUCTS_SQL,
-    taskText: 'Виведіть, який клієнт у якому замовленні який товар придбав і в якій кількості.',
+    taskText: 'Виведи, який клієнт у якому замовленні який товар придбав і в якій кількості.',
     expectedOutputColumns: ['name', 'order_id', 'product_name', 'quantity'],
     orderMatters: false,
     referenceSql: `
@@ -415,7 +415,7 @@ export default [
     schemaDescription: `${EMPLOYEES_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: EMPLOYEES_SQL + ORDERS_SQL,
     taskText:
-      'Зведіть співробітників і замовлення так, щоб у результаті лишилися і співробітники, які не вели жодного замовлення, і замовлення, за якими не закріплений жоден наявний співробітник.',
+      'Зведи співробітників і замовлення так, щоб у результаті лишилися і співробітники, які не вели жодного замовлення, і замовлення, за якими не закріплений жоден наявний співробітник.',
     expectedOutputColumns: ['first_name', 'order_id', 'amount'],
     orderMatters: false,
     referenceSql: `
@@ -445,7 +445,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      'Складіть список пар співробітників, які працюють в одному департаменті. Кожна пара має зустрітися лише один раз, і людину не можна ставити в пару із самою собою.',
+      'Склади список пар співробітників, які працюють в одному департаменті. Кожна пара має зустрітися лише один раз, і людину не можна ставити в пару із самою собою.',
     expectedOutputColumns: ['employee_a', 'employee_b', 'department'],
     orderMatters: false,
     referenceSql: `
@@ -477,7 +477,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Виведіть усіх клієнтів разом із їхніми замовленнями дорожчими за 200. Клієнт, у якого таких замовлень немає, усе одно має лишитися в результаті.',
+      'Виведи всіх клієнтів разом із їхніми замовленнями дорожчими за 200. Клієнт, у якого таких замовлень немає, усе одно має лишитися в результаті.',
     expectedOutputColumns: ['name', 'order_id', 'amount'],
     orderMatters: false,
     referenceSql: `
@@ -496,7 +496,7 @@ export default [
       'Скелет: SELECT c.name, o.order_id, o.amount FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.amount > 200;',
     ],
     explanation:
-      'Ця відмінність — одна з найважливіших у темі зʼєднань. Умова в ON застосовується під час зʼєднання: непарні рядки лівої таблиці все одно зберігаються, просто з порожніми колонками справа. Та сама умова у WHERE спрацювала б після зʼєднання й викинула б їх, бо NULL > 200 не істина, — LEFT JOIN тихо перетворився б на INNER. Якщо після LEFT JOIN раптово зникли рядки, першим ділом шукайте умову на праву таблицю у WHERE.',
+      'Ця відмінність — одна з найважливіших у темі зʼєднань. Умова в ON застосовується під час зʼєднання: непарні рядки лівої таблиці все одно зберігаються, просто з порожніми колонками справа. Та сама умова у WHERE спрацювала б після зʼєднання й викинула б їх, бо NULL > 200 не істина, — LEFT JOIN тихо перетворився б на INNER. Якщо після LEFT JOIN раптово зникли рядки, першим ділом шукай умову на праву таблицю у WHERE.',
   },
   {
     id: 'L3-affordable-for-order',
@@ -509,7 +509,7 @@ export default [
     schemaDescription: `${ORDERS_SCHEMA}\n${PRODUCTS_SCHEMA}`,
     setupSql: ORDERS_SQL + PRODUCTS_SQL,
     taskText:
-      'Для кожного замовлення підберіть товари, ціна яких становить від 80 до 100 відсотків його суми.',
+      'Для кожного замовлення підбери товари, ціна яких становить від 80 до 100 відсотків його суми.',
     expectedOutputColumns: ['order_id', 'amount', 'product_name', 'price'],
     orderMatters: false,
     referenceSql: `
@@ -528,7 +528,7 @@ export default [
       'Скелет: SELECT o.order_id, o.amount, p.product_name, p.price FROM orders o JOIN products p ON p.price BETWEEN o.amount * 0.8 AND o.amount;',
     ],
     explanation:
-      'В ON не обовʼязково має бути рівність ключів — придатна будь-яка умова, що повертає істину або хибу. Ціна такої гнучкості практична: за відсутності рівності СУБД не може скористатися індексом і фактично перебирає пари, тому діапазонні зʼєднання на великих таблицях дорогі. Зверніть увагу й на те, що замовлення без жодного підхожого товару в результат не потрапляють: це INNER JOIN.',
+      'В ON не обовʼязково має бути рівність ключів — придатна будь-яка умова, що повертає істину або хибу. Ціна такої гнучкості практична: за відсутності рівності СУБД не може скористатися індексом і фактично перебирає пари, тому діапазонні зʼєднання на великих таблицях дорогі. Зверни увагу й на те, що замовлення без жодного підхожого товару в результат не потрапляють: це INNER JOIN.',
   },
   {
     id: 'L3-diverse-buyers',
@@ -541,7 +541,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}\n${PRODUCTS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL + ORDER_ITEMS_SQL + PRODUCTS_SQL,
     taskText:
-      'Виведіть клієнтів, які купували товари з трьох або більше різних категорій, і кількість цих категорій.',
+      'Виведи клієнтів, які купували товари з трьох або більше різних категорій, і кількість цих категорій.',
     expectedOutputColumns: ['name', 'category_count'],
     orderMatters: false,
     referenceSql: `
@@ -577,7 +577,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Виведіть країни, з яких надійшло щонайменше чотири замовлення, разом із кількістю замовлень і сумарною виручкою.',
+      'Виведи країни, з яких надійшло щонайменше чотири замовлення, разом із кількістю замовлень і сумарною виручкою.',
     expectedOutputColumns: ['country', 'order_count', 'revenue'],
     orderMatters: false,
     referenceSql: `
@@ -597,7 +597,7 @@ export default [
       'Скелет: SELECT c.country, COUNT(o.order_id) AS order_count, SUM(o.amount) AS revenue FROM customers c JOIN orders o ON ... GROUP BY c.country HAVING COUNT(o.order_id) >= 4;',
     ],
     explanation:
-      'Простежте повний конвеєр: JOIN будує розширений набір рядків, GROUP BY згортає його в країни, HAVING відкидає готові групи. Італії в результаті немає, і причина не в HAVING: єдиний італійський клієнт не має жодного замовлення, тому INNER JOIN відкинув його ще до групування. Якби завдання вимагало показати й країни з нулем, довелося б брати LEFT JOIN — і тоді HAVING довелося б переписати, бо нуль не проходить умову «щонайменше чотири».',
+      'Простеж повний конвеєр: JOIN будує розширений набір рядків, GROUP BY згортає його в країни, HAVING відкидає готові групи. Італії в результаті немає, і причина не в HAVING: єдиний італійський клієнт не має жодного замовлення, тому INNER JOIN відкинув його ще до групування. Якби завдання вимагало показати й країни з нулем, довелося б брати LEFT JOIN — і тоді HAVING довелося б переписати, бо нуль не проходить умову «щонайменше чотири».',
   },
   {
     id: 'L3-category-reach',
@@ -610,7 +610,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}\n${PRODUCTS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL + ORDER_ITEMS_SQL + PRODUCTS_SQL,
     taskText:
-      'Для кожної категорії порахуйте, скільки різних клієнтів купували з неї товари і скільки грошей вона принесла.',
+      'Для кожної категорії порахуй, скільки різних клієнтів купували з неї товари і скільки грошей вона принесла.',
     expectedOutputColumns: ['category', 'buyer_count', 'revenue'],
     orderMatters: false,
     referenceSql: `

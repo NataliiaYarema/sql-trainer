@@ -11,7 +11,7 @@ export default [
     context: 'HR будує єдиний список співробітників, упорядкований за рівнем оплати.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Присвойте кожному співробітнику порядковий номер за спаданням зарплати.',
+    taskText: 'Присвой кожному співробітнику порядковий номер за спаданням зарплати.',
     expectedOutputColumns: ['first_name', 'salary', 'position'],
     orderMatters: false,
     referenceSql: `
@@ -40,7 +40,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      'Присвойте кожному співробітнику місце за зарплатою так, щоб однакові зарплати отримали однакове місце.',
+      'Присвой кожному співробітнику місце за зарплатою так, щоб однакові зарплати отримали однакове місце.',
     expectedOutputColumns: ['first_name', 'salary', 'salary_rank'],
     orderMatters: false,
     referenceSql: `
@@ -68,7 +68,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      'Для кожного співробітника виведіть його зарплату та сумарний фонд оплати його департаменту.',
+      'Для кожного співробітника виведи його зарплату та сумарний фонд оплати його департаменту.',
     expectedOutputColumns: ['first_name', 'department', 'salary', 'department_total'],
     orderMatters: false,
     referenceSql: `
@@ -97,7 +97,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      'Для кожного співробітника виведіть його зарплату та середню зарплату його департаменту.',
+      'Для кожного співробітника виведи його зарплату та середню зарплату його департаменту.',
     expectedOutputColumns: ['first_name', 'department', 'salary', 'dept_avg_salary'],
     orderMatters: false,
     referenceSql: `
@@ -114,7 +114,7 @@ export default [
       'Скелет: SELECT first_name, department, salary, AVG(salary) OVER (PARTITION BY department) AS dept_avg_salary FROM employees;',
     ],
     explanation:
-      'Будь-яка агрегатна функція — SUM, AVG, COUNT, MIN, MAX — стає віконною, щойно ви додаєте OVER. Порівняння значення рядка з агрегатом його групи в одному запиті — саме те, заради чого віконні функції й придумали.',
+      'Будь-яка агрегатна функція — SUM, AVG, COUNT, MIN, MAX — стає віконною, щойно ти додаєш OVER. Порівняння значення рядка з агрегатом його групи в одному запиті — саме те, заради чого віконні функції й придумали.',
   },
   {
     id: 'L5-previous-order',
@@ -127,7 +127,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Для кожного замовлення виведіть дату попереднього замовлення того самого клієнта. Для першого замовлення клієнта значення має бути NULL.',
+      'Для кожного замовлення виведи дату попереднього замовлення того самого клієнта. Для першого замовлення клієнта значення має бути NULL.',
     expectedOutputColumns: ['customer_id', 'order_date', 'prev_order_date'],
     orderMatters: false,
     referenceSql: `
@@ -158,7 +158,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Для кожного замовлення виведіть дату наступного замовлення того самого клієнта. Для останнього замовлення значення має бути NULL.',
+      'Для кожного замовлення виведи дату наступного замовлення того самого клієнта. Для останнього замовлення значення має бути NULL.',
     expectedOutputColumns: ['customer_id', 'order_date', 'next_order_date'],
     orderMatters: false,
     referenceSql: `
@@ -190,7 +190,7 @@ export default [
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
     taskText:
-      'Для кожного товару виведіть його місце за ціною, пораховане двома способами: RANK і DENSE_RANK.',
+      'Для кожного товару виведи його місце за ціною, пораховане двома способами: RANK і DENSE_RANK.',
     expectedOutputColumns: ['product_name', 'price', 'price_rank', 'dense_price_rank'],
     orderMatters: false,
     referenceSql: `
@@ -207,7 +207,7 @@ export default [
       'Скелет: SELECT product_name, price, RANK() OVER (ORDER BY price DESC) AS price_rank, DENSE_RANK() OVER (ORDER BY price DESC) AS dense_price_rank FROM products;',
     ],
     explanation:
-      'Різниця видно лише на нічиїх, і в даних вони є: по 210 коштують два товари, по 89 — теж два. Після пари однакових значень RANK пропускає номер (1, 2, 2, 4), а DENSE_RANK не пропускає (1, 2, 2, 3). Обирайте свідомо: RANK чесно каже «третього місця не існує, бо двоє поділили друге», DENSE_RANK зручніший, коли номер потрібен як мітка рівня, а не як позиція в перегонах.',
+      'Різниця видно лише на нічиїх, і в даних вони є: по 210 коштують два товари, по 89 — теж два. Після пари однакових значень RANK пропускає номер (1, 2, 2, 4), а DENSE_RANK не пропускає (1, 2, 2, 3). Обирай свідомо: RANK чесно каже «третього місця не існує, бо двоє поділили друге», DENSE_RANK зручніший, коли номер потрібен як мітка рівня, а не як позиція в перегонах.',
   },
   {
     id: 'L5-best-order-alongside',
@@ -220,7 +220,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Для кожного замовлення виведіть його суму й суму найбільшого замовлення цього ж клієнта.',
+      'Для кожного замовлення виведи його суму й суму найбільшого замовлення цього ж клієнта.',
     expectedOutputColumns: ['customer_id', 'order_id', 'amount', 'best_amount'],
     orderMatters: false,
     referenceSql: `
@@ -252,7 +252,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Виведіть кожне замовлення разом із накопичувальною сумою всіх замовлень від найранішого до поточного.',
+      'Виведи кожне замовлення разом із накопичувальною сумою всіх замовлень від найранішого до поточного.',
     expectedOutputColumns: ['order_date', 'amount', 'running_total'],
     orderMatters: true,
     referenceSql: `
@@ -280,7 +280,7 @@ export default [
     context: 'Відділ роботи з клієнтами готує картки покупців із їхньою найбільшою покупкою.',
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
-    taskText: 'Для кожного клієнта, який має замовлення, виведіть його найдорожче замовлення.',
+    taskText: 'Для кожного клієнта, який має замовлення, виведи його найдорожче замовлення.',
     expectedOutputColumns: ['name', 'order_date', 'amount'],
     orderMatters: false,
     referenceSql: `
@@ -305,8 +305,8 @@ export default [
       WHERE r.rn = 1;
     `,
     hints: [
-      'Це «top-1 у межах групи»: пронумеруйте замовлення кожного клієнта за сумою й лишіть перше.',
-      'Віконну функцію не можна використати у WHERE того самого запиту — винесіть її в CTE.',
+      'Це «top-1 у межах групи»: пронумеруй замовлення кожного клієнта за сумою й лиши перше.',
+      'Віконну функцію не можна використати у WHERE того самого запиту — винеси її в CTE.',
       'Скелет: WITH ranked AS (SELECT ..., ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rn FROM orders) SELECT ... FROM ranked r JOIN customers c ON ... WHERE r.rn = 1;',
     ],
     explanation:
@@ -323,7 +323,7 @@ export default [
     schemaDescription: `${EMPLOYEES_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: EMPLOYEES_SQL + ORDERS_SQL,
     taskText:
-      'Для кожного місяця проранжуйте менеджерів за сумою продажів (1 — найкращий у своєму місяці).',
+      'Для кожного місяця проранжуй менеджерів за сумою продажів (1 — найкращий у своєму місяці).',
     expectedOutputColumns: ['month', 'first_name', 'monthly_sales', 'sales_rank'],
     orderMatters: false,
     referenceSql: `
@@ -348,7 +348,7 @@ export default [
       FROM monthly;
     `,
     hints: [
-      'Спершу зведіть замовлення до сум «менеджер × місяць», і лише потім ранжуйте.',
+      'Спершу зведи замовлення до сум «менеджер × місяць», і лише потім ранжуй.',
       'Вікно розбивається по місяцю: PARTITION BY month ORDER BY monthly_sales DESC.',
       "Скелет: WITH monthly AS (SELECT TO_CHAR(o.order_date, 'YYYY-MM') AS month, e.first_name, SUM(o.amount) AS monthly_sales FROM orders o JOIN employees e ON ... GROUP BY 1, 2) SELECT ..., ROW_NUMBER() OVER (PARTITION BY month ORDER BY monthly_sales DESC) AS sales_rank FROM monthly;",
     ],
@@ -366,7 +366,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      'Розділіть співробітників на чотири рівні групи за зарплатою, від найвищої до найнижчої, і виведіть номер групи для кожного.',
+      'Розділи співробітників на чотири рівні групи за зарплатою, від найвищої до найнижчої, і виведи номер групи для кожного.',
     expectedOutputColumns: ['first_name', 'salary', 'quartile'],
     orderMatters: false,
     referenceSql: `
@@ -395,7 +395,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Для кожного замовлення в хронологічному порядку виведіть його суму й середню суму за поточним і двома попередніми замовленнями, округлену до двох знаків.',
+      'Для кожного замовлення в хронологічному порядку виведи його суму й середню суму за поточним і двома попередніми замовленнями, округлену до двох знаків.',
     expectedOutputColumns: ['order_date', 'amount', 'moving_avg'],
     orderMatters: true,
     referenceSql: `
@@ -428,7 +428,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Для кожного замовлення виведіть імʼя клієнта, дату, суму, накопичену суму його витрат до цього моменту включно та суму його попереднього замовлення.',
+      'Для кожного замовлення виведи імʼя клієнта, дату, суму, накопичену суму його витрат до цього моменту включно та суму його попереднього замовлення.',
     expectedOutputColumns: ['name', 'order_date', 'amount', 'running_spend', 'prev_amount'],
     orderMatters: false,
     referenceSql: `
@@ -463,7 +463,7 @@ export default [
       'Скелет: WITH customer_orders AS (SELECT c.name, o.customer_id, o.order_id, o.order_date, o.amount FROM orders o JOIN customers c ON ...) SELECT name, order_date, amount, SUM(amount) OVER (PARTITION BY customer_id ORDER BY order_date, order_id) AS running_spend, LAG(amount) OVER (...) AS prev_amount FROM customer_orders;',
     ],
     explanation:
-      'Підсумкове завдання курсу: кілька віконних функцій над одним вікном плюс CTE для підготовки даних. Саме так рахують когортні метрики — накопичений дохід, LTV у часі, крок до наступної покупки. Зверніть увагу, що обидві функції описують однакове вікно: коли таких виразів багато, його виносять в окремий блок WINDOW, щоб не повторюватися.',
+      'Підсумкове завдання курсу: кілька віконних функцій над одним вікном плюс CTE для підготовки даних. Саме так рахують когортні метрики — накопичений дохід, LTV у часі, крок до наступної покупки. Зверни увагу, що обидві функції описують однакове вікно: коли таких виразів багато, його виносять в окремий блок WINDOW, щоб не повторюватися.',
   },
   {
     id: 'L5-top-two-per-manager',
@@ -476,7 +476,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Для кожного менеджера виведіть два його найбільші замовлення. Якщо замовлення лише одне, показати саме його.',
+      'Для кожного менеджера виведи два його найбільші замовлення. Якщо замовлення лише одне, показати саме його.',
     expectedOutputColumns: ['manager_id', 'order_id', 'amount'],
     orderMatters: false,
     referenceSql: `
@@ -499,11 +499,11 @@ export default [
       WHERE rn <= 2;
     `,
     hints: [
-      'Це «топ-N усередині групи»: спершу пронумеруйте замовлення кожного менеджера за сумою, потім лишіть перші два.',
-      'Віконну функцію не можна використати у WHERE того самого запиту — винесіть її в CTE.',
+      'Це «топ-N усередині групи»: спершу пронумеруй замовлення кожного менеджера за сумою, потім лиши перші два.',
+      'Віконну функцію не можна використати у WHERE того самого запиту — винеси її в CTE.',
       'Скелет: WITH ranked AS (SELECT manager_id, order_id, amount, ROW_NUMBER() OVER (PARTITION BY manager_id ORDER BY amount DESC) AS rn FROM orders) SELECT manager_id, order_id, amount FROM ranked WHERE rn <= 2;',
     ],
     explanation:
-      'Універсальний прийом для цілого класу задач «перші N у межах групи»: пронумерувати вікном, а потім відфільтрувати номер уже над готовим результатом. Прямо у WHERE цього не зробити, бо віконні функції обчислюються після WHERE, — звідси CTE. Зверніть увагу, що рядків сім, а не вісім: в одного менеджера є лише одне замовлення, і ROW_NUMBER не вигадує другого. «Топ-2» для групи з одного елемента чесно дає один рядок.',
+      'Універсальний прийом для цілого класу задач «перші N у межах групи»: пронумерувати вікном, а потім відфільтрувати номер уже над готовим результатом. Прямо у WHERE цього не зробити, бо віконні функції обчислюються після WHERE, — звідси CTE. Зверни увагу, що рядків сім, а не вісім: в одного менеджера є лише одне замовлення, і ROW_NUMBER не вигадує другого. «Топ-2» для групи з одного елемента чесно дає один рядок.',
   },
 ];

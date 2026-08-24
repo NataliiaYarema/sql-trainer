@@ -52,7 +52,7 @@ export function sandboxSchemaHtml(schemaLines) {
       </div>
       <h2 class="sandbox-schema__title">Таблиці бази</h2>
       <p class="sandbox-schema__hint">
-        Експериментуйте із SQL-запитами та досліджуйте таблиці.
+        Експериментуй із SQL-запитами та досліджуй таблиці.
       </p>
       ${schemaLines.map(parseSchemaLine).map(tableHtml).join('')}
     </div>

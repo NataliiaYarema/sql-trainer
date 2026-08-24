@@ -511,6 +511,9 @@ body {
   font-weight: 550;
   cursor: pointer;
   transition: all 0.15s ease;
+  /* Пункти шапки — посилання (щоб їх можна було відкрити в новій вкладці),
+     а браузер малює посиланням підкреслення. Кнопкам це правило не шкодить. */
+  text-decoration: none;
 }
 
 .btn:disabled {

@@ -17,6 +17,8 @@ import { dashboardHtml } from '../src/ui/dashboard.js';
 import { theoryTopicHtml } from '../src/ui/theoryTopic.js';
 import topics from '../src/theory/topics.js';
 import {
+  SUCCESS_PHRASES,
+  FAILURE_PHRASES,
   renderSuccess,
   renderFailure,
   renderGiveUp,
@@ -191,14 +193,14 @@ const doneWithSkills = levelCompleteHtml({
     { text: 'знаходити записи без відповідності', done: false },
   ],
 });
-check('екран завершення називає вміння', doneWithSkills.includes('Ви тепер вмієте'));
+check('екран завершення називає вміння', doneWithSkills.includes('Ти тепер вмієш'));
 check('здобуте вміння позначене відміткою', doneWithSkills.includes('skill-item--done'));
 check('нездобуте вміння теж показане', doneWithSkills.includes('знаходити записи'));
 check(
   'позначене лише здобуте вміння',
   (doneWithSkills.match(/skill-item--done/g) ?? []).length === 1
 );
-check('без умінь блок не малюється', !doneHtml.includes('Ви тепер вмієте'));
+check('без умінь блок не малюється', !doneHtml.includes('Ти тепер вмієш'));
 
 check('на останньому рівні немає кнопки наступного', !lastLevelHtml.includes('next-level'));
 check('екран завершення показує фактичний прогрес', lastLevelHtml.includes('2 з 4'));
@@ -242,24 +244,64 @@ check('на нотатках кнопка прогресу лишається', 
 
 check('на решті екранів обидві кнопки на місці', headerHtml.includes('data-action="dashboard"'));
 
+// Пункти шапки — посилання, а не кнопки: інакше правою кнопкою миші їх не
+// відкрити в новій вкладці. href мусить бути справжнім маршрутом, бо нова
+// вкладка стартує з нуля і екран визначається саме з нього.
+const navTag = (html, action) =>
+  html.match(new RegExp(`<a[^>]*data-action="${action}"[^>]*>`))?.[0] ?? '';
+
+[
+  ['sandbox', '#/sandbox'],
+  ['dashboard', '#/progress'],
+  ['notes', '#/notes'],
+  ['to-home', '#/'],
+].forEach(([action, href]) => {
+  const tag = navTag(headerHtml, action);
+  check(`шапка: «${action}» — посилання`, tag !== '');
+  check(`шапка: «${action}» веде на ${href}`, tag.includes(`href="${href}"`));
+});
+
+check(
+  'у шапці не лишилося кнопок навігації',
+  !/<button[^>]*data-action="(sandbox|dashboard|notes|to-home)"/.test(headerHtml)
+);
+
+// Вікно перевірки каже лише «правильно» чи «ні». Розбір — окремо: за кнопкою
+// «Здатися». Тому в обох гілках перевіряємо не текст, а його відсутність.
 const fbRoot = fakeRoot();
 renderSuccess(fbRoot, { task });
-check('успіх містить пояснення завдання', fbRoot.innerHTML.includes(escapeHtml(task.explanation)));
+check('успіх показує фразу', fbRoot.innerHTML.includes('feedback--success'));
+check(
+  'успіх не переказує пояснення завдання',
+  !fbRoot.innerHTML.includes(escapeHtml(task.explanation))
+);
 check('успіх не показує бали', !fbRoot.innerHTML.includes('балів'));
 check('успіх не показує відзнаки', !fbRoot.innerHTML.includes('new-badges'));
 check('успіх не розкриває еталонний SQL', !fbRoot.innerHTML.includes('solution-sql'));
 
-renderFailure(fbRoot, { task, reason: 'Дані не збігаються.' });
-check('невдача розкриває правильний запит', fbRoot.innerHTML.includes('solution-sql'));
-check('невдача містить пояснення', fbRoot.innerHTML.includes('Пояснення'));
+renderFailure(fbRoot);
+check('невдача показує фразу', fbRoot.innerHTML.includes('feedback--error'));
+check('невдача не розкриває правильний запит', !fbRoot.innerHTML.includes('solution-sql'));
+check('невдача не містить пояснення', !fbRoot.innerHTML.includes('Пояснення'));
+check(
+  'невдача не переказує пояснення завдання',
+  !fbRoot.innerHTML.includes(escapeHtml(task.explanation))
+);
+
+// Панель показує саму фразу й нічого більше, тому фраза не має посилатися на
+// текст поруч: «як мало бути» чи «підказка нижче» вказували б у порожнечу.
+[...SUCCESS_PHRASES, ...FAILURE_PHRASES].forEach((phrase) => {
+  check(`фраза «${phrase}» не обіцяє розбору поруч`, !/нижче|Розберімо/.test(phrase));
+});
+
+renderGiveUp(fbRoot, task);
+check("здача показує розв'язок", fbRoot.innerHTML.includes('solution-sql'));
+check('здача містить пояснення', fbRoot.innerHTML.includes('Пояснення'));
 check("розв'язок підсвічено", fbRoot.innerHTML.includes('class="sql-keyword"'));
 check(
   "розв'язок показано без втрати символів",
   fbRoot.innerHTML.includes(highlightSql(dedent(task.referenceSql)))
 );
-
-renderGiveUp(fbRoot, task);
-check("здача показує розв'язок", fbRoot.innerHTML.includes('solution-sql'));
 
 renderSqlError(fbRoot, 'Помилка SQL: no such column: foo');
 check('SQL-помилка показується користувачу', fbRoot.innerHTML.includes('no such column'));
@@ -445,7 +487,7 @@ check('екран має видалення всіх нотаток', notesHtml.
 check('видалення всіх — небезпечного вигляду', notesHtml.includes('btn--danger'));
 
 const emptyNotesHtml = notesScreenHtml([]);
-check('без нотаток показується пояснення', emptyNotesHtml.includes('Нотаток поки немає'));
+check('без нотаток показується пояснення', emptyNotesHtml.includes('Тут поки що порожньо'));
 check('порожній екран не має записів', !emptyNotesHtml.includes('note-entry"'));
 check('порожній екран веде на головну', emptyNotesHtml.includes('data-action="to-home"'));
 check('без нотаток немає що видаляти', !emptyNotesHtml.includes('data-action="delete-all-notes"'));

@@ -37,7 +37,7 @@ export class SqlUserError extends Error {}
 async function runSelect(sql) {
   const trimmed = sql.trim();
   if (!trimmed) {
-    throw new SqlUserError('Запит порожній. Напишіть SQL-запит перед перевіркою.');
+    throw new SqlUserError('Запит порожній. Напиши SQL-запит перед перевіркою.');
   }
   if (FORBIDDEN_STATEMENT.test(trimmed)) {
     throw new SqlUserError(

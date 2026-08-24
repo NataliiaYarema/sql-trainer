@@ -11,7 +11,7 @@ export default [
     context: 'Категорійний менеджер оцінює, наскільки рівномірно наповнений каталог.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Порахуйте кількість товарів у кожній категорії.',
+    taskText: 'Порахуй кількість товарів у кожній категорії.',
     expectedOutputColumns: ['category', 'product_count'],
     orderMatters: false,
     referenceSql: `
@@ -38,7 +38,7 @@ export default [
     context: 'Менеджер сегментує базу за активністю покупців.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Порахуйте кількість замовлень для кожного клієнта.',
+    taskText: 'Порахуй кількість замовлень для кожного клієнта.',
     expectedOutputColumns: ['customer_id', 'order_count'],
     orderMatters: false,
     referenceSql: `
@@ -54,7 +54,7 @@ export default [
       'Скелет: SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id;',
     ],
     explanation:
-      'Той самий прийом, але групування йде за числовим ідентифікатором. Зверніть увагу: у результат потраплять лише клієнти, які мають хоча б одне замовлення — тих, кого немає в orders, тут просто не існує.',
+      'Той самий прийом, але групування йде за числовим ідентифікатором. Зверни увагу: у результат потраплять лише клієнти, які мають хоча б одне замовлення — тих, кого немає в orders, тут просто не існує.',
   },
   {
     id: 'L2-avg-price-by-category',
@@ -65,7 +65,7 @@ export default [
     context: 'Аналітик порівнює цінові рівні різних напрямків каталогу.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Порахуйте середню ціну товарів у кожній категорії.',
+    taskText: 'Порахуй середню ціну товарів у кожній категорії.',
     expectedOutputColumns: ['category', 'avg_price'],
     orderMatters: false,
     referenceSql: `
@@ -81,7 +81,7 @@ export default [
       'Скелет: SELECT category, AVG(price) AS avg_price FROM products GROUP BY category;',
     ],
     explanation:
-      'AVG працює в межах групи так само, як COUNT: для кожної категорії обчислюється власне середнє. Якби ви прибрали GROUP BY, отримали б одне середнє по всьому каталогу — зовсім інша метрика.',
+      'AVG працює в межах групи так само, як COUNT: для кожної категорії обчислюється власне середнє. Якби прибрати GROUP BY, вийшло б одне середнє по всьому каталогу — зовсім інша метрика.',
   },
   {
     id: 'L2-revenue-by-customer',
@@ -92,7 +92,7 @@ export default [
     context: 'Відділ продажів хоче знати, скільки грошей приніс кожен клієнт за весь час.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Порахуйте сумарну суму замовлень кожного клієнта.',
+    taskText: 'Порахуй сумарну суму замовлень кожного клієнта.',
     expectedOutputColumns: ['customer_id', 'total_spent'],
     orderMatters: false,
     referenceSql: `
@@ -119,7 +119,7 @@ export default [
     context: 'HR готує перегляд компенсацій і хоче побачити розкид усередині кожного підрозділу.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Для кожного департаменту виведіть найменшу та найбільшу зарплату.',
+    taskText: 'Для кожного департаменту виведи найменшу та найбільшу зарплату.',
     expectedOutputColumns: ['department', 'min_salary', 'max_salary'],
     orderMatters: false,
     referenceSql: `
@@ -136,7 +136,7 @@ export default [
       'Скелет: SELECT department, MIN(salary) AS min_salary, MAX(salary) AS max_salary FROM employees GROUP BY department;',
     ],
     explanation:
-      'В одному SELECT можна поставити скільки завгодно агрегатів — усі вони рахуються за один прохід по тих самих групах. Зверніть увагу на порожній департамент у результаті: GROUP BY збирає всі NULL в одну спільну групу, хоча у WHERE значення NULL не дорівнює навіть саме собі. Це різні механізми порівняння, і плутати їх — типова помилка.',
+      'В одному SELECT можна поставити скільки завгодно агрегатів — усі вони рахуються за один прохід по тих самих групах. Зверни увагу на порожній департамент у результаті: GROUP BY збирає всі NULL в одну спільну групу, хоча у WHERE значення NULL не дорівнює навіть саме собі. Це різні механізми порівняння, і плутати їх — типова помилка.',
   },
   {
     id: 'L2-country-count',
@@ -147,7 +147,7 @@ export default [
     context: 'Керівництво планує вихід на нові ринки й уточнює, у скількох країнах уже є покупці.',
     schemaDescription: CUSTOMERS_SCHEMA,
     setupSql: CUSTOMERS_SQL,
-    taskText: 'Порахуйте, скільки різних країн представлено серед клієнтів.',
+    taskText: 'Порахуй, скільки різних країн представлено серед клієнтів.',
     expectedOutputColumns: ['country_count'],
     orderMatters: false,
     referenceSql: `
@@ -171,7 +171,7 @@ export default [
     context: 'Фінансовий відділ звіряє другий квартал і рахує внесок кожного клієнта окремо.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Порахуйте, скільки кожен клієнт витратив на замовлення від 1 квітня 2024 року.',
+    taskText: 'Порахуй, скільки кожен клієнт витратив на замовлення від 1 квітня 2024 року.',
     expectedOutputColumns: ['customer_id', 'total_spent'],
     orderMatters: false,
     referenceSql: `
@@ -200,7 +200,7 @@ export default [
       'Для слайда керівництву потрібні середні зарплати підрозділів без копійок — дробові хвости лише заважають читати.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Для кожного департаменту виведіть середню зарплату, округлену до цілих.',
+    taskText: 'Для кожного департаменту виведи середню зарплату, округлену до цілих.',
     expectedOutputColumns: ['department', 'avg_salary'],
     orderMatters: false,
     referenceSql: `
@@ -227,7 +227,7 @@ export default [
     context: 'Керівник запитує одну цифру: скільки взагалі позицій у каталозі.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Порахуйте загальну кількість товарів.',
+    taskText: 'Порахуй загальну кількість товарів.',
     expectedOutputColumns: ['total_products'],
     orderMatters: false,
     referenceSql: `
@@ -251,7 +251,7 @@ export default [
     context: 'Фінансовий директор хоче одну підсумкову цифру продажів за весь період.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Порахуйте суму всіх замовлень.',
+    taskText: 'Порахуй суму всіх замовлень.',
     expectedOutputColumns: ['total_revenue'],
     orderMatters: false,
     referenceSql: `
@@ -260,7 +260,7 @@ export default [
     `,
     hints: [
       'Потрібно скласти значення однієї колонки по всіх рядках.',
-      'SUM(amount) підсумовує колонку; не забудьте аліас через AS.',
+      'SUM(amount) підсумовує колонку; не забудь аліас через AS.',
       'Скелет: SELECT SUM(amount) AS total_revenue FROM orders;',
     ],
     explanation:
@@ -275,7 +275,7 @@ export default [
     context: 'Керівництво шукає преміальні напрямки: категорії із середньою ціною понад 100.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Виведіть категорії, у яких середня ціна товару перевищує 100.',
+    taskText: 'Виведи категорії, у яких середня ціна товару перевищує 100.',
     expectedOutputColumns: ['category', 'avg_price'],
     orderMatters: false,
     referenceSql: `
@@ -303,7 +303,7 @@ export default [
     context: 'Програма лояльності стартує з тих, у кого вже чотири й більше замовлень.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Виведіть клієнтів із чотирма й більше замовленнями та кількість їхніх замовлень.',
+    taskText: 'Виведи клієнтів із чотирма й більше замовленнями та кількість їхніх замовлень.',
     expectedOutputColumns: ['customer_id', 'order_count'],
     orderMatters: false,
     referenceSql: `
@@ -315,7 +315,7 @@ export default [
       HAVING COUNT(*) >= 4;
     `,
     hints: [
-      'Спершу порахуйте замовлення кожного клієнта, потім відкиньте тих, у кого їх мало.',
+      'Спершу порахуй замовлення кожного клієнта, потім відкинь тих, у кого їх мало.',
       'Умова ставиться на результат COUNT(*), тобто в HAVING.',
       'Скелет: SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id HAVING COUNT(*) >= 4;',
     ],
@@ -333,7 +333,7 @@ export default [
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
     taskText:
-      'Порахуйте вартість складських залишків кожної категорії як суму ціна × залишок і виведіть три найбільші.',
+      'Порахуй вартість складських залишків кожної категорії як суму ціна × залишок і виведи три найбільші.',
     expectedOutputColumns: ['category', 'stock_value'],
     orderMatters: true,
     referenceSql: `
@@ -346,12 +346,12 @@ export default [
       LIMIT 3;
     `,
     hints: [
-      'Спершу порахуйте підсумок для кожної категорії, потім вишикуйте категорії за цим підсумком і візьміть початок списку.',
+      'Спершу порахуй підсумок для кожної категорії, потім вишикуй категорії за цим підсумком і візьми початок списку.',
       'ORDER BY може посилатися на аліас, заданий у SELECT, а LIMIT відрізає хвіст уже впорядкованого результату.',
       'Скелет: SELECT category, SUM(price * stock) AS stock_value FROM products GROUP BY category ORDER BY stock_value DESC LIMIT 3;',
     ],
     explanation:
-      'На аліас із SELECT можна посилатися в ORDER BY, бо сортування виконується вже після того, як колонки результату пораховані. У HAVING так не можна — він працює раніше, тому там агрегат доводиться писати повторно. Ця асиметрія й спантеличує найчастіше. Зверніть також увагу, що множення стоїть усередині SUM: SUM(price) * SUM(stock) дало б зовсім інше число.',
+      'На аліас із SELECT можна посилатися в ORDER BY, бо сортування виконується вже після того, як колонки результату пораховані. У HAVING так не можна — він працює раніше, тому там агрегат доводиться писати повторно. Ця асиметрія й спантеличує найчастіше. Зверни також увагу, що множення стоїть усередині SUM: SUM(price) * SUM(stock) дало б зовсім інше число.',
   },
   {
     id: 'L2-big-and-pricey',
@@ -364,7 +364,7 @@ export default [
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
     taskText:
-      'Виведіть категорії, де середня ціна перевищує 100 і водночас налічується більше 5 товарів.',
+      'Виведи категорії, де середня ціна перевищує 100 і водночас налічується більше 5 товарів.',
     expectedOutputColumns: ['category', 'product_count', 'avg_price'],
     orderMatters: false,
     referenceSql: `
@@ -396,7 +396,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Знайдіть пари «клієнт — менеджер», у яких набралося щонайменше два замовлення на загальну суму понад 300. Виведіть кількість замовлень і суму.',
+      'Знайди пари «клієнт — менеджер», у яких набралося щонайменше два замовлення на загальну суму понад 300. Виведи кількість замовлень і суму.',
     expectedOutputColumns: ['customer_id', 'manager_id', 'order_count', 'total_spent'],
     orderMatters: false,
     referenceSql: `

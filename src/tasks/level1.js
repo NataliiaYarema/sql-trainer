@@ -11,7 +11,7 @@ export default [
     context: 'Новий менеджер знайомиться з базою і хоче побачити картки клієнтів цілком.',
     schemaDescription: CUSTOMERS_SCHEMA,
     setupSql: CUSTOMERS_SQL,
-    taskText: 'Виведіть усі колонки й усі рядки таблиці customers.',
+    taskText: 'Виведи всі колонки й усі рядки таблиці customers.',
     expectedOutputColumns: ['customer_id', 'name', 'country'],
     orderMatters: false,
     referenceSql: `
@@ -36,7 +36,7 @@ export default [
       'Для друкованого прайса потрібні лише назви товарів і ціни — решта полів на аркуші зайва.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Виведіть назву та ціну кожного товару.',
+    taskText: 'Виведи назву та ціну кожного товару.',
     expectedOutputColumns: ['product_name', 'price'],
     orderMatters: false,
     referenceSql: `
@@ -47,11 +47,11 @@ export default [
     `,
     hints: [
       'Замість усіх колонок потрібні лише дві конкретні.',
-      'Перелічіть потрібні колонки через кому одразу після SELECT.',
+      'Перелічи потрібні колонки через кому одразу після SELECT.',
       'Скелет: SELECT product_name, price FROM products;',
     ],
     explanation:
-      'Явний перелік колонок — норма для робочих запитів: ви отримуєте рівно ті дані, які потрібні, а результат не зміниться, якщо в таблицю додадуть нові поля. Порядок колонок у SELECT задає порядок у результаті.',
+      'Явний перелік колонок — норма для робочих запитів: ти отримуєш рівно ті дані, які потрібні, а результат не зміниться, якщо в таблицю додадуть нові поля. Порядок колонок у SELECT задає порядок у результаті.',
   },
   {
     id: 'L1-departments',
@@ -62,7 +62,7 @@ export default [
     context: 'Новий HR-менеджер складає структуру компанії й починає з переліку підрозділів.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Виведіть перелік департаментів без повторів.',
+    taskText: 'Виведи перелік департаментів без повторів.',
     expectedOutputColumns: ['department'],
     orderMatters: false,
     referenceSql: `
@@ -75,7 +75,7 @@ export default [
       'Скелет: SELECT DISTINCT department FROM employees;',
     ],
     explanation:
-      'Зверніть увагу на порожній рядок у результаті: один співробітник не має департаменту, і DISTINCT вважає NULL повноцінним окремим значенням — на відміну від умов у WHERE, де NULL нічому не дорівнює. Друга особливість: DISTINCT працює над усім рядком результату, а не над однією колонкою, тому SELECT DISTINCT department, salary дав би вже кожну пару значень.',
+      'Зверни увагу на порожній рядок у результаті: один співробітник не має департаменту, і DISTINCT вважає NULL повноцінним окремим значенням — на відміну від умов у WHERE, де NULL нічому не дорівнює. Друга особливість: DISTINCT працює над усім рядком результату, а не над однією колонкою, тому SELECT DISTINCT department, salary дав би вже кожну пару значень.',
   },
   {
     id: 'L1-top-managers',
@@ -86,7 +86,7 @@ export default [
     context: 'HR складає список керівників верхнього рівня для розсилки про стратегічну сесію.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Виведіть імена та прізвища співробітників, у яких немає керівника.',
+    taskText: 'Виведи імена та прізвища співробітників, у яких немає керівника.',
     expectedOutputColumns: ['first_name', 'last_name'],
     orderMatters: false,
     referenceSql: `
@@ -113,7 +113,7 @@ export default [
     context: 'Категорійний менеджер переглядає асортимент електроніки перед сезонною акцією.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: "Виведіть товари категорії 'Electronics'.",
+    taskText: "Виведи товари категорії 'Electronics'.",
     expectedOutputColumns: ['product_name', 'price'],
     orderMatters: false,
     referenceSql: `
@@ -129,7 +129,7 @@ export default [
       "Скелет: SELECT product_name, price FROM products WHERE category = '...';",
     ],
     explanation:
-      'WHERE відсіює рядки ще до формування результату. Умова рівності — найпростіший фільтр; памʼятайте, що в SQL порівняння рядків чутливе до регістру, тому Electronics і electronics — різні значення.',
+      'WHERE відсіює рядки ще до формування результату. Умова рівності — найпростіший фільтр; памʼятай, що в SQL порівняння рядків чутливе до регістру, тому Electronics і electronics — різні значення.',
   },
   {
     id: 'L1-low-stock',
@@ -140,7 +140,7 @@ export default [
     context: 'Закупівельник щотижня перевіряє, які позиції треба дозамовити.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Виведіть товари, залишок яких менший за 20.',
+    taskText: 'Виведи товари, залишок яких менший за 20.',
     expectedOutputColumns: ['product_name', 'stock'],
     orderMatters: false,
     referenceSql: `
@@ -156,7 +156,7 @@ export default [
       'Скелет: SELECT product_name, stock FROM products WHERE stock < 20;',
     ],
     explanation:
-      "Оператори порівняння >, <, >=, <=, = і <> працюють у WHERE так само, як у математиці. Зверніть увагу: числа пишуться без лапок — PostgreSQL суворий до типів і на stock < '20' відповість помилкою про несумісні типи.",
+      "Оператори порівняння >, <, >=, <=, = і <> працюють у WHERE так само, як у математиці. Зверни увагу: числа пишуться без лапок — PostgreSQL суворий до типів і на stock < '20' відповість помилкою про несумісні типи.",
   },
   {
     id: 'L1-price-desc',
@@ -167,7 +167,7 @@ export default [
     context: 'Продавець готує презентацію і хоче показати преміальні позиції першими.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Виведіть назви й ціни всіх товарів, відсортовані від найдорожчого до найдешевшого.',
+    taskText: 'Виведи назви й ціни всіх товарів, відсортовані від найдорожчого до найдешевшого.',
     expectedOutputColumns: ['product_name', 'price'],
     orderMatters: true,
     referenceSql: `
@@ -195,7 +195,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Виведіть три найсвіжіші замовлення за датою. Якщо дата однакова, вище має бути замовлення з більшим номером.',
+      'Виведи три найсвіжіші замовлення за датою. Якщо дата однакова, вище має бути замовлення з більшим номером.',
     expectedOutputColumns: ['order_id', 'order_date', 'amount'],
     orderMatters: true,
     referenceSql: `
@@ -208,7 +208,7 @@ export default [
       LIMIT 3;
     `,
     hints: [
-      'Спершу впорядкуйте рядки, потім обріжте зайві.',
+      'Спершу впорядкуй рядки, потім обріж зайві.',
       'LIMIT n лишає лише перші n рядків уже відсортованого результату.',
       'Скелет: SELECT order_id, order_date, amount FROM orders ORDER BY order_date DESC, order_id DESC LIMIT 3;',
     ],
@@ -224,7 +224,7 @@ export default [
     context: 'Для вітрини преміальних меблів потрібні дві найдорожчі позиції саме цієї категорії.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: "Виведіть дві найдорожчі позиції категорії 'Furniture'.",
+    taskText: "Виведи дві найдорожчі позиції категорії 'Furniture'.",
     expectedOutputColumns: ['product_name', 'price'],
     orderMatters: true,
     referenceSql: `
@@ -254,7 +254,7 @@ export default [
       'Маркетинг готує акцію середнього сегмента й відбирає позиції, які туди вкладаються за ціною.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Виведіть назви й ціни товарів, ціна яких від 50 до 150 включно.',
+    taskText: 'Виведи назви й ціни товарів, ціна яких від 50 до 150 включно.',
     expectedOutputColumns: ['product_name', 'price'],
     orderMatters: false,
     referenceSql: `
@@ -281,7 +281,7 @@ export default [
     context: 'Для сезонної вітрини «дім і спорт» потрібні позиції одразу з двох напрямків.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: "Виведіть товари категорій 'Kitchen' і 'Sports' разом із їхніми цінами.",
+    taskText: "Виведи товари категорій 'Kitchen' і 'Sports' разом із їхніми цінами.",
     expectedOutputColumns: ['product_name', 'category', 'price'],
     orderMatters: false,
     referenceSql: `
@@ -309,7 +309,7 @@ export default [
     context: 'Оператор підтримки шукає товар, а клієнт памʼятає лише частину назви.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: "Виведіть назви й категорії товарів, у назві яких є слово 'Desk'.",
+    taskText: "Виведи назви й категорії товарів, у назві яких є слово 'Desk'.",
     expectedOutputColumns: ['product_name', 'category'],
     orderMatters: false,
     referenceSql: `
@@ -338,7 +338,7 @@ export default [
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
     taskText:
-      'Виведіть назву, категорію та вартість залишку (ціна × залишок) кожного товару. Відсортуйте за категорією, а всередині категорії — від найдорожчого товару до найдешевшого.',
+      'Виведи назву, категорію та вартість залишку (ціна × залишок) кожного товару. Відсортуй за категорією, а всередині категорії — від найдорожчого товару до найдешевшого.',
     expectedOutputColumns: ['product_name', 'category', 'stock_value'],
     orderMatters: true,
     referenceSql: `
@@ -355,7 +355,7 @@ export default [
       'Скелет: SELECT product_name, category, price * stock AS stock_value FROM products ORDER BY category, price DESC;',
     ],
     explanation:
-      'Друга колонка в ORDER BY вмикається лише там, де перша дала однакові значення, — тому саме вона впорядковує товари всередині категорії. Зверніть увагу й на те, що сортуємо за price, хоча в результаті показуємо stock_value: ORDER BY вільний посилатися на колонки таблиці, яких немає у виводі.',
+      'Друга колонка в ORDER BY вмикається лише там, де перша дала однакові значення, — тому саме вона впорядковує товари всередині категорії. Зверни увагу й на те, що сортуємо за price, хоча в результаті показуємо stock_value: ORDER BY вільний посилатися на колонки таблиці, яких немає у виводі.',
   },
   {
     id: 'L1-expensive-low-stock',
@@ -367,7 +367,7 @@ export default [
       'Закупівлі складають список термінових дозамовлень: дорогі позиції, яких лишилося мало, треба поповнити першими.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Виведіть пʼять найдорожчих товарів, залишок яких менший за 50.',
+    taskText: 'Виведи пʼять найдорожчих товарів, залишок яких менший за 50.',
     expectedOutputColumns: ['product_name', 'price', 'stock'],
     orderMatters: true,
     referenceSql: `
@@ -381,12 +381,12 @@ export default [
       LIMIT 5;
     `,
     hints: [
-      'Розберіть умову на частини: спершу «залишок менший за 50», потім «найдорожчі», потім «пʼять».',
+      'Розбери умову на частини: спершу «залишок менший за 50», потім «найдорожчі», потім «пʼять».',
       'Фільтр іде у WHERE, «найдорожчі» — це ORDER BY price DESC, «пʼять» — LIMIT 5.',
       'Скелет: SELECT product_name, price, stock FROM products WHERE stock < 50 ORDER BY price DESC LIMIT 5;',
     ],
     explanation:
-      'Підсумкове завдання рівня: бізнес-формулювання розкладається на три технічні кроки. Важливо, що LIMIT застосовується вже після фільтра — якби ви спершу взяли пʼять найдорожчих товарів узагалі, а потім відсіяли за залишком, у списку лишилося б менше пʼяти позицій.',
+      'Підсумкове завдання рівня: бізнес-формулювання розкладається на три технічні кроки. Важливо, що LIMIT застосовується вже після фільтра — якби спершу взяти пʼять найдорожчих товарів узагалі, а потім відсіяти за залишком, у списку лишилося б менше пʼяти позицій.',
   },
   {
     id: 'L1-restock-shortlist',
@@ -399,7 +399,7 @@ export default [
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
     taskText:
-      "Виведіть товари, яких на складі менше 50, які не належать до категорії 'Electronics' і при цьому або коштують більше 100, або їх лишилося менше 10.",
+      "Виведи товари, яких на складі менше 50, які не належать до категорії 'Electronics' і при цьому або коштують більше 100, або їх лишилося менше 10.",
     expectedOutputColumns: ['product_name', 'category', 'price', 'stock'],
     orderMatters: false,
     referenceSql: `

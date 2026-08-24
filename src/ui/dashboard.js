@@ -1,7 +1,7 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 import { askConfirm } from './confirmDialog.js';
 
-const EMPTY_HINT = 'Даних поки немає — історія збирається з моменту, коли ви відкриваєте завдання.';
+const EMPTY_HINT = 'Даних поки немає — історія збирається з моменту, коли ти відкриваєш завдання.';
 
 const MASTERY_HINT = 'Відмітка зʼявиться, коли всі завдання теми будуть розвʼязані.';
 

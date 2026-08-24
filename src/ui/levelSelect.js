@@ -4,7 +4,7 @@ import { icon, escapeHtml } from '../utils/dom.js';
 export function levelSelectHtml(levels) {
   return `
     <div class="level-select">
-      <h2 class="level-select__title">Оберіть рівень</h2>
+      <h2 class="level-select__title">Обери рівень</h2>
       <div class="level-select__grid">
         ${levels.map(levelCardHtml).join('')}
       </div>

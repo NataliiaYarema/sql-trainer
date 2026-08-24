@@ -15,7 +15,7 @@ function renderCell(value) {
 // Чиста функція розмітки — за конвенцією проєкту. Теорії потрібна та сама
 // таблиця, що й під запитом користувача: якби вона малювала свою, результат
 // у теорії й у вправі виглядали б по-різному без жодної на те причини.
-export function resultTableHtml(result, { label = 'Результат вашого запиту' } = {}) {
+export function resultTableHtml(result, { label = 'Результат твого запиту' } = {}) {
   if (!result) return '';
 
   const rows = result.values.slice(0, MAX_ROWS);

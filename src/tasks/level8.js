@@ -19,7 +19,7 @@ export default [
     schemaDescription: APP_USERS_SCHEMA,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Порахуйте, скільки користувачів зареєструвалося кожного місяця, показавши місяць першою датою періоду.',
+      'Порахуй, скільки користувачів зареєструвалося кожного місяця, показавши місяць першою датою періоду.',
     expectedOutputColumns: ['cohort_month', 'users'],
     orderMatters: false,
     referenceSql: `
@@ -47,7 +47,7 @@ export default [
     context: 'Команда хоче побачити, скільки людей доходить до кожного кроку покупки.',
     schemaDescription: APP_EVENTS_SCHEMA,
     setupSql: ANALYTICS_SQL,
-    taskText: 'Порахуйте кількість подій кожного типу, від найчастіших до найрідших.',
+    taskText: 'Порахуй кількість подій кожного типу, від найчастіших до найрідших.',
     expectedOutputColumns: ['event_type', 'events'],
     orderMatters: true,
     referenceSql: `
@@ -76,7 +76,7 @@ export default [
       'Продуктовий аналітик стежить, чи росте кількість людей, які реально користуються застосунком щомісяця.',
     schemaDescription: APP_EVENTS_SCHEMA,
     setupSql: ANALYTICS_SQL,
-    taskText: 'Порахуйте, скільки різних користувачів здійснювали дії в застосунку кожного місяця.',
+    taskText: 'Порахуй, скільки різних користувачів здійснювали дії в застосунку кожного місяця.',
     expectedOutputColumns: ['month', 'active_users'],
     orderMatters: false,
     referenceSql: `
@@ -106,7 +106,7 @@ export default [
     schemaDescription: APP_EVENTS_SCHEMA,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Знайдіть десятьох користувачів із найбільшою кількістю сесій, від найактивнішого до менш активного.',
+      'Знайди десятьох користувачів із найбільшою кількістю сесій, від найактивнішого до менш активного.',
     expectedOutputColumns: ['user_id', 'sessions'],
     orderMatters: true,
     referenceSql: `
@@ -135,7 +135,7 @@ export default [
     context: 'Фінансовий аналітик хоче побачити кількість покупок і виручку за кожен місяць.',
     schemaDescription: APP_PURCHASES_SCHEMA,
     setupSql: ANALYTICS_SQL,
-    taskText: 'Порахуйте кількість покупок і суму виручки за кожен місяць.',
+    taskText: 'Порахуй кількість покупок і суму виручки за кожен місяць.',
     expectedOutputColumns: ['month', 'purchases', 'revenue'],
     orderMatters: false,
     referenceSql: `
@@ -166,7 +166,7 @@ export default [
     schemaDescription: `${APP_USERS_SCHEMA}\n${APP_PURCHASES_SCHEMA}`,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Порахуйте кількість покупок і середній чек у кожній країні користувача, округливши середнє до копійок.',
+      'Порахуй кількість покупок і середній чек у кожній країні користувача, округливши середнє до копійок.',
     expectedOutputColumns: ['country', 'purchases', 'avg_check'],
     orderMatters: false,
     referenceSql: `
@@ -198,7 +198,7 @@ export default [
     schemaDescription: `${APP_USERS_SCHEMA}\n${APP_PURCHASES_SCHEMA}`,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Для кожного каналу залучення порахуйте, скільки користувачів прийшло і скільки з них зробили хоча б одну покупку.',
+      'Для кожного каналу залучення порахуй, скільки користувачів прийшло і скільки з них зробили хоча б одну покупку.',
     expectedOutputColumns: ['channel', 'users', 'buyers'],
     orderMatters: false,
     referenceSql: `
@@ -230,7 +230,7 @@ export default [
     schemaDescription: `${APP_USERS_SCHEMA}\n${APP_PURCHASES_SCHEMA}`,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Порахуйте LTV кожного каналу залучення — середню суму покупок на одного зареєстрованого користувача, включно з тими, хто нічого не купив.',
+      'Порахуй LTV кожного каналу залучення — середню суму покупок на одного зареєстрованого користувача, включно з тими, хто нічого не купив.',
     expectedOutputColumns: ['channel', 'users', 'ltv'],
     orderMatters: false,
     referenceSql: `
@@ -263,7 +263,7 @@ export default [
     schemaDescription: APP_EVENTS_SCHEMA,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Порахуйте кількість подій кожного типу, а для кожного кроку, крім першого, — яку частку у відсотках він становить від кроку перед ним, округливши до десятої.',
+      'Порахуй кількість подій кожного типу, а для кожного кроку, крім першого, — яку частку у відсотках він становить від кроку перед ним, округливши до десятої.',
     expectedOutputColumns: ['event_type', 'events', 'step_conversion'],
     orderMatters: true,
     referenceSql: `
@@ -283,7 +283,7 @@ export default [
       ORDER BY events DESC;
     `,
     hints: [
-      'Спершу порахуйте, скільки разів трапилася кожна дія, і розташуйте кроки від найпоширенішого до найрідкіснішого. Потім для кожного кроку, крім першого, порахуйте, яку частку від попереднього кроку він становить у відсотках.',
+      'Спершу порахуй, скільки разів трапилася кожна дія, і розташуй кроки від найпоширенішого до найрідкіснішого. Потім для кожного кроку, крім першого, порахуй, яку частку від попереднього кроку він становить у відсотках.',
       'CTE рахує кількість подій по кроках окремо, а віконна функція LAG(events) OVER (ORDER BY events DESC) дивиться на кількість попереднього рядка вікна — з нею й порівнюється поточний крок.',
       'Скелет: WITH funnel AS (SELECT event_type, COUNT(*) AS events FROM app_events GROUP BY event_type) SELECT event_type, events, ROUND(100.0 * events / LAG(events) OVER (ORDER BY events DESC), 1) AS step_conversion FROM funnel ORDER BY events DESC;',
     ],
@@ -301,7 +301,7 @@ export default [
     schemaDescription: `${APP_USERS_SCHEMA}\n${APP_EVENTS_SCHEMA}`,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Для кожної когорти реєстрації (місяць) порахуйте розмір когорти, скільки її користувачів здійснили хоч одну дію рівно наступного календарного місяця й яка це частка у відсотках.',
+      'Для кожної когорти реєстрації (місяць) порахуй розмір когорти, скільки її користувачів здійснили хоч одну дію рівно наступного календарного місяця й яка це частка у відсотках.',
     expectedOutputColumns: ['cohort_month', 'cohort_size', 'retained', 'retention_rate'],
     orderMatters: false,
     referenceSql: `
@@ -331,7 +331,7 @@ export default [
       ORDER BY cohort_month;
     `,
     hints: [
-      'Розбийте користувачів на групи за місяцем реєстрації. Для кожної групи перевірте, чи людина зробила щось у застосунку саме в наступному календарному місяці після реєстрації, і порахуйте цю частку від усієї групи.',
+      'Розбий користувачів на групи за місяцем реєстрації. Для кожної групи перевір, чи людина зробила щось у застосунку саме в наступному календарному місяці після реєстрації, і порахуй цю частку від усієї групи.',
       "Перший CTE визначає когорту кожного користувача через DATE_TRUNC('month', signup_date), другий — DISTINCT-ом відбирає тих, у кого є подія рівно в cohort_month + INTERVAL '1 month'; LEFT JOIN цих двох CTE не губить когорту, у якої повернень не було.",
       "Скелет: WITH cohort AS (SELECT user_id, DATE_TRUNC('month', signup_date) AS cohort_month FROM app_users), retained AS (SELECT DISTINCT c.user_id, c.cohort_month FROM cohort AS c JOIN app_events AS e ON e.user_id = c.user_id WHERE DATE_TRUNC('month', e.occurred_at) = c.cohort_month + INTERVAL '1 month') SELECT c.cohort_month::date AS cohort_month, COUNT(*) AS cohort_size, COUNT(r.user_id) AS retained, ROUND(100.0 * COUNT(r.user_id) / COUNT(*), 1) AS retention_rate FROM cohort AS c LEFT JOIN retained AS r ON r.user_id = c.user_id GROUP BY c.cohort_month ORDER BY cohort_month;",
     ],
@@ -349,7 +349,7 @@ export default [
     schemaDescription: APP_PURCHASES_SCHEMA,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Для кожного покупця порахуйте дату останньої покупки, кількість покупок і суму, а потім розподіліть покупців на чотири рівні групи окремо за кожною з цих трьох ознак.',
+      'Для кожного покупця порахуй дату останньої покупки, кількість покупок і суму, а потім розподіли покупців на чотири рівні групи окремо за кожною з цих трьох ознак.',
     expectedOutputColumns: [
       'user_id',
       'recency_quartile',
@@ -376,7 +376,7 @@ export default [
       ORDER BY user_id;
     `,
     hints: [
-      'Спершу для кожного покупця знайдіть дату останньої покупки, кількість покупок і загальну суму. Потім розділіть усіх покупців на чотири рівні групи — окремо за давністю останньої покупки, окремо за кількістю покупок, окремо за сумою.',
+      'Спершу для кожного покупця знайди дату останньої покупки, кількість покупок і загальну суму. Потім розділи всіх покупців на чотири рівні групи — окремо за давністю останньої покупки, окремо за кількістю покупок, окремо за сумою.',
       'NTILE(4) OVER (ORDER BY ...) ділить відсортованих покупців на чотири групи так, щоб у кожній було приблизно однаково людей; три окремі NTILE в одному SELECT рахуються незалежно, кожен зі своїм ORDER BY.',
       'Скелет: WITH base AS (SELECT user_id, MAX(purchase_date) AS last_purchase, COUNT(*) AS frequency, SUM(amount) AS monetary FROM app_purchases GROUP BY user_id) SELECT user_id, NTILE(4) OVER (ORDER BY last_purchase) AS recency_quartile, NTILE(4) OVER (ORDER BY frequency) AS frequency_quartile, NTILE(4) OVER (ORDER BY monetary) AS monetary_quartile FROM base ORDER BY user_id;',
     ],
@@ -399,7 +399,7 @@ export default [
     schemaDescription: APP_PURCHASES_SCHEMA,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Порахуйте загальну кількість покупців, скільки з них зробили дві покупки й більше, і яка це частка у відсотках, округлена до десятої.',
+      'Порахуй загальну кількість покупців, скільки з них зробили дві покупки й більше, і яка це частка у відсотках, округлена до десятої.',
     expectedOutputColumns: ['buyers', 'repeat_buyers', 'repeat_rate'],
     orderMatters: false,
     referenceSql: `
@@ -420,7 +420,7 @@ export default [
       FROM buyer_purchases;
     `,
     hints: [
-      'Спершу порахуйте, скільки покупок зробив кожен покупець. Потім порахуйте всіх покупців, окремо тих, у кого дві покупки й більше, і яку частку другі становлять від усіх.',
+      'Спершу порахуй, скільки покупок зробив кожен покупець. Потім порахуй всіх покупців, окремо тих, у кого дві покупки й більше, і яку частку другі становлять від усіх.',
       'FILTER (WHERE …) дає COUNT(*) рахувати лише підмножину рядків, що задовольняє умову, — і робить це в тому самому проході, що й загальний підрахунок.',
       'Скелет: WITH buyer_purchases AS (SELECT user_id, COUNT(*) AS purchases FROM app_purchases GROUP BY user_id) SELECT COUNT(*) AS buyers, COUNT(*) FILTER (WHERE purchases >= 2) AS repeat_buyers, ROUND(100.0 * COUNT(*) FILTER (WHERE purchases >= 2) / COUNT(*), 1) AS repeat_rate FROM buyer_purchases;',
     ],
@@ -443,7 +443,7 @@ export default [
     schemaDescription: APP_PURCHASES_SCHEMA,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Для покупців із двома покупками й більше порахуйте їхню кількість і середню кількість днів між першою та другою покупкою, округлену до десятої.',
+      'Для покупців із двома покупками й більше порахуй їхню кількість і середню кількість днів між першою та другою покупкою, округлену до десятої.',
     expectedOutputColumns: ['repeat_buyers', 'avg_days_to_second'],
     orderMatters: false,
     referenceSql: `
@@ -468,7 +468,7 @@ export default [
       WHERE first_buy.purchase_number = 1;
     `,
     hints: [
-      'Для кожного покупця пронумеруйте його покупки за датою від першої до останньої. Потім зіставте в один рядок покупку номер один і покупку номер два того самого покупця та порахуйте різницю в датах.',
+      'Для кожного покупця пронумеруй його покупки за датою від першої до останньої. Потім зведи в один рядок покупку номер один і покупку номер два того самого покупця та порахуй різницю в датах.',
       'ROW_NUMBER() із PARTITION BY user_id нумерує покупки всередині кожного покупця окремо; другий ключ purchase_id в ORDER BY потрібен, бо дві покупки можуть припасти на один день, і без нього «перша» була б випадковою.',
       'Скелет: WITH ranked AS (SELECT user_id, purchase_date, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY purchase_date, purchase_id) AS purchase_number FROM app_purchases) SELECT COUNT(*) AS repeat_buyers, ROUND(AVG(later.purchase_date - first_buy.purchase_date), 1) AS avg_days_to_second FROM ranked AS first_buy JOIN ranked AS later ON later.user_id = first_buy.user_id AND later.purchase_number = 2 WHERE first_buy.purchase_number = 1;',
     ],
@@ -491,7 +491,7 @@ export default [
     schemaDescription: `${PRODUCTS_SCHEMA}\n${APP_PURCHASES_SCHEMA}`,
     setupSql: PRODUCTS_SQL + ANALYTICS_SQL,
     taskText:
-      'Для кожного товару порахуйте, скільки разів його купували не першою покупкою користувача, і покажіть від найпопулярнішого товару повернення до найменш популярного.',
+      'Для кожного товару порахуй, скільки разів його купували не першою покупкою користувача, і покажи від найпопулярнішого товару повернення до найменш популярного.',
     expectedOutputColumns: ['product_name', 'repeat_purchases'],
     orderMatters: true,
     referenceSql: `
@@ -514,7 +514,7 @@ export default [
       ORDER BY repeat_purchases DESC, pr.product_name;
     `,
     hints: [
-      'Для кожного товару порахуйте, скільки разів його купували в той момент, коли в людини вже була якась покупка раніше — тобто саме при поверненні, а не вперше.',
+      'Для кожного товару порахуй, скільки разів його купували в той момент, коли в людини вже була якась покупка раніше — тобто саме при поверненні, а не вперше.',
       'ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY purchase_date, purchase_id) нумерує покупки кожного користувача окремо від 1; WHERE purchase_number >= 2 лишає тільки ті покупки, що не є першими для свого покупця.',
       'Скелет: WITH ranked AS (SELECT product_id, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY purchase_date, purchase_id) AS purchase_number FROM app_purchases) SELECT pr.product_name, COUNT(*) AS repeat_purchases FROM ranked AS r JOIN products AS pr ON pr.product_id = r.product_id WHERE r.purchase_number >= 2 GROUP BY pr.product_name ORDER BY repeat_purchases DESC, pr.product_name;',
     ],
@@ -537,7 +537,7 @@ export default [
     schemaDescription: `${APP_USERS_SCHEMA}\n${APP_PURCHASES_SCHEMA}`,
     setupSql: ANALYTICS_SQL,
     taskText:
-      'Для кожного каналу залучення порахуйте кількість покупців, скільки з них зробили другу покупку, яку частку в процентах (округлену до десятої) вони становлять і скільки днів у середньому минає до другої покупки (округлено до десятої).',
+      'Для кожного каналу залучення порахуй кількість покупців, скільки з них зробили другу покупку, яку частку в процентах (округлену до десятої) вони становлять і скільки днів у середньому минає до другої покупки (округлено до десятої).',
     expectedOutputColumns: [
       'channel',
       'buyers',
@@ -585,7 +585,7 @@ export default [
       ORDER BY u.channel;
     `,
     hints: [
-      'Для кожного каналу залучення порахуйте, скільки людей узагалі купували, скільки з них купили вдруге, яка це частка у відсотках і скільки днів у середньому минає між першою та другою покупкою.',
+      'Для кожного каналу залучення порахуй, скільки людей узагалі купували, скільки з них купили вдруге, яка це частка у відсотках і скільки днів у середньому минає між першою та другою покупкою.',
       'Три CTE тут — це по суті три попередні кроки кейса: ranked нумерує покупки користувача, buyers перелічує унікальних покупців, second_gap зіставляє першу й другу покупку в один рядок; LEFT JOIN приєднує second_gap так, щоб покупці без другої покупки не зникли з результату.',
       'Скелет: WITH ranked AS (SELECT user_id, purchase_date, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY purchase_date, purchase_id) AS purchase_number FROM app_purchases), buyers AS (SELECT DISTINCT user_id FROM app_purchases), second_gap AS (SELECT first_buy.user_id, later.purchase_date - first_buy.purchase_date AS days_to_second FROM ranked AS first_buy JOIN ranked AS later ON later.user_id = first_buy.user_id AND later.purchase_number = 2 WHERE first_buy.purchase_number = 1) SELECT u.channel, COUNT(*) AS buyers, COUNT(g.user_id) AS repeat_buyers, ROUND(100.0 * COUNT(g.user_id) / COUNT(*), 1) AS repeat_rate, ROUND(AVG(g.days_to_second), 1) AS avg_days_to_second FROM buyers AS b JOIN app_users AS u ON u.user_id = b.user_id LEFT JOIN second_gap AS g ON g.user_id = b.user_id GROUP BY u.channel ORDER BY u.channel;',
     ],

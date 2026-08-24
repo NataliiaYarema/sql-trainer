@@ -17,7 +17,7 @@ export default [
       'HR готує звіт про темпи найму за роками, щоб планувати бюджет на рекрутинг наступного року.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Порахуйте, скільки співробітників найняли кожного року.',
+    taskText: 'Порахуй, скільки співробітників найняли кожного року.',
     expectedOutputColumns: ['hire_year', 'hired'],
     orderMatters: false,
     referenceSql: `
@@ -46,7 +46,7 @@ export default [
       'Менеджер зі складу хоче знати, на які дні тижня припадає найбільше замовлень, щоб планувати зміни персоналу.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Порахуйте кількість замовлень за кожним днем тижня.',
+    taskText: 'Порахуй кількість замовлень за кожним днем тижня.',
     expectedOutputColumns: ['weekday', 'orders_count'],
     orderMatters: false,
     referenceSql: `
@@ -74,7 +74,7 @@ export default [
     context: 'Фінансовий відділ хоче бачити динаміку виручки по місяцях, щоб порівнювати сезони.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Порахуйте суму замовлень за кожен місяць.',
+    taskText: 'Порахуй суму замовлень за кожен місяць.',
     expectedOutputColumns: ['month', 'revenue'],
     orderMatters: false,
     referenceSql: `
@@ -103,7 +103,7 @@ export default [
       'Оператор контакт-центру імпортував список контактів із CRM, де поля заповнювали вручну і з різними пробілами.',
     schemaDescription: RAW_CONTACTS_SCHEMA,
     setupSql: RAW_CONTACTS_SQL,
-    taskText: 'Виведіть номер контакту та імʼя без пробілів по краях.',
+    taskText: 'Виведи номер контакту та імʼя без пробілів по краях.',
     expectedOutputColumns: ['contact_id', 'clean_name'],
     orderMatters: false,
     referenceSql: `
@@ -131,7 +131,7 @@ export default [
       'Маркетолог готує розсилку і хоче знайти дублікати адрес, які відрізняються лише регістром літер.',
     schemaDescription: RAW_CONTACTS_SCHEMA,
     setupSql: RAW_CONTACTS_SQL,
-    taskText: 'Виведіть номер контакту та адресу пошти малими літерами.',
+    taskText: 'Виведи номер контакту та адресу пошти малими літерами.',
     expectedOutputColumns: ['contact_id', 'email'],
     orderMatters: false,
     referenceSql: `
@@ -160,7 +160,7 @@ export default [
     schemaDescription: RAW_CONTACTS_SCHEMA,
     setupSql: RAW_CONTACTS_SQL,
     taskText:
-      'Виведіть чотиризначний код контакту з провідними нулями та довжину його очищеного імені.',
+      'Виведи чотиризначний код контакту з провідними нулями та довжину його очищеного імені.',
     expectedOutputColumns: ['contact_code', 'name_length'],
     orderMatters: false,
     referenceSql: `
@@ -187,7 +187,7 @@ export default [
     context: 'Відділ розсилок формує підпис «Імʼя <пошта>» для шаблону листа кожному контакту.',
     schemaDescription: RAW_CONTACTS_SCHEMA,
     setupSql: RAW_CONTACTS_SQL,
-    taskText: 'Зберіть для кожного контакту підпис виду «Імʼя <пошта>».',
+    taskText: 'Збери для кожного контакту підпис виду «Імʼя <пошта>».',
     expectedOutputColumns: ['contact_id', 'signature'],
     orderMatters: false,
     referenceSql: `
@@ -216,7 +216,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Виведіть виручку за кожен місяць, підписавши місяць назвою й роком, у хронологічному порядку.',
+      'Виведи виручку за кожен місяць, підписавши місяць назвою й роком, у хронологічному порядку.',
     expectedOutputColumns: ['month_label', 'revenue'],
     orderMatters: true,
     referenceSql: `
@@ -245,7 +245,7 @@ export default [
       'Керівництво щоквартально звіряє план продажів і хоче кількість та суму замовлень по кварталах.',
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
-    taskText: 'Для кожного кварталу виведіть кількість замовлень і їхню суму.',
+    taskText: 'Для кожного кварталу виведи кількість замовлень і їхню суму.',
     expectedOutputColumns: ['quarter', 'orders_count', 'revenue'],
     orderMatters: false,
     referenceSql: `
@@ -276,7 +276,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Для замовлень від 1 червня 2024 року включно виведіть номер, дату та дату, коли спливає 30-денний строк повернення.',
+      'Для замовлень від 1 червня 2024 року включно виведи номер, дату та дату, коли спливає 30-денний строк повернення.',
     expectedOutputColumns: ['order_id', 'order_date', 'return_deadline'],
     orderMatters: false,
     referenceSql: `
@@ -306,7 +306,7 @@ export default [
       'HR готує річний звіт про стаж співробітників станом на кінець року, а не на сьогодні.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Порахуйте для кожного співробітника стаж станом на 31 грудня 2024 року.',
+    taskText: 'Порахуй для кожного співробітника стаж станом на 31 грудня 2024 року.',
     expectedOutputColumns: ['first_name', 'hire_date', 'experience'],
     orderMatters: false,
     referenceSql: `
@@ -335,7 +335,7 @@ export default [
       'Маркетолог розбирає джерела трафіку на канал і підканал, щоб оцінити ефективність кожного окремо.',
     schemaDescription: RAW_CONTACTS_SCHEMA,
     setupSql: RAW_CONTACTS_SQL,
-    taskText: 'Розберіть джерело переходу на канал і підканал.',
+    taskText: 'Розбери джерело переходу на канал і підканал.',
     expectedOutputColumns: ['contact_id', 'channel', 'subchannel'],
     orderMatters: false,
     referenceSql: `
@@ -363,7 +363,7 @@ export default [
     context: 'Аналітик хоче побачити, які поштові домени найчастіше трапляються серед контактів.',
     schemaDescription: RAW_CONTACTS_SCHEMA,
     setupSql: RAW_CONTACTS_SQL,
-    taskText: 'Витягніть із кожної адреси домен — усе, що після равлика, — малими літерами.',
+    taskText: 'Витягни з кожної адреси домен — усе, що після равлика, — малими літерами.',
     expectedOutputColumns: ['contact_id', 'domain'],
     orderMatters: false,
     referenceSql: `
@@ -393,7 +393,7 @@ export default [
     schemaDescription: RAW_CONTACTS_SCHEMA,
     setupSql: RAW_CONTACTS_SQL,
     taskText:
-      'Приведіть контакти до ладу: імʼя без зайвих пробілів і з великої літери кожне слово, пошта малими літерами.',
+      'Приведи контакти до ладу: імʼя без зайвих пробілів і з великої літери кожне слово, пошта малими літерами.',
     expectedOutputColumns: ['contact_id', 'clean_name', 'clean_email'],
     orderMatters: false,
     referenceSql: `
@@ -423,7 +423,7 @@ export default [
     schemaDescription: `${ORDERS_SCHEMA}\n${CUSTOMERS_SCHEMA}`,
     setupSql: ORDERS_SQL + CUSTOMERS_SQL,
     taskText:
-      'Зведіть суми замовлень за місяцями й клієнтами: місяць у вигляді 2024-01, клієнта — «ПРІЗВИЩЕ, Імʼя».',
+      'Зведи суми замовлень за місяцями й клієнтами: місяць у вигляді 2024-01, клієнта — «ПРІЗВИЩЕ, Імʼя».',
     expectedOutputColumns: ['month', 'customer', 'total'],
     orderMatters: false,
     referenceSql: `

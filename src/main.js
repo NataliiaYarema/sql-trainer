@@ -11,7 +11,7 @@ import { renderHints } from './ui/hintPanel.js';
 import { renderNotePanel } from './ui/notePanel.js';
 import { renderControls } from './ui/controls.js';
 import { renderTaskNav } from './ui/taskNav.js';
-import { renderProgress, bindBackHome } from './ui/progressBar.js';
+import { renderProgress, bindBackHome, NAV_ROUTES } from './ui/progressBar.js';
 import { renderLevelSelect } from './ui/levelSelect.js';
 import { renderNotesScreen } from './ui/notesScreen.js';
 import { computeMetrics } from './analytics/metrics.js';
@@ -115,6 +115,27 @@ function saveCurrentNote() {
 function flushPending() {
   saveCurrentDraft();
   saveCurrentNote();
+}
+
+// Розділ, у якому ми зараз, пишемо в hash. Всередині сторінки переходи, як і
+// раніше, робить JS — hash потрібен новій вкладці: пункт шапки тепер посилання,
+// і правий клік «Відкрити в новій вкладці» стартує застосунок із нуля саме за
+// цією адресою. Шлях (/notes) не годиться: сайт роздається як статика, сервер
+// про такий маршрут не знає й віддав би 404.
+// replaceState, а не location.hash = …: присвоєння додає запис в історію, і
+// кнопка «назад» ходила б по вже показаних екранах замість виходу зі сторінки.
+function setRoute(route) {
+  if (window.location.hash === route) return;
+  window.history.replaceState(null, '', route);
+}
+
+// Екрани завдань і теорії власної адреси не мають — усі вони під NAV_ROUTES.home,
+// тому невідомий hash так само веде на головну.
+function screenForRoute(hash) {
+  if (hash === NAV_ROUTES.sandbox) return showSandbox;
+  if (hash === NAV_ROUTES.dashboard) return showDashboard;
+  if (hash === NAV_ROUTES.notes) return showNotes;
+  return showLevelSelect;
 }
 
 // Навігація в шапці однакова на всіх екранах, тому обробники живуть в одному
@@ -255,12 +276,10 @@ async function handleCheck() {
       eventLog.record('solved', task.id, { ms: Date.now() - taskOpenedAt });
     }
     gameState.registerSolved(task);
-    if (currentIndex === startedAt) renderSuccess(roots.feedback, { task });
+    if (currentIndex === startedAt) renderSuccess(roots.feedback);
   } else {
     eventLog.record('attempt', task.id, { r: comparison.code });
-    if (currentIndex === startedAt) {
-      renderFailure(roots.feedback, { task, reason: comparison.reason });
-    }
+    if (currentIndex === startedAt) renderFailure(roots.feedback);
   }
 
   flushPending();
@@ -398,6 +417,7 @@ function renderLevelDone() {
 
 function showLevelSelect() {
   flushPending();
+  setRoute(NAV_ROUTES.home);
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -423,6 +443,7 @@ function showLevelSelect() {
 // сітки — текст теми з переходом на практику відповідного рівня.
 function showTheory(level) {
   flushPending();
+  setRoute(NAV_ROUTES.home);
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -460,6 +481,7 @@ function noteEntries() {
 // Окремий екран за зразком showTheory: та сама панель, робоча панель схована.
 function showNotes() {
   flushPending();
+  setRoute(NAV_ROUTES.notes);
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -499,6 +521,7 @@ function currentMetrics() {
 // Ще один екран за зразком showNotes: та сама панель, робоча панель схована.
 function showDashboard() {
   flushPending();
+  setRoute(NAV_ROUTES.dashboard);
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -525,6 +548,7 @@ function showDashboard() {
 // ній живуть редактор і таблиця результату.
 function showSandbox() {
   flushPending();
+  setRoute(NAV_ROUTES.sandbox);
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -548,6 +572,7 @@ function showSandbox() {
 // а не перше нерозв'язане на рівні.
 function openLevel(level, startIndex) {
   // Єдиний вхід у завдання, що не проходить через clearTaskPanels.
+  setRoute(NAV_ROUTES.home);
   sandboxMode = false;
   activeLevel = level;
   levelTasks = tasksByLevel(level);
@@ -559,7 +584,11 @@ function openLevel(level, startIndex) {
 }
 
 editor = createEditor(roots.editor, handleCheck, scheduleDraftSave);
-showLevelSelect();
+screenForRoute(window.location.hash)();
+
+// Клік по пункту шапки hash не міняє (його перехоплює bindNav), тож сюди
+// потрапляє лише ручна правка адреси — але тоді екран має відповідати рядку.
+window.addEventListener('hashchange', () => screenForRoute(window.location.hash)());
 
 // Автозбереження чернетки відкладене на 400 мс: перезавантаження сторінки в
 // цьому вікні губило б останню серію натискань, якщо її не дописати примусово.

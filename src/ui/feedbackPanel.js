@@ -1,7 +1,7 @@
 import { icon, escapeHtml, dedent } from '../utils/dom.js';
 import { highlightSql } from './sqlHighlight.js';
 
-const SUCCESS_PHRASES = [
+export const SUCCESS_PHRASES = [
   'Точно в ціль!',
   'Саме так це і роблять аналітики.',
   'Чудова робота!',
@@ -9,10 +9,12 @@ const SUCCESS_PHRASES = [
   'Ідеально. Наступний рівень чекає.',
 ];
 
-const FAILURE_PHRASES = [
-  'Ще не те — але ви вже близько.',
-  'Не зовсім. Розберімо, як мало бути.',
-  'Спробуйте ще раз, тепер з підказкою нижче.',
+// Жодна фраза не відсилає «нижче» й не обіцяє розбору: під нею тепер порожньо,
+// а розв'язок показує лише кнопка «Показати відповідь».
+export const FAILURE_PHRASES = [
+  'Ще не те — але ти вже близько.',
+  'Не зовсім. Спробуй ще раз або відкрий відповідь.',
+  'Результат не збігається з очікуваним.',
   'Помилка — це нормальна частина навчання.',
 ];
 
@@ -33,21 +35,21 @@ function solutionBlock(task) {
   `;
 }
 
-export function renderSuccess(root, { task }) {
+// Вікно перевірки — це вирок, а не розбір: сама фраза й нічого більше.
+// Пояснення завдання й еталонний запит лишилися там, де користувач просить їх
+// свідомо: у renderGiveUp. Через це обидві функції не потребують task.
+export function renderSuccess(root) {
   root.innerHTML = `
     <div class="feedback feedback--success">
       <div class="feedback__head">${icon('i-check')}${escapeHtml(pick(SUCCESS_PHRASES))}</div>
-      <p class="feedback__text">${escapeHtml(task.explanation)}</p>
     </div>
   `;
 }
 
-export function renderFailure(root, { task, reason }) {
+export function renderFailure(root) {
   root.innerHTML = `
     <div class="feedback feedback--error">
       <div class="feedback__head">${icon('i-x')}${escapeHtml(pick(FAILURE_PHRASES))}</div>
-      <p class="feedback__text">${escapeHtml(reason)}</p>
-      ${solutionBlock(task)}
     </div>
   `;
 }
@@ -65,7 +67,7 @@ export function renderGiveUp(root, task) {
   root.innerHTML = `
     <div class="feedback feedback--warning">
       <div class="feedback__head">${icon('i-flag')}Ось розв'язок цього завдання</div>
-      <p class="feedback__text">Розберіть запит нижче — і спробуйте написати його самостійно на схожому завданні.</p>
+      <p class="feedback__text">Розбери запит нижче — і спробуй написати його самостійно на схожому завданні.</p>
       ${solutionBlock(task)}
     </div>
   `;

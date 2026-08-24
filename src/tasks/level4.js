@@ -24,7 +24,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Виведіть імена та країни клієнтів, які мають хоча б одне замовлення на суму понад 300.',
+      'Виведи імена та країни клієнтів, які мають хоча б одне замовлення на суму понад 300.',
     expectedOutputColumns: ['name', 'country'],
     orderMatters: false,
     referenceSql: `
@@ -39,7 +39,7 @@ export default [
       );
     `,
     hints: [
-      'Спершу знайдіть ідентифікатори клієнтів із великими замовленнями, потім відберіть їх у довіднику.',
+      'Спершу знайди ідентифікатори клієнтів із великими замовленнями, потім відбери їх у довіднику.',
       'Оператор IN приймає не лише список значень, а й цілий підзапит.',
       'Скелет: SELECT name, country FROM customers WHERE customer_id IN (SELECT customer_id FROM orders WHERE amount > 300);',
     ],
@@ -55,7 +55,7 @@ export default [
     context: 'Логістика планує палетне зберігання для позицій, що їх беруть по три й більше штук.',
     schemaDescription: `${PRODUCTS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}`,
     setupSql: PRODUCTS_SQL + ORDER_ITEMS_SQL,
-    taskText: 'Виведіть товари, які хоча б раз замовляли в кількості 3 або більше.',
+    taskText: 'Виведи товари, які хоча б раз замовляли в кількості 3 або більше.',
     expectedOutputColumns: ['product_name', 'category'],
     orderMatters: false,
     referenceSql: `
@@ -75,7 +75,7 @@ export default [
       'Скелет: SELECT product_name, category FROM products WHERE product_id IN (SELECT product_id FROM order_items WHERE quantity >= 3);',
     ],
     explanation:
-      'Підзапит у WHERE зручний, коли з другої таблиці потрібна лише умова відбору, а не її колонки. Якби ви зробили JOIN, довелося б додавати DISTINCT, щоб прибрати дублікати від кількох підхожих позицій.',
+      'Підзапит у WHERE зручний, коли з другої таблиці потрібна лише умова відбору, а не її колонки. Якби зробити JOIN, довелося б додавати DISTINCT, щоб прибрати дублікати від кількох підхожих позицій.',
   },
   {
     id: 'L4-above-average-salary',
@@ -86,7 +86,7 @@ export default [
     context: 'HR аналізує розкид зарплат і шукає тих, хто отримує більше за середню по компанії.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Виведіть співробітників із зарплатою вищою за середню по компанії.',
+    taskText: 'Виведи співробітників із зарплатою вищою за середню по компанії.',
     expectedOutputColumns: ['first_name', 'salary'],
     orderMatters: false,
     referenceSql: `
@@ -117,7 +117,7 @@ export default [
       'Категорійний менеджер хоче бачити ціну кожного товару поруч із середньою по каталогу.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Для кожного товару виведіть його ціну та середню ціну по всьому каталогу.',
+    taskText: 'Для кожного товару виведи його ціну та середню ціну по всьому каталогу.',
     expectedOutputColumns: ['product_name', 'price', 'avg_price'],
     orderMatters: false,
     referenceSql: `
@@ -144,7 +144,7 @@ export default [
     context: 'Перед розсилкою маркетинг лишає в базі лише тих, у кого є хоч одне замовлення.',
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
-    taskText: 'Виведіть клієнтів, у яких існує хоча б одне замовлення.',
+    taskText: 'Виведи клієнтів, у яких існує хоча б одне замовлення.',
     expectedOutputColumns: ['name', 'country'],
     orderMatters: false,
     referenceSql: `
@@ -176,7 +176,7 @@ export default [
       'HR перевіряє, які департаменти жодного разу не наймали людей у 2024 році — можливо, там спинилося зростання.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Виведіть департаменти, у яких немає жодного співробітника, найнятого у 2024 році.',
+    taskText: 'Виведи департаменти, у яких немає жодного співробітника, найнятого у 2024 році.',
     expectedOutputColumns: ['department'],
     orderMatters: false,
     referenceSql: `
@@ -192,7 +192,7 @@ export default [
         );
     `,
     hints: [
-      'Сформулюйте протилежне: «у департаменті є хтось, найнятий у 2024». Потім заперечте це.',
+      'Сформулюй протилежне: «у департаменті є хтось, найнятий у 2024». Потім запереч це.',
       'NOT EXISTS істинний саме тоді, коли підзапит не повернув жодного рядка.',
       'Скелет: SELECT DISTINCT department FROM employees e WHERE department IS NOT NULL AND NOT EXISTS (SELECT 1 FROM employees e2 WHERE e2.department = e.department AND EXTRACT(YEAR FROM e2.hire_date) = 2024);',
     ],
@@ -209,7 +209,7 @@ export default [
       'Аналітик хоче розбити довгий запит на зрозумілі кроки, починаючи з відбору дорогих товарів.',
     schemaDescription: PRODUCTS_SCHEMA,
     setupSql: PRODUCTS_SQL,
-    taskText: 'Через CTE відберіть товари дорожчі за 200, а потім виведіть їхні назви й ціни.',
+    taskText: 'Через CTE відбери товари дорожчі за 200, а потім виведи їхні назви й ціни.',
     expectedOutputColumns: ['product_name', 'price'],
     orderMatters: false,
     referenceSql: `
@@ -243,7 +243,7 @@ export default [
     schemaDescription: ORDERS_SCHEMA,
     setupSql: ORDERS_SQL,
     taskText:
-      'Через CTE порахуйте суму замовлень кожного клієнта, а потім виведіть лише тих, хто витратив понад 500.',
+      'Через CTE порахуй суму замовлень кожного клієнта, а потім виведи лише тих, хто витратив понад 500.',
     expectedOutputColumns: ['customer_id', 'total_spent'],
     orderMatters: false,
     referenceSql: `
@@ -278,7 +278,7 @@ export default [
       'Аналітик рахує середній чек, але лише для тих, у кого щонайменше чотири замовлення — випадкові покупці спотворюють картину.',
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
-    taskText: 'Виведіть імена клієнтів із 4+ замовленнями та їхній середній чек.',
+    taskText: 'Виведи імена клієнтів із 4+ замовленнями та їхній середній чек.',
     expectedOutputColumns: ['name', 'avg_order'],
     orderMatters: false,
     referenceSql: `
@@ -297,12 +297,12 @@ export default [
         ON c.customer_id = stats.customer_id;
     `,
     hints: [
-      'Порахуйте агрегати окремим запитом, а потім приєднайте до нього довідник клієнтів.',
+      'Порахуй агрегати окремим запитом, а потім приєднай до нього довідник клієнтів.',
       'Підзапит у FROM працює як тимчасова таблиця, і йому варто дати аліас.',
       'Скелет: SELECT c.name, s.avg_order FROM (SELECT customer_id, AVG(amount) AS avg_order FROM orders GROUP BY customer_id HAVING COUNT(*) >= 4) s JOIN customers c ON ...;',
     ],
     explanation:
-      'Підзапит у FROM (derived table) дає змогу спершу агрегувати дані, а потім працювати з результатом як зі звичайною таблицею. Саме з цієї ідеї виросли CTE, які ви щойно бачили на цьому ж рівні: вони роблять те саме, але читаються значно краще, тому в нових запитах зазвичай беруть WITH.',
+      'Підзапит у FROM (derived table) дає змогу спершу агрегувати дані, а потім працювати з результатом як зі звичайною таблицею. Саме з цієї ідеї виросли CTE, які щойно траплялися тобі на цьому ж рівні: вони роблять те саме, але читаються значно краще, тому в нових запитах зазвичай беруть WITH.',
   },
   {
     id: 'L4-department-top-salary',
@@ -314,7 +314,7 @@ export default [
       'Керівництво виділяє найбільш високооплачуваного співробітника в кожному департаменті.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText: 'Виведіть співробітників, чия зарплата максимальна в межах їхнього департаменту.',
+    taskText: 'Виведи співробітників, чия зарплата максимальна в межах їхнього департаменту.',
     expectedOutputColumns: ['first_name', 'department', 'salary'],
     orderMatters: false,
     referenceSql: `
@@ -347,7 +347,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Для кожного клієнта виведіть кількість його замовлень, порахувавши її корельованим підзапитом. Клієнти без замовлень мають показати 0.',
+      'Для кожного клієнта виведи кількість його замовлень, порахувавши її корельованим підзапитом. Клієнти без замовлень мають показати 0.',
     expectedOutputColumns: ['name', 'order_count'],
     orderMatters: false,
     referenceSql: `
@@ -379,7 +379,7 @@ export default [
     schemaDescription: `${PRODUCTS_SCHEMA}\n${ORDER_ITEMS_SCHEMA}`,
     setupSql: PRODUCTS_SQL + ORDER_ITEMS_SQL,
     taskText:
-      'Через два CTE порахуйте виручку кожної категорії, потім середню виручку серед категорій, і виведіть категорії з виручкою вище цієї середньої.',
+      'Через два CTE порахуй виручку кожної категорії, потім середню виручку серед категорій, і виведи категорії з виручкою вище цієї середньої.',
     expectedOutputColumns: ['category', 'revenue'],
     orderMatters: false,
     referenceSql: `
@@ -420,7 +420,7 @@ export default [
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
     taskText:
-      'Виведіть імена та прізвища співробітників, у яких немає жодного підлеглого. Скористайтеся NOT EXISTS.',
+      'Виведи імена та прізвища співробітників, у яких немає жодного підлеглого. Скористайся NOT EXISTS.',
     expectedOutputColumns: ['first_name', 'last_name'],
     orderMatters: false,
     referenceSql: `
@@ -435,7 +435,7 @@ export default [
       );
     `,
     hints: [
-      'Сформулюйте протилежне: «є хтось, чий керівник — ця людина». Потім заперечте це.',
+      'Сформулюй протилежне: «є хтось, чий керівник — ця людина». Потім запереч це.',
       'NOT EXISTS істинний саме тоді, коли підзапит не повернув жодного рядка.',
       'Скелет: SELECT e.first_name, e.last_name FROM employees e WHERE NOT EXISTS (SELECT 1 FROM employees m WHERE m.manager_id = e.employee_id);',
     ],
@@ -453,7 +453,7 @@ export default [
     schemaDescription: `${EMPLOYEES_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: EMPLOYEES_SQL + ORDERS_SQL,
     taskText:
-      'Порахуйте сумарні продажі кожного менеджера й виведіть тих, чия сума перевищує середню суму по менеджерах.',
+      'Порахуй сумарні продажі кожного менеджера й виведи тих, чия сума перевищує середню суму по менеджерах.',
     expectedOutputColumns: ['first_name', 'total_sales'],
     orderMatters: false,
     referenceSql: `
@@ -477,8 +477,8 @@ export default [
       );
     `,
     hints: [
-      'Спершу зведіть замовлення до сум по менеджерах — це природний CTE.',
-      'Потім порівняйте кожну суму із середнім, порахованим з того самого CTE скалярним підзапитом.',
+      'Спершу зведи замовлення до сум по менеджерах — це природний CTE.',
+      'Потім порівняй кожну суму із середнім, порахованим з того самого CTE скалярним підзапитом.',
       'Скелет: WITH manager_sales AS (SELECT e.first_name, SUM(o.amount) AS total_sales FROM orders o JOIN employees e ON e.employee_id = o.manager_id GROUP BY ...) SELECT * FROM manager_sales WHERE total_sales > (SELECT AVG(total_sales) FROM manager_sales);',
     ],
     explanation:
@@ -495,7 +495,7 @@ export default [
     schemaDescription: `${CUSTOMERS_SCHEMA}\n${ORDERS_SCHEMA}`,
     setupSql: CUSTOMERS_SQL + ORDERS_SQL,
     taskText:
-      'Через три CTE порахуйте витрати кожного клієнта, зведіть їх у виручку по країнах, знайдіть середню виручку країни й виведіть країни, що її перевищують.',
+      'Через три CTE порахуй витрати кожного клієнта, зведи їх у виручку по країнах, знайди середню виручку країни й виведи країни, що її перевищують.',
     expectedOutputColumns: ['country', 'country_total'],
     orderMatters: false,
     referenceSql: `
@@ -531,6 +531,6 @@ export default [
       'Скелет: WITH customer_totals AS (...), country_totals AS (... FROM customer_totals ...), overall AS (SELECT AVG(country_total) FROM country_totals) SELECT ... FROM country_totals, overall WHERE country_total > avg_country;',
     ],
     explanation:
-      'Ланцюжок CTE розгортає запит згори вниз як послідовність кроків, а не як три рівні вкладених дужок — саме цим він і цінний, коли логіка звіту багатоетапна. Зверніть увагу на агрегат від агрегату в другому кроці: SUM(t.total) підсумовує вже пораховані суми клієнтів. Написати там SUM(o.amount) було б неможливо, бо на цьому кроці окремих замовлень уже не існує — попередній CTE згорнув їх у підсумки.',
+      'Ланцюжок CTE розгортає запит згори вниз як послідовність кроків, а не як три рівні вкладених дужок — саме цим він і цінний, коли логіка звіту багатоетапна. Зверни увагу на агрегат від агрегату в другому кроці: SUM(t.total) підсумовує вже пораховані суми клієнтів. Написати там SUM(o.amount) було б неможливо, бо на цьому кроці окремих замовлень уже не існує — попередній CTE згорнув їх у підсумки.',
   },
 ];
