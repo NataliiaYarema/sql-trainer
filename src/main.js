@@ -456,6 +456,7 @@ function showTheory(level) {
   renderTheoryTopic(roots.taskCard, topicByLevel(level), {
     onToPractice: () => openLevel(level),
     onToHome: showLevelSelect,
+    onRunInSandbox: showSandboxWithQuery,
   });
 }
 
@@ -591,6 +592,18 @@ function showSandbox() {
 
   editor.setValue(sandboxInitialSql(loadSandboxSql()));
   editor.focus();
+}
+
+// Приклад із теорії відкривається виконаним: користувач натиснув «Виконати
+// запит», а не «Показати запит», тож другого кліку від нього не чекають.
+//
+// Запит потрапляє і в сховище пісочниці — так само, як будь-який інший текст
+// у її редакторі. Тобто попередня чернетка пісочниці заміщується прикладом;
+// це і є «перенести в пісочницю».
+async function showSandboxWithQuery(sql) {
+  showSandbox();
+  editor.setValue(sql);
+  await runSandboxQuery();
 }
 
 // startIndex приходить з екрана нотаток: там потрібне саме те завдання,

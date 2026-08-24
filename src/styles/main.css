@@ -1147,6 +1147,16 @@ body {
   font-weight: 600;
 }
 
+.theory-run {
+  display: flex;
+  margin-top: 8px;
+}
+
+.theory-run .btn {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
 .theory-example__result {
   margin-top: 10px;
   padding-left: 12px;

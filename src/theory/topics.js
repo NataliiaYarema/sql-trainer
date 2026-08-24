@@ -129,20 +129,6 @@ const topics = [
     setupSql: `${PRODUCTS_SQL}${ORDERS_SQL}${EMPLOYEES_SQL}`,
     examples: [
       {
-        label: 'MIN і MAX — межі кожної групи',
-        sql: dedent(`
-          SELECT
-            category,
-            MIN(price) AS cheapest,
-            MAX(price) AS priciest
-          FROM products
-          GROUP BY category
-          ORDER BY category;
-        `),
-        result:
-          'Пʼять категорій, у кожної — ціна найдешевшого й найдорожчого товару. У Stationery розкид від 4.20 до 15.00, у Furniture — від 45.50 до 430.00.',
-      },
-      {
         label: 'Сума в межах кожної групи',
         sql: dedent(`
           SELECT
@@ -167,6 +153,20 @@ const topics = [
         `),
         result:
           'Рядок на кожного менеджера: скільки замовлень він провів і який у нього середній чек, округлений до копійок.',
+      },
+      {
+        label: 'MIN і MAX — межі кожної групи',
+        sql: dedent(`
+          SELECT
+            category,
+            MIN(price) AS cheapest,
+            MAX(price) AS priciest
+          FROM products
+          GROUP BY category
+          ORDER BY category;
+        `),
+        result:
+          'Пʼять категорій, у кожної — ціна найдешевшого й найдорожчого товару. У Stationery розкид від 4.20 до 15.00, у Furniture — від 45.50 до 430.00.',
       },
       {
         label: 'HAVING — фільтр уже готових груп',
@@ -320,35 +320,6 @@ const topics = [
     setupSql: `${EMPLOYEES_SQL}${PRODUCTS_SQL}${ORDERS_SQL}${CUSTOMERS_SQL}`,
     examples: [
       {
-        label: 'NOT IN — виключити за готовим списком',
-        sql: dedent(`
-          SELECT
-            name
-          FROM customers
-          WHERE customer_id NOT IN (
-            SELECT customer_id
-            FROM orders
-          );
-        `),
-        result:
-          'Один рядок: Sofia Rossi — єдина клієнтка без жодного замовлення. Підзапит спершу збирає список тих, хто замовляв, і зовнішній запит відкидає всіх із цього списку.',
-      },
-      {
-        label: 'NOT EXISTS — виключити за умовою',
-        sql: dedent(`
-          SELECT
-            c.name
-          FROM customers AS c
-          WHERE NOT EXISTS (
-            SELECT 1
-            FROM orders AS o
-            WHERE o.customer_id = c.customer_id
-          );
-        `),
-        result:
-          'Та сама Sofia Rossi, але дорогою іншою: підзапит тут не збирає список, а для кожного клієнта питає «чи існує хоч одне замовлення». Саме тому в SELECT стоїть 1 — значення не потрібне, важлива лише наявність рядка.',
-      },
-      {
         label: 'Скалярний підзапит у WHERE',
         sql: dedent(`
           SELECT
@@ -376,6 +347,35 @@ const topics = [
         `),
         result:
           'Товари, яких лишилося менше 10 штук, і поруч — наскільки кожен дешевший за найдорожчий товар прайса.',
+      },
+      {
+        label: 'NOT IN — виключити за готовим списком',
+        sql: dedent(`
+          SELECT
+            name
+          FROM customers
+          WHERE customer_id NOT IN (
+            SELECT customer_id
+            FROM orders
+          );
+        `),
+        result:
+          'Один рядок: Sofia Rossi — єдина клієнтка без жодного замовлення. Підзапит спершу збирає список тих, хто замовляв, і зовнішній запит відкидає всіх із цього списку.',
+      },
+      {
+        label: 'NOT EXISTS — виключити за умовою',
+        sql: dedent(`
+          SELECT
+            c.name
+          FROM customers AS c
+          WHERE NOT EXISTS (
+            SELECT 1
+            FROM orders AS o
+            WHERE o.customer_id = c.customer_id
+          );
+        `),
+        result:
+          'Та сама Sofia Rossi, але дорогою іншою: підзапит тут не збирає список, а для кожного клієнта питає «чи існує хоч одне замовлення». Саме тому в SELECT стоїть 1 — значення не потрібне, важлива лише наявність рядка.',
       },
       {
         label: 'WITH — назвати проміжний крок',
@@ -457,36 +457,6 @@ const topics = [
     setupSql: `${EMPLOYEES_SQL}${PRODUCTS_SQL}${ORDERS_SQL}`,
     examples: [
       {
-        label: 'RANK і DENSE_RANK — два способи рахувати нічиї',
-        sql: dedent(`
-          SELECT
-            product_name,
-            price,
-            RANK() OVER (ORDER BY price DESC) AS rank_place,
-            DENSE_RANK() OVER (ORDER BY price DESC) AS dense_place
-          FROM products
-          ORDER BY price DESC
-          LIMIT 8;
-        `),
-        result:
-          'Вісім найдорожчих товарів. Office Chair і Docking Station коштують по 210 і обидва отримують пʼяте місце — а далі шляхи розходяться: RANK перестрибує на сьоме, DENSE_RANK іде на шосте. Різницю видно лише там, де є нічия, тому дивитися на них поодинці марно.',
-      },
-      {
-        label: 'LAG і LEAD — заглянути в сусідній рядок',
-        sql: dedent(`
-          SELECT
-            order_date,
-            amount,
-            LAG(amount) OVER (ORDER BY order_date) AS prev_amount,
-            LEAD(amount) OVER (ORDER BY order_date) AS next_amount
-          FROM orders
-          ORDER BY order_date
-          LIMIT 6;
-        `),
-        result:
-          'Кожне замовлення бачить сусідів по даті: LAG дає суму попереднього, LEAD — наступного. У найпершого рядка prev_amount порожній, бо попереднього просто немає, — на цьому й будують різницю «поточне мінус попереднє».',
-      },
-      {
         label: 'Нумерація всередині кожної групи',
         sql: dedent(`
           SELECT
@@ -503,6 +473,21 @@ const topics = [
           'Усі 25 товарів на місці, у кожного — його місце за ціною всередині своєї категорії. Нумерація починається з 1 наново для кожної категорії.',
       },
       {
+        label: 'RANK і DENSE_RANK — два способи рахувати нічиї',
+        sql: dedent(`
+          SELECT
+            product_name,
+            price,
+            RANK() OVER (ORDER BY price DESC) AS rank_place,
+            DENSE_RANK() OVER (ORDER BY price DESC) AS dense_place
+          FROM products
+          ORDER BY price DESC
+          LIMIT 8;
+        `),
+        result:
+          'Вісім найдорожчих товарів. Office Chair і Docking Station коштують по 210 і обидва отримують пʼяте місце — а далі шляхи розходяться: RANK перестрибує на сьоме, DENSE_RANK іде на шосте. Різницю видно лише там, де є нічия, тому дивитися на них поодинці марно.',
+      },
+      {
         label: 'Порівняти рядок з його ж групою',
         sql: dedent(`
           SELECT
@@ -515,6 +500,21 @@ const topics = [
         `),
         result:
           'Кожен співробітник і різниця між його зарплатою та найнижчою зарплатою в його департаменті. GROUP BY тут не підійшов би: він лишив би по одному рядку на департамент.',
+      },
+      {
+        label: 'LAG і LEAD — заглянути в сусідній рядок',
+        sql: dedent(`
+          SELECT
+            order_date,
+            amount,
+            LAG(amount) OVER (ORDER BY order_date) AS prev_amount,
+            LEAD(amount) OVER (ORDER BY order_date) AS next_amount
+          FROM orders
+          ORDER BY order_date
+          LIMIT 6;
+        `),
+        result:
+          'Кожне замовлення бачить сусідів по даті: LAG дає суму попереднього, LEAD — наступного. У найпершого рядка prev_amount порожній, бо попереднього просто немає, — на цьому й будують різницю «поточне мінус попереднє».',
       },
       {
         label: 'NTILE — розкласти на рівні частини',
@@ -598,34 +598,6 @@ const topics = [
     setupSql: `${ORDERS_SQL}${RAW_CONTACTS_SQL}`,
     examples: [
       {
-        label: 'INTERVAL і AGE — арифметика дат',
-        sql: dedent(`
-          SELECT
-            order_id,
-            order_date,
-            order_date + INTERVAL '30 days' AS due_date,
-            AGE(DATE '2024-07-01', order_date) AS since_order
-          FROM orders
-          ORDER BY order_date
-          LIMIT 5;
-        `),
-        result:
-          'Перше замовлення від 5 січня має термін оплати 4 лютого, а від 1 липня його відділяє «5 mons 27 days». INTERVAL додає до дати проміжок і повертає дату, AGE віднімає одну дату від іншої й повертає проміжок словами.',
-      },
-      {
-        label: 'SPLIT_PART — розрізати значення за роздільником',
-        sql: dedent(`
-          SELECT
-            contact_id,
-            raw_email,
-            LOWER(SPLIT_PART(raw_email, '@', 2)) AS domain
-          FROM raw_contacts
-          ORDER BY contact_id;
-        `),
-        result:
-          'Десять контактів із доменом окремою колонкою: example.com, mail.ua, bondar.dev. Третій аргумент — номер шматка, тому 2 означає «те, що після равлика»; з 1 вийшло б імʼя скриньки.',
-      },
-      {
         label: 'DATE_TRUNC — звести дати до місяця',
         sql: dedent(`
           SELECT
@@ -655,6 +627,21 @@ const topics = [
           'Пʼять найраніших замовлень із номером дня тижня й номером місяця. Нумерація днів починається з нуля-неділі, тому 5 — це пʼятниця, 4 — четвер, 6 — субота.',
       },
       {
+        label: 'INTERVAL і AGE — арифметика дат',
+        sql: dedent(`
+          SELECT
+            order_id,
+            order_date,
+            order_date + INTERVAL '30 days' AS due_date,
+            AGE(DATE '2024-07-01', order_date) AS since_order
+          FROM orders
+          ORDER BY order_date
+          LIMIT 5;
+        `),
+        result:
+          'Перше замовлення від 5 січня має термін оплати 4 лютого, а від 1 липня його відділяє «5 mons 27 days». INTERVAL додає до дати проміжок і повертає дату, AGE віднімає одну дату від іншої й повертає проміжок словами.',
+      },
+      {
         label: 'TRIM і INITCAP — очистити сире імʼя',
         sql: dedent(`
           SELECT
@@ -665,6 +652,19 @@ const topics = [
         `),
         result:
           'Поруч видно сире значення й очищене: « anna kovalenko » стає «Anna Kovalenko». У третього контакту подвійний пробіл усередині лишився — TRIM його не бачить.',
+      },
+      {
+        label: 'SPLIT_PART — розрізати значення за роздільником',
+        sql: dedent(`
+          SELECT
+            contact_id,
+            raw_email,
+            LOWER(SPLIT_PART(raw_email, '@', 2)) AS domain
+          FROM raw_contacts
+          ORDER BY contact_id;
+        `),
+        result:
+          'Десять контактів із доменом окремою колонкою: example.com, mail.ua, bondar.dev. Третій аргумент — номер шматка, тому 2 означає «те, що після равлика»; з 1 вийшло б імʼя скриньки.',
       },
       {
         label: 'TO_CHAR і || — зібрати читабельну мітку',

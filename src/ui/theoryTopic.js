@@ -3,7 +3,20 @@ import { topicKeywords } from '../theory/topics.js';
 import { highlightSql } from './sqlHighlight.js';
 import { resultTableHtml } from './resultTable.js';
 
-function caseHtml(item) {
+// Кнопка «Виконати запит» переносить SQL у пісочницю. Запит передається
+// індексом блоку в темі, а не текстом у data-атрибуті: SQL довелося б
+// екранувати в HTML і розбирати назад, а індекс однозначний і короткий.
+function runButtonHtml(action, indexAttr, index) {
+  return `
+    <div class="theory-run">
+      <button class="btn btn--ghost" data-action="${action}" ${indexAttr}="${index}">
+        ${icon('i-play')}Виконати запит
+      </button>
+    </div>
+  `;
+}
+
+function caseHtml(item, index) {
   return `
     <article class="theory-case">
       <h3 class="theory-case__title">${escapeHtml(item.title)}</h3>
@@ -18,6 +31,7 @@ function caseHtml(item) {
       </blockquote>
 
       <pre class="sql-block"><code>${highlightSql(item.sql)}</code></pre>
+      ${runButtonHtml('run-case', 'data-case-index', index)}
       <ol class="theory-case__steps">
         ${item.steps.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}
       </ol>
@@ -121,11 +135,12 @@ function summaryBlockHtml(block) {
   return `<p class="theory-topic__note">${escapeHtml(block)}</p>`;
 }
 
-function exampleHtml({ label, sql, result }) {
+function exampleHtml({ label, sql, result }, index) {
   return `
     <div class="theory-example">
       <div class="theory-example__label">${escapeHtml(label)}</div>
       <pre class="theory-example__sql"><code>${highlightSql(sql)}</code></pre>
+      ${runButtonHtml('run-example', 'data-example-index', index)}
       <div class="theory-example__result">${escapeHtml(result)}</div>
     </div>
   `;
@@ -156,6 +171,18 @@ function pitfallHtml({ title, text, wrongSql, rightSql }) {
 
 export function renderTheoryTopic(root, topic, handlers) {
   root.innerHTML = theoryTopicHtml(topic);
+
+  // Тема або з прикладами, або з кейсами — беремо той список, який є.
+  root.querySelectorAll('[data-action="run-example"]').forEach((button) => {
+    button.addEventListener('click', () =>
+      handlers.onRunInSandbox(topic.examples[Number(button.dataset.exampleIndex)].sql)
+    );
+  });
+  root.querySelectorAll('[data-action="run-case"]').forEach((button) => {
+    button.addEventListener('click', () =>
+      handlers.onRunInSandbox(topic.cases[Number(button.dataset.caseIndex)].sql)
+    );
+  });
 
   root
     .querySelector('[data-action="to-practice"]')

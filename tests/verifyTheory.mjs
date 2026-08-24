@@ -325,6 +325,31 @@ check(
   'екран теми перелічує типові помилки',
   topic.pitfalls.every((p) => topicHtml.includes(escapeHtml(p.title)))
 );
+// Кнопка «Виконати запит» біля кожного прикладу. SQL передається індексом
+// блоку, а не текстом в атрибуті: інакше запит довелося б екранувати в HTML
+// і розбирати назад, а індекс однозначно вказує на місце в темі.
+check(
+  'кожен приклад має кнопку виконання',
+  (topicHtml.match(/data-action="run-example"/g) ?? []).length === topic.examples.length
+);
+check(
+  'кнопка виконання знає свій приклад',
+  topic.examples.every((_, i) => topicHtml.includes(`data-example-index="${i}"`))
+);
+check('кнопка виконання підписана', topicHtml.includes('Виконати запит'));
+
+// Кейси рівня 8 показують SQL так само, тому кнопка потрібна й там.
+const caseTopic = topicByLevel(8);
+const caseTopicHtml = theoryTopicHtml(caseTopic);
+check(
+  'кожен кейс має кнопку виконання',
+  (caseTopicHtml.match(/data-action="run-case"/g) ?? []).length === caseTopic.cases.length
+);
+check(
+  'кнопка виконання знає свій кейс',
+  caseTopic.cases.every((_, i) => caseTopicHtml.includes(`data-case-index="${i}"`))
+);
+
 check('екран теми веде до практики', topicHtml.includes('data-action="to-practice"'));
 check('екран теми веде на головну', topicHtml.includes('data-action="to-home"'));
 check('екран теми називає вихід «На головну»', topicHtml.includes('На головну'));
