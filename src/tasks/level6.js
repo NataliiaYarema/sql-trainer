@@ -430,7 +430,7 @@ export default [
       SELECT
         TO_CHAR(o.order_date, 'YYYY-MM') AS month,
         UPPER(SPLIT_PART(c.name, ' ', 2)) || ', ' ||
-          SPLIT_PART(c.name, ' ', 1) AS customer,
+          INITCAP(SPLIT_PART(c.name, ' ', 1)) AS customer,
         SUM(o.amount) AS total
       FROM orders AS o
       JOIN customers AS c ON c.customer_id = o.customer_id
@@ -439,10 +439,10 @@ export default [
     `,
     hints: [
       'Треба порахувати суму замовлень окремо для кожної пари «місяць + клієнт», а імʼя клієнта показати у форматі «ПРІЗВИЩЕ, Імʼя».',
-      "TO_CHAR(..., 'YYYY-MM') дає мітку місяця, а SPLIT_PART розбирає повне імʼя на прізвище й імʼя за пробілом.",
-      "Скелет: SELECT TO_CHAR(o.order_date, 'YYYY-MM') AS month, UPPER(SPLIT_PART(c.name, ' ', 2)) || ', ' || SPLIT_PART(c.name, ' ', 1) AS customer, SUM(o.amount) AS total FROM orders o JOIN customers c ON c.customer_id = o.customer_id GROUP BY month, customer ORDER BY month, customer;",
+      "TO_CHAR(..., 'YYYY-MM') дає мітку місяця, SPLIT_PART розбирає повне імʼя на прізвище й імʼя за пробілом, а UPPER та INITCAP задають регістр кожної половини.",
+      "Скелет: SELECT TO_CHAR(o.order_date, 'YYYY-MM') AS month, UPPER(SPLIT_PART(c.name, ' ', 2)) || ', ' || INITCAP(SPLIT_PART(c.name, ' ', 1)) AS customer, SUM(o.amount) AS total FROM orders o JOIN customers c ON c.customer_id = o.customer_id GROUP BY month, customer ORDER BY month, customer;",
     ],
     explanation:
-      "PostgreSQL дозволяє групувати за псевдонімом обчисленої колонки (GROUP BY month, customer), тому громіздкі вирази не доводиться дублювати в GROUP BY. TO_CHAR(..., 'YYYY-MM') дає текстову мітку місяця, яка при цьому сортується правильно як звичайний рядок — на відміну від назви місяця словом, де алфавітний і хронологічний порядок розходяться.",
+      "PostgreSQL дозволяє групувати дані за псевдонімами обчислених колонок (GROUP BY month, customer), тому громіздкі вирази з SELECT не потрібно дублювати в GROUP BY. TO_CHAR(..., 'YYYY-MM') перетворює дату на текстову мітку у форматі рік-місяць, наприклад 2026-08. Такий формат зручно використовувати для сортування, оскільки він зберігає правильний хронологічний порядок — на відміну від назв місяців словами, де алфавітний і хронологічний порядок можуть відрізнятися. UPPER та INITCAP окремо задають формат обох частин імені: прізвище виводиться у верхньому регістрі, а імʼя — з великої літери.",
   },
 ];
