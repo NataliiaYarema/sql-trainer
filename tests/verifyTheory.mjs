@@ -5,6 +5,7 @@ import { theoryListHtml } from '../src/ui/theoryList.js';
 import { theoryTopicHtml } from '../src/ui/theoryTopic.js';
 import { highlightSql } from '../src/ui/sqlHighlight.js';
 import { checkSqlFormatting } from './sqlFormat.mjs';
+import { forbiddenStatementIn } from '../src/db/sqlGuard.js';
 import { runQuery, closeAll } from './pgHarness.mjs';
 
 let failures = 0;
@@ -132,14 +133,22 @@ check(
   'кожна тема має структурований вступ через summaryBlocks',
   topics.every((t) => Array.isArray(t.summaryBlocks))
 );
-// Рівні 6 і 7 складаються з двох різних половин (дати й рядки; умовна логіка
-// й операції з множинами), тому потребують двох окремих списків.
+// Рівень 6 складається з двох різних половин (дати й рядки), і кожна половина
+// має власний список — інакше вступ читався б як один суцільний перелік.
+//
+// Рівень 7 теж двоскладовий (умовна логіка й операції з множинами), але його
+// половини розділені інакше: умовну логіку розписано абзацами, бо CASE,
+// COALESCE і NULLIF потребують пояснення в кілька речень кожен, а пункт списку
+// такого не витримує. Список лишився там, де він природний, — чотири операції
+// з множинами, які саме й читаються як перелік. Тому вимога тут мʼякша:
+// щонайменше один список.
 check(
-  'теми рівнів 6 і 7 мають два окремі списки в summaryBlocks',
-  [6, 7].every(
-    (level) =>
-      (topicByLevel(level)?.summaryBlocks ?? []).filter((b) => Array.isArray(b)).length >= 2
-  )
+  'тема рівня 6 має два окремі списки в summaryBlocks',
+  (topicByLevel(6)?.summaryBlocks ?? []).filter((b) => Array.isArray(b)).length >= 2
+);
+check(
+  'тема рівня 7 має список операцій з множинами',
+  (topicByLevel(7)?.summaryBlocks ?? []).filter((b) => Array.isArray(b)).length >= 1
 );
 
 // --- ключові конструкції в назві теми --------------------------------------
@@ -216,6 +225,18 @@ checkSqlFormatting(
   check,
   'приклади записані як робочий SQL'
 );
+// Кнопка «Виконати запит» кидає приклад і кейс у пісочницю, а там запит
+// проходить той самий захист «лише SELECT / WITH», що й у завданнях. Слово
+// з переліку забороненого означає приклад, який покаже помилку замість
+// результату. Пастки й поради під це не підпадають: їх не виконують.
+const guardHits = [...allExamples, ...allCaseSql]
+  .map(({ name, sql }) => ({ name, word: forbiddenStatementIn(sql) }))
+  .filter((item) => item.word);
+for (const hit of guardHits) {
+  console.error(`     ${hit.name}: SQL містить «${hit.word}»`);
+}
+check('приклади й кейси не спотикаються об захист «лише SELECT»', guardHits.length === 0);
+
 check(
   'аргументи секцій мають відступ',
   topics.every((t) => (t.examples ?? []).every((e) => /^ {2,}\S/m.test(e.sql)))
