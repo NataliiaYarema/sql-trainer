@@ -24,16 +24,16 @@
 
 ## Рівні
 
-| Рівень | Тема                   | Про що                                                                                      |
-| ------ | ---------------------- | ------------------------------------------------------------------------------------------- |
-| 1      | Основи вибірки         | `SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`, `DISTINCT`                                  |
-| 2      | Групування й агрегація | `GROUP BY`, `HAVING`, `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`                                   |
-| 3      | Об'єднання таблиць     | `JOIN`, `INNER JOIN`, `LEFT JOIN`, `ON`, `USING`                                            |
-| 4      | Підзапити й CTE        | `WITH`, `AS`, `IN`, `NOT IN`, `NOT EXISTS`                                                  |
-| 5      | Віконні функції        | `OVER`, `PARTITION BY`, `ROW_NUMBER`, `RANK`, `DENSE_RANK`, `LAG`, `LEAD`, `NTILE`          |
-| 6      | Дати та рядки          | `DATE_TRUNC`, `EXTRACT`, `INTERVAL`, `AGE`, `TO_CHAR`, `TRIM`, `INITCAP`, `SPLIT_PART`      |
-| 7      | Умови й множини        | `CASE`, `WHEN`, `THEN`, `ELSE`, `END`, `COALESCE`, `NULLIF`, `UNION`, `INTERSECT`, `EXCEPT` |
-| 8      | Аналітичні кейси       | `WITH`, `DATE_TRUNC`, `COUNT`, `DISTINCT`, `FILTER`, `LAG`, `NTILE`                         |
+| Рівень | Тема                   | Про що                                                                                 |
+| ------ | ---------------------- | -------------------------------------------------------------------------------------- |
+| 1      | Основи вибірки         | `SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`, `DISTINCT`                             |
+| 2      | Групування й агрегація | `GROUP BY`, `HAVING`, `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`                              |
+| 3      | Об'єднання таблиць     | `JOIN`, `INNER JOIN`, `LEFT JOIN`, `ON`, `USING`                                       |
+| 4      | Підзапити й CTE        | `WITH`, `AS`, `IN`, `NOT IN`, `NOT EXISTS`                                             |
+| 5      | Віконні функції        | `OVER`, `PARTITION BY`, `ROW_NUMBER`, `RANK`, `DENSE_RANK`, `LAG`, `LEAD`, `NTILE`     |
+| 6      | Дати та рядки          | `DATE_TRUNC`, `EXTRACT`, `INTERVAL`, `AGE`, `TO_CHAR`, `TRIM`, `INITCAP`, `SPLIT_PART` |
+| 7      | Умови й множини        | `CASE`, `COALESCE`, `NULLIF`, `UNION`, `INTERSECT`, `EXCEPT`                           |
+| 8      | Аналітичні кейси       | `WITH`, `DATE_TRUNC`, `COUNT`, `DISTINCT`, `FILTER`, `LAG`, `NTILE`                    |
 
 Кожен рівень супроводжує сторінка теорії з тими самими конструкціями: короткий підсумок,
 приклади SQL на реальних даних і типові пастки.
