@@ -267,7 +267,23 @@ async function handleCheck() {
     renderResultTable(roots.result, userResult);
   }
 
-  const referenceResult = await executeReferenceQuery(task.setupSql, task.referenceSql);
+  // Еталон теж проходить через захист «лише SELECT» і теж може впасти —
+  // не через користувача, а через хибу в самому банку завдань. Без цієї
+  // гілки виняток летів би нагору, і перевірка мовчки не давала б жодного
+  // вердикту: таблиця результату вже намальована, а «правильно/неправильно»
+  // не з'являється ніколи. Спробу в такому разі не зараховуємо.
+  let referenceResult;
+  try {
+    referenceResult = await executeReferenceQuery(task.setupSql, task.referenceSql);
+  } catch (err) {
+    if (err instanceof SqlUserError) {
+      if (currentIndex !== startedAt) return;
+      renderSqlError(roots.feedback, `Не вдалося перевірити завдання: ${err.message}`);
+      return;
+    }
+    throw err;
+  }
+
   const comparison = compareResults(userResult, referenceResult, task);
 
   if (comparison.ok) {

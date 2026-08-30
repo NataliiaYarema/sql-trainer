@@ -9,6 +9,7 @@ import tasks, {
 import * as schemas from '../src/tasks/schemas.js';
 import { dedent } from '../src/utils/dom.js';
 import { checkSqlFormatting } from './sqlFormat.mjs';
+import { forbiddenStatementIn } from '../src/db/sqlGuard.js';
 import { runQuery, closeAll } from './pgHarness.mjs';
 
 let failures = 0;
@@ -211,6 +212,26 @@ checkSqlFormatting(
   check,
   "еталонні розв'язки записані як робочий SQL"
 );
+
+// Захист «лише SELECT / WITH» бачить і еталонний запит (він виконується на
+// кожній перевірці), і скелет із третьої підказки (його користувач вставляє
+// в редактор). Слово з переліку забороненого всередині них означає завдання,
+// яке неможливо розв'язати підказаним способом.
+const guardHits = tasks.flatMap((t) => {
+  const hits = [];
+  const inReference = forbiddenStatementIn(t.referenceSql);
+  if (inReference) hits.push(`${t.id}: referenceSql містить «${inReference}»`);
+  // Дивимося лише на підказку-скелет: її користувач вставляє в редактор
+  // як є. Решта підказок — проза, і назвати в них функцію словом можна.
+  const skeleton = t.hints.find((hint) => /^Скелет:/.test(hint));
+  const inSkeleton = skeleton && forbiddenStatementIn(skeleton);
+  if (inSkeleton) hits.push(`${t.id}: скелет у підказці містить «${inSkeleton}»`);
+  return hits;
+});
+for (const hit of guardHits) {
+  console.error(`     ${hit}`);
+}
+check('еталони й підказки не спотикаються об захист «лише SELECT»', guardHits.length === 0);
 
 // Обхід згрупований за setupSql, а друк — у порядку банку.
 //

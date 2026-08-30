@@ -1,5 +1,6 @@
 import { PGlite } from '@electric-sql/pglite';
 import { toResult } from './pgResult.js';
+import { FORBIDDEN_STATEMENT, FORBIDDEN_STATEMENT_MESSAGE } from './sqlGuard.js';
 import { ALL_FIXTURES_SQL } from '../tasks/fixtures.js';
 
 // Один інстанс PGlite на весь застосунок. Свіжа база під кожен запит коштує
@@ -27,11 +28,6 @@ function initDbOnce() {
   return dbPromise;
 }
 
-// Regex лишається, але змінює роль: тепер це не захист (його дає read-only),
-// а зрозуміле повідомлення замість сирої помилки PostgreSQL.
-const FORBIDDEN_STATEMENT =
-  /\b(insert|update|delete|drop|alter|create|attach|detach|pragma|replace|vacuum|begin|commit|rollback)\b/i;
-
 export class SqlUserError extends Error {}
 
 async function runSelect(sql) {
@@ -40,9 +36,7 @@ async function runSelect(sql) {
     throw new SqlUserError('Запит порожній. Напиши SQL-запит перед перевіркою.');
   }
   if (FORBIDDEN_STATEMENT.test(trimmed)) {
-    throw new SqlUserError(
-      'Дозволені лише запити SELECT / WITH — цей запит містить заборонену команду.'
-    );
+    throw new SqlUserError(FORBIDDEN_STATEMENT_MESSAGE);
   }
 
   const db = await initDbOnce();
