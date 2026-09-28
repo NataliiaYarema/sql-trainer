@@ -416,7 +416,7 @@ LANGS.forEach((lang) => {
       `${lang}: фраза «${phrase}» не обіцяє розбору поруч`,
       // Межі слова обов'язкові: без них іспанське «trabajo» містить у собі
       // «abajo» і чесна фраза падала б на перевірці.
-      !/нижче|Розберімо|below|abajo/i.test(phrase)
+      !/\bнижче\b|\bРозберімо\b|\bbelow\b|\babajo\b/i.test(phrase)
     );
   });
   const root = fakeRoot();
