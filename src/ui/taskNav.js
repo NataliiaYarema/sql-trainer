@@ -1,3 +1,6 @@
+import { escapeHtml } from '../utils/dom.js';
+import { t } from '../i18n/index.js';
+
 const STATUS_CLASS = {
   solved: ' task-nav__item--solved',
   revealed: ' task-nav__item--revealed',
@@ -8,7 +11,7 @@ const STATUS_CLASS = {
 // на будь-яке — зокрема назад, до вже розв'язаних, щоб доопрацювати відповідь.
 export function taskNavHtml(items, currentIndex) {
   return `
-    <nav class="task-nav" aria-label="Завдання рівня">
+    <nav class="task-nav" aria-label="${escapeHtml(t('taskNav.label'))}">
       ${items
         .map(
           ({ index, status, hasNote }) => `

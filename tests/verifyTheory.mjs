@@ -1,4 +1,5 @@
-import tasks, { LEVELS, LEVEL_NAMES } from '../src/tasks/index.js';
+import tasks, { LEVELS } from '../src/tasks/index.js';
+import { levelName, setLanguage } from '../src/i18n/index.js';
 import topics, { topicByLevel, topicKeywords } from '../src/theory/topics.js';
 import { escapeHtml } from '../src/utils/dom.js';
 import { theoryListHtml } from '../src/ui/theoryList.js';
@@ -26,9 +27,14 @@ check(
   'кожна тема прив’язана до наявного рівня',
   topics.map((t) => t.level).join() === LEVELS.join()
 );
+// Тексти теорії лишаються українськими до етапу 3, тому й назву рівня беремо
+// українською. Коли теми переїдуть у словники, перевірка стане наскрізною по
+// мовах — а до того вона мусить лишатися живою, а не зникнути разом із
+// LEVEL_NAMES.
+setLanguage('uk');
 check(
   'назва теми збігається з назвою рівня',
-  topics.every((t) => t.title === LEVEL_NAMES[t.level])
+  topics.every((t) => t.title === levelName(t.level))
 );
 // Опціональний доступ (?.) тут навмисний: якщо для рівня немає теми,
 // topicByLevel поверне undefined, і без ?. читання .level впало б винятком

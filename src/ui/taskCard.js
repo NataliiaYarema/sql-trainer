@@ -1,5 +1,5 @@
 import { icon, escapeHtml } from '../utils/dom.js';
-import { LEVEL_NAMES, TIER_LABELS } from '../tasks/index.js';
+import { t, levelName } from '../i18n/index.js';
 
 // Розбирає рядок виду "employees(employee_id INT, first_name TEXT)" на назву
 // таблиці та список колонок, щоб показати кожне поле окремим рядком.
@@ -48,37 +48,37 @@ export function renderTaskCard(root, { task, index, total, isSolved, caseStudySt
   root.innerHTML = `
     <div class="task-card">
       <div class="task-card__head">
-        <span class="level-pill">${icon('i-target')}Рівень ${task.level} · ${escapeHtml(LEVEL_NAMES[task.level])}</span>
-        <span class="tier-pill tier-pill--${task.tier}">${escapeHtml(TIER_LABELS[task.tier])}</span>
-        <span class="task-counter">Завдання ${index + 1} з ${total}</span>
-        ${isSolved ? `<span class="solved-mark">${icon('i-check')}вже розв'язано</span>` : ''}
+        <span class="level-pill">${icon('i-target')}${escapeHtml(t('taskCard.levelPill', { level: task.level, name: levelName(task.level) }))}</span>
+        <span class="tier-pill tier-pill--${task.tier}">${escapeHtml(t(`tier.${task.tier}`))}</span>
+        <span class="task-counter">${escapeHtml(t('taskCard.counter', { current: index + 1, total }))}</span>
+        ${isSolved ? `<span class="solved-mark">${icon('i-check')}${escapeHtml(t('taskCard.solved'))}</span>` : ''}
       </div>
 
       <h2 class="task-card__title">${escapeHtml(task.title)}</h2>
 
       ${
         task.caseStudy
-          ? `<div class="case-pill">${icon('i-flag')}Кейс: ${escapeHtml(task.caseStudy.title)} — крок ${task.caseStudy.step} з ${caseStudySteps}</div>`
+          ? `<div class="case-pill">${icon('i-flag')}${escapeHtml(t('taskCard.case', { title: task.caseStudy.title, step: task.caseStudy.step, total: caseStudySteps }))}</div>`
           : ''
       }
 
       <div class="task-section">
-        <div class="section-label">${icon('i-briefcase')}Бізнес-контекст</div>
+        <div class="section-label">${icon('i-briefcase')}${escapeHtml(t('taskCard.context'))}</div>
         <div class="task-section__body task-section__body--muted">${escapeHtml(task.context)}</div>
       </div>
 
       <div class="task-section">
-        <div class="section-label">${icon('i-table')}Структура даних</div>
+        <div class="section-label">${icon('i-table')}${escapeHtml(t('taskCard.schema'))}</div>
         <div class="schema-block">${renderSchema(task.schemaDescription)}</div>
       </div>
 
       <div class="task-section">
-        <div class="section-label">${icon('i-target')}Завдання</div>
+        <div class="section-label">${icon('i-target')}${escapeHtml(t('taskCard.task'))}</div>
         <div class="task-section__body">${escapeHtml(task.taskText)}</div>
       </div>
 
       <div class="task-section">
-        <div class="section-label">${icon('i-columns')}Очікувані колонки</div>
+        <div class="section-label">${icon('i-columns')}${escapeHtml(t('taskCard.columns'))}</div>
         <div class="column-chips">
           ${task.expectedOutputColumns.map((c) => `<span class="column-chip">${escapeHtml(c)}</span>`).join('')}
         </div>

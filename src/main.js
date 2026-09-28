@@ -1,5 +1,5 @@
 import './styles/main.css';
-import tasks, { LEVELS, LEVEL_NAMES, tasksByLevel, tasksByCaseStudy } from './tasks/index.js';
+import tasks, { LEVELS, tasksByLevel, tasksByCaseStudy } from './tasks/index.js';
 import { executeUserQuery, executeReferenceQuery, SqlUserError } from './db/sqlEngine.js';
 import { compareResults } from './compare/resultComparer.js';
 import { GameState } from './game/state.js';
@@ -12,7 +12,7 @@ import { renderNotePanel } from './ui/notePanel.js';
 import { renderControls } from './ui/controls.js';
 import { renderTaskNav } from './ui/taskNav.js';
 import { renderProgress, bindBackHome, routeFor, parseRoute } from './ui/progressBar.js';
-import { getLanguage, setLanguage, t } from './i18n/index.js';
+import { getLanguage, setLanguage, t, levelName } from './i18n/index.js';
 import { renderLevelSelect } from './ui/levelSelect.js';
 import { renderNotesScreen } from './ui/notesScreen.js';
 import { computeMetrics } from './analytics/metrics.js';
@@ -247,7 +247,13 @@ function handleInsertQuery() {
 function renderLevelProgress() {
   renderProgress(
     roots.progress,
-    { levelName: `Рівень ${activeLevel} · ${LEVEL_NAMES[activeLevel]}`, showBack: true },
+    {
+      levelName: t('taskCard.levelPill', {
+        level: activeLevel,
+        name: levelName(activeLevel),
+      }),
+      showBack: true,
+    },
     navHandlers
   );
   bindBackHome(roots.progress, showLevelSelect);
@@ -481,7 +487,7 @@ function renderLevelDone() {
     roots.taskCard,
     {
       level: activeLevel,
-      name: LEVEL_NAMES[activeLevel],
+      name: levelName(activeLevel),
       solved: gameState.solvedCountForLevel(activeLevel),
       total: levelTasks.length,
       skills: skillsForLevel(activeLevel, currentStatuses(), tasks),
@@ -506,7 +512,7 @@ function showLevelSelect() {
     roots.taskCard,
     LEVELS.map((level) => ({
       level,
-      name: LEVEL_NAMES[level],
+      name: levelName(level),
       total: tasksByLevel(level).length,
       solved: gameState.solvedCountForLevel(level),
       noteCount: gameState.notedCountForLevel(level),
@@ -548,7 +554,7 @@ function noteEntries() {
       .map(({ task, index }) => ({
         taskId: task.id,
         level,
-        levelName: LEVEL_NAMES[level],
+        levelName: levelName(level),
         index,
         title: task.title,
         context: task.context,

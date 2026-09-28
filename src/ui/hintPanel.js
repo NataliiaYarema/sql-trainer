@@ -1,4 +1,5 @@
 import { icon, escapeHtml } from '../utils/dom.js';
+import { t } from '../i18n/index.js';
 
 export function renderHints(root, hints, revealedCount) {
   if (revealedCount === 0) {
@@ -12,7 +13,7 @@ export function renderHints(root, hints, revealedCount) {
       (hint, i) => `
         <div class="hint-item">
           <span class="hint-item__icon">${icon('i-bulb')}</span>
-          <div class="hint-item__text"><strong>Підказка ${i + 1}.</strong> ${escapeHtml(hint)}</div>
+          <div class="hint-item__text"><strong>${escapeHtml(t('hint.numbered', { number: i + 1 }))}</strong> ${escapeHtml(hint)}</div>
         </div>
       `
     )

@@ -1,4 +1,5 @@
 import { icon } from '../utils/dom.js';
+import { t } from '../i18n/index.js';
 
 export function controlsHtml({ hintsRevealed, totalHints, isFirstTask, isLastTask }) {
   const hintsLeft = totalHints - hintsRevealed;
@@ -6,26 +7,26 @@ export function controlsHtml({ hintsRevealed, totalHints, isFirstTask, isLastTas
   return `
     <div class="controls">
       <button class="btn btn--primary" data-action="check">
-        ${icon('i-play')}Перевірити
+        ${icon('i-play')}${t('controls.check')}
       </button>
       <button class="btn btn--hint" data-action="hint" ${hintsLeft === 0 ? 'disabled' : ''}>
-        ${icon('i-bulb')}Підказка (${hintsRevealed}/${totalHints})
+        ${icon('i-bulb')}${t('controls.hint', { revealed: hintsRevealed, total: totalHints })}
       </button>
       <button class="btn btn--ghost" data-action="giveup">
-        ${icon('i-flag')}Показати відповідь
+        ${icon('i-flag')}${t('controls.giveUp')}
       </button>
       <div class="controls__nav">
         <button class="btn btn--nav" data-action="prev" ${isFirstTask ? 'disabled' : ''}>
-          ${icon('i-arrow-left')}Попереднє
+          ${icon('i-arrow-left')}${t('controls.prev')}
         </button>
         <button class="btn btn--nav btn--next" data-action="next">
-          ${isLastTask ? 'Завершити' : 'Наступне'}${icon('i-arrow-right')}
+          ${isLastTask ? t('controls.finish') : t('controls.next')}${icon('i-arrow-right')}
         </button>
       </div>
     </div>
     <div class="controls-home">
       <button class="btn btn--ghost" data-action="to-home">
-        ${icon('i-arrow-left')}На головну
+        ${icon('i-arrow-left')}${t('nav.home')}
       </button>
     </div>
   `;

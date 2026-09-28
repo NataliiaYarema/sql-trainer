@@ -1,12 +1,12 @@
 import tasks, {
   LEVELS,
-  LEVEL_NAMES,
   LEVEL_PLAN,
   LEVEL_TOPICS,
   tasksByCaseStudy,
   tasksByLevel,
 } from '../src/tasks/index.js';
 import * as schemas from '../src/tasks/schemas.js';
+import { levelName, setLanguage, LANGS } from '../src/i18n/index.js';
 import { dedent } from '../src/utils/dom.js';
 import { checkSqlFormatting } from './sqlFormat.mjs';
 import { forbiddenStatementIn } from '../src/db/sqlGuard.js';
@@ -26,9 +26,15 @@ function check(name, condition) {
 const levelsInBank = [...new Set(tasks.map((t) => t.level))].sort();
 check('LEVELS перелічує всі рівні з банку завдань', LEVELS.join() === levelsInBank.join());
 check(
-  'кожен рівень має назву',
-  LEVELS.every((level) => typeof LEVEL_NAMES[level] === 'string')
+  'кожен рівень має назву в кожній мові',
+  LANGS.every((lang) => {
+    setLanguage(lang);
+    // Порівняння з ключем не зайве: t() віддає сам ключ, коли назви немає,
+    // тому перевірка «рядок і не порожній» пропустила б дірку у словнику.
+    return LEVELS.every((level) => levelName(level) !== `level.${level}.name`);
+  })
 );
+setLanguage('uk');
 check(
   'tasksByLevel повертає лише завдання свого рівня',
   LEVELS.every((level) => tasksByLevel(level).every((t) => t.level === level))

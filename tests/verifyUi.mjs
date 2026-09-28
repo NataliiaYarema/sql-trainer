@@ -1,4 +1,4 @@
-import tasks, { LEVELS, LEVEL_NAMES, tasksByLevel } from '../src/tasks/index.js';
+import tasks, { LEVELS, tasksByLevel } from '../src/tasks/index.js';
 import { escapeHtml, dedent } from '../src/utils/dom.js';
 import { highlightSql } from '../src/ui/sqlHighlight.js';
 import { levelSelectHtml } from '../src/ui/levelSelect.js';
@@ -9,7 +9,7 @@ import { renderTaskCard } from '../src/ui/taskCard.js';
 import { renderHints } from '../src/ui/hintPanel.js';
 import { renderResultTable } from '../src/ui/resultTable.js';
 import { progressHtml, routeFor, parseRoute, languageSelectHtml } from '../src/ui/progressBar.js';
-import { t, setLanguage, LANGS } from '../src/i18n/index.js';
+import { t, setLanguage, levelName, LANGS } from '../src/i18n/index.js';
 import { notePanelHtml, saveButtonLabel } from '../src/ui/notePanel.js';
 import { notesScreenHtml } from '../src/ui/notesScreen.js';
 import { sandboxControlsHtml } from '../src/ui/sandbox.js';
@@ -51,7 +51,7 @@ const tableName = singleTable.slice(0, singleTable.indexOf('('));
 const cardRoot = fakeRoot();
 renderTaskCard(cardRoot, { task, index: 1, total: 4, isSolved: false });
 check('картка містить заголовок завдання', cardRoot.innerHTML.includes(task.title));
-check('картка містить бізнес-контекст', cardRoot.innerHTML.includes('Бізнес-контекст'));
+check('картка містить бізнес-контекст', cardRoot.innerHTML.includes(t('taskCard.context')));
 check('картка містить назву таблиці', cardRoot.innerHTML.includes(`>${tableName}</div>`));
 check(
   'кожна колонка схеми — окремий рядок',
@@ -66,7 +66,10 @@ check(
   'картка перелічує очікувані колонки',
   task.expectedOutputColumns.every((c) => cardRoot.innerHTML.includes(c))
 );
-check('картка рахує завдання в межах рівня', cardRoot.innerHTML.includes('Завдання 2 з 4'));
+check(
+  'картка рахує завдання в межах рівня',
+  cardRoot.innerHTML.includes(t('taskCard.counter', { current: 2, total: 4 }))
+);
 
 const twoTableRoot = fakeRoot();
 const joinTask = tasks.find((t) => schemaLines(t).length === 2);
@@ -84,7 +87,7 @@ check(
 const complexRoot = fakeRoot();
 const complexTask = tasks.find((t) => t.tier === 'complex');
 renderTaskCard(complexRoot, { task: complexTask, index: 9, total: 10, isSolved: false });
-check('картка позначає комплексне завдання', complexRoot.innerHTML.includes('Комплексне'));
+check('картка позначає комплексне завдання', complexRoot.innerHTML.includes(t('tier.complex')));
 const basicRoot = fakeRoot();
 renderTaskCard(basicRoot, {
   task: tasks.find((t) => t.tier === 'basic'),
@@ -92,8 +95,11 @@ renderTaskCard(basicRoot, {
   total: 10,
   isSolved: false,
 });
-check('базове завдання не позначається як комплексне', !basicRoot.innerHTML.includes('Комплексне'));
-check('картка позначає базове завдання', basicRoot.innerHTML.includes('Базове'));
+check(
+  'базове завдання не позначається як комплексне',
+  !basicRoot.innerHTML.includes(t('tier.complex'))
+);
+check('картка позначає базове завдання', basicRoot.innerHTML.includes(t('tier.basic')));
 check('картка не містить emoji-префіксів', !/[\u{1F300}-\u{1FAFF}]/u.test(cardRoot.innerHTML));
 
 // Завдань із кейсом у банку ще немає — вони приїдуть з рівнем 8. Тому картку
@@ -109,10 +115,71 @@ renderTaskCard(caseRoot, {
 });
 check(
   'картка показує назву кейса й номер кроку',
-  caseRoot.innerHTML.includes('Аналіз конверсії') && caseRoot.innerHTML.includes('крок 2 з 4')
+  caseRoot.innerHTML.includes(
+    escapeHtml(t('taskCard.case', { title: 'Аналіз конверсії', step: 2, total: 4 }))
+  )
 );
 check('бейдж кейса має власний клас', caseRoot.innerHTML.includes('case-pill'));
 check('звичайне завдання бейджа кейса не показує', !cardRoot.innerHTML.includes('case-pill'));
+
+// Картка й панель керування — трьома мовами. Назви завдань поки українські
+// (їх перекладає етап 2), тому звіряємо саме підписи інтерфейсу.
+LANGS.forEach((lang) => {
+  setLanguage(lang);
+  const root = fakeRoot();
+  renderTaskCard(root, { task, index: 1, total: 4, isSolved: true });
+  [
+    ['бізнес-контекст', t('taskCard.context')],
+    ['структуру даних', t('taskCard.schema')],
+    ['очікувані колонки', t('taskCard.columns')],
+    ['лічильник завдань', t('taskCard.counter', { current: 2, total: 4 })],
+    ['складність', t(`tier.${task.tier}`)],
+    ['назву рівня', t(`level.${task.level}.name`)],
+  ].forEach(([what, expected]) => {
+    check(`${lang}: картка підписує ${what}`, root.innerHTML.includes(escapeHtml(expected)));
+  });
+  check(
+    `${lang}: картка позначає розв'язане`,
+    root.innerHTML.includes(escapeHtml(t('taskCard.solved')))
+  );
+
+  const controls = controlsHtml({
+    hintsRevealed: 1,
+    totalHints: 3,
+    isFirstTask: false,
+    isLastTask: false,
+  });
+  [
+    ['перевірку', t('controls.check')],
+    ['підказку', t('controls.hint', { revealed: 1, total: 3 })],
+    ['відповідь', t('controls.giveUp')],
+    ['попереднє', t('controls.prev')],
+    ['наступне', t('controls.next')],
+  ].forEach(([what, expected]) => {
+    check(`${lang}: керування підписує ${what}`, controls.includes(expected));
+  });
+  check(
+    `${lang}: останнє завдання дає «завершити»`,
+    controlsHtml({
+      hintsRevealed: 0,
+      totalHints: 3,
+      isFirstTask: false,
+      isLastTask: true,
+    }).includes(t('controls.finish'))
+  );
+
+  const hints = fakeRoot();
+  renderHints(hints, task.hints, 1);
+  check(
+    `${lang}: підказка нумерується`,
+    hints.innerHTML.includes(t('hint.numbered', { number: 1 }))
+  );
+  check(
+    `${lang}: смужка завдань має доступну назву`,
+    taskNavHtml([], 0).includes(t('taskNav.label'))
+  );
+});
+setLanguage('en');
 
 const hintRoot = fakeRoot();
 renderHints(hintRoot, task.hints, 0);
@@ -136,7 +203,7 @@ check('числа отримують окремий клас', tableRoot.innerHT
 
 const levels = LEVELS.map((level) => ({
   level,
-  name: LEVEL_NAMES[level],
+  name: levelName(level),
   total: tasksByLevel(level).length,
   solved: level === 1 ? 2 : 0,
 }));
@@ -145,7 +212,7 @@ check(
   'екран вибору показує всі рівні',
   (selectHtml.match(/data-level="/g) ?? []).length === LEVELS.length
 );
-check('картка рівня показує назву теми', selectHtml.includes('Основи вибірки'));
+check('картка рівня показує назву теми', selectHtml.includes(escapeHtml(levelName(1))));
 check(
   'картка рівня показує відсоток',
   selectHtml.includes(`${Math.round((2 / tasksByLevel(1).length) * 100)}%`)
@@ -171,8 +238,8 @@ check(
 );
 check('екран вибору без даних про нотатки не ламається', !selectHtml.includes('level-card__notes'));
 
-const doneHtml = levelCompleteHtml({ level: 3, name: LEVEL_NAMES[3], solved: 4, total: 4 });
-check('екран завершення називає рівень', doneHtml.includes("Об'єднання таблиць"));
+const doneHtml = levelCompleteHtml({ level: 3, name: levelName(3), solved: 4, total: 4 });
+check('екран завершення називає рівень', doneHtml.includes(escapeHtml(levelName(3))));
 check('екран завершення показує прогрес', doneHtml.includes('4 з 4'));
 check('екран завершення веде до наступного рівня', doneHtml.includes('data-action="next-level"'));
 check('екран завершення веде на головну', doneHtml.includes('data-action="to-home"'));
@@ -180,13 +247,13 @@ check('екран завершення називає вихід «На голо
 
 const lastLevelHtml = levelCompleteHtml({
   level: LEVELS.at(-1),
-  name: LEVEL_NAMES[LEVELS.at(-1)],
+  name: levelName(LEVELS.at(-1)),
   solved: 2,
   total: 4,
 });
 const doneWithSkills = levelCompleteHtml({
   level: 3,
-  name: LEVEL_NAMES[3],
+  name: levelName(3),
   solved: 4,
   total: 4,
   skills: [
@@ -417,7 +484,7 @@ check(
 );
 check(
   'на не останньому завданні напис "Наступне"',
-  firstControls.includes('Наступне') && !firstControls.includes('Наступне завдання')
+  firstControls.includes(t('controls.next')) && !firstControls.includes(t('controls.finish'))
 );
 check('доступна підказка не вимкнена', !/data-action="hint"[^>]*disabled/.test(firstControls));
 
@@ -441,7 +508,7 @@ check(
 check('кнопка "Попереднє" без зеленої підсвітки', !prevTag.includes('btn--next'));
 check('кнопка "Наступне" лишається зеленою', nextTag.includes('btn--next'));
 check('під завданням є вихід на головну', firstControls.includes('data-action="to-home"'));
-check('вихід під завданням називається «На головну»', firstControls.includes('На головну'));
+check('вихід під завданням веде на головну', firstControls.includes(t('nav.home')));
 check(
   'вихід на головну — окремий ряд, а не частина кнопок переходу',
   !navGroup.includes('data-action="to-home"')
@@ -457,7 +524,7 @@ check(
   'не на першому завданні "Попереднє" активна',
   !/data-action="prev"[^>]*disabled/.test(lastControls)
 );
-check('на останньому завданні напис "Завершити"', lastControls.includes('Завершити'));
+check('на останньому завданні напис "Завершити"', lastControls.includes(t('controls.finish')));
 check(
   'коли підказки вичерпані, кнопка вимкнена',
   /data-action="hint"[^>]*disabled/.test(lastControls)
