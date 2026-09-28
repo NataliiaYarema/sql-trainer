@@ -40,4 +40,30 @@ export default {
   'controls.next': 'Siguiente',
   'controls.finish': 'Terminar',
   'taskNav.label': 'Ejercicios del nivel',
+  'feedback.success': [
+    '¡Justo en el blanco!',
+    'Así es como lo hacen los analistas.',
+    '¡Buen trabajo!',
+    'La consulta es correcta: seguimos.',
+    'Perfecto. El siguiente nivel espera.',
+  ],
+  'feedback.failure': [
+    'Todavía no, pero ya casi.',
+    'No es eso. Inténtalo otra vez o mira la solución.',
+    'El resultado no coincide con el esperado.',
+    'Equivocarse es parte normal del aprendizaje.',
+  ],
+  'feedback.queryFailed': 'La consulta no se ejecutó',
+  'feedback.giveUpHead': 'Esta es la solución del ejercicio',
+  'feedback.giveUpText':
+    'Estudia la consulta de abajo y luego intenta escribirla por tu cuenta en un ejercicio parecido.',
+  'feedback.solution': 'Consulta correcta',
+  'feedback.explanation': 'Explicación',
+  'feedback.checkFailed': 'No se pudo comprobar el ejercicio: {message}',
+  'sql.empty': 'La consulta está vacía. Escribe una consulta SQL antes de comprobar.',
+  'sql.forbidden': 'Solo se permiten consultas SELECT / WITH: esta contiene un comando prohibido.',
+  'sql.multiple': 'Solo se puede ejecutar una consulta a la vez.',
+  'sql.noResult':
+    'La consulta no devolvió ningún resultado. Comprueba que sea una consulta SELECT.',
+  'sql.error': 'Error de SQL: {message}',
 };

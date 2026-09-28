@@ -334,7 +334,7 @@ async function handleCheck() {
   } catch (err) {
     if (err instanceof SqlUserError) {
       if (currentIndex !== startedAt) return;
-      renderSqlError(roots.feedback, `Не вдалося перевірити завдання: ${err.message}`);
+      renderSqlError(roots.feedback, t('feedback.checkFailed', { message: err.message }));
       return;
     }
     throw err;

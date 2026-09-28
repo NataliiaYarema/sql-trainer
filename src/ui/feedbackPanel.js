@@ -1,22 +1,19 @@
 import { icon, escapeHtml, dedent } from '../utils/dom.js';
 import { highlightSql } from './sqlHighlight.js';
+import { t } from '../i18n/index.js';
 
-export const SUCCESS_PHRASES = [
-  'Точно в ціль!',
-  'Саме так це і роблять аналітики.',
-  'Чудова робота!',
-  'Запит правильний — рухаємось далі.',
-  'Ідеально. Наступний рівень чекає.',
-];
-
-// Жодна фраза не відсилає «нижче» й не обіцяє розбору: під нею тепер порожньо,
+// Фрази беруться зі словника при кожному показі, а не один раз на завантаження
+// модуля: інакше після зміни мови вікно перевірки лишалося б попередньою.
+//
+// Жодна фраза не відсилає «нижче» й не обіцяє розбору: під нею порожньо,
 // а розв'язок показує лише кнопка «Показати відповідь».
-export const FAILURE_PHRASES = [
-  'Ще не те — але ти вже близько.',
-  'Не зовсім. Спробуй ще раз або відкрий відповідь.',
-  'Результат не збігається з очікуваним.',
-  'Помилка — це нормальна частина навчання.',
-];
+export function successPhrases() {
+  return t('feedback.success');
+}
+
+export function failurePhrases() {
+  return t('feedback.failure');
+}
 
 function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
@@ -25,10 +22,10 @@ function pick(list) {
 function solutionBlock(task) {
   return `
     <div class="feedback__section">
-      <div class="section-label">${icon('i-book')}Правильний запит</div>
+      <div class="section-label">${icon('i-book')}${escapeHtml(t('feedback.solution'))}</div>
       <pre class="solution-sql"><code>${highlightSql(dedent(task.referenceSql))}</code></pre>
       <div class="feedback__section">
-        <div class="section-label">${icon('i-bulb')}Пояснення</div>
+        <div class="section-label">${icon('i-bulb')}${escapeHtml(t('feedback.explanation'))}</div>
         <p class="feedback__explanation">${escapeHtml(task.explanation)}</p>
       </div>
     </div>
@@ -41,7 +38,7 @@ function solutionBlock(task) {
 export function renderSuccess(root) {
   root.innerHTML = `
     <div class="feedback feedback--success">
-      <div class="feedback__head">${icon('i-check')}${escapeHtml(pick(SUCCESS_PHRASES))}</div>
+      <div class="feedback__head">${icon('i-check')}${escapeHtml(pick(successPhrases()))}</div>
     </div>
   `;
 }
@@ -49,7 +46,7 @@ export function renderSuccess(root) {
 export function renderFailure(root) {
   root.innerHTML = `
     <div class="feedback feedback--error">
-      <div class="feedback__head">${icon('i-x')}${escapeHtml(pick(FAILURE_PHRASES))}</div>
+      <div class="feedback__head">${icon('i-x')}${escapeHtml(pick(failurePhrases()))}</div>
     </div>
   `;
 }
@@ -57,7 +54,7 @@ export function renderFailure(root) {
 export function renderSqlError(root, message) {
   root.innerHTML = `
     <div class="feedback feedback--warning">
-      <div class="feedback__head">${icon('i-x')}Запит не виконався</div>
+      <div class="feedback__head">${icon('i-x')}${escapeHtml(t('feedback.queryFailed'))}</div>
       <p class="feedback__text">${escapeHtml(message)}</p>
     </div>
   `;
@@ -66,8 +63,8 @@ export function renderSqlError(root, message) {
 export function renderGiveUp(root, task) {
   root.innerHTML = `
     <div class="feedback feedback--warning">
-      <div class="feedback__head">${icon('i-flag')}Ось розв'язок цього завдання</div>
-      <p class="feedback__text">Розбери запит нижче — і спробуй написати його самостійно на схожому завданні.</p>
+      <div class="feedback__head">${icon('i-flag')}${escapeHtml(t('feedback.giveUpHead'))}</div>
+      <p class="feedback__text">${escapeHtml(t('feedback.giveUpText'))}</p>
       ${solutionBlock(task)}
     </div>
   `;

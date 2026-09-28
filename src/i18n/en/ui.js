@@ -43,4 +43,32 @@ export default {
   'controls.next': 'Next',
   'controls.finish': 'Finish',
   'taskNav.label': 'Tasks in this level',
+  'feedback.success': [
+    'Right on target!',
+    "That's exactly how analysts do it.",
+    'Great work!',
+    'The query is correct — moving on.',
+    'Perfect. The next level is waiting.',
+  ],
+  // Жодна фраза не відсилає до тексту поруч: під нею порожньо, бо renderFailure
+  // не приймає завдання й розбору не показує.
+  'feedback.failure': [
+    "Not quite — but you're close.",
+    'Not yet. Try again, or reveal the answer.',
+    "The result doesn't match the expected one.",
+    'Mistakes are a normal part of learning.',
+  ],
+  'feedback.queryFailed': 'The query did not run',
+  'feedback.giveUpHead': 'Here is the solution',
+  'feedback.giveUpText':
+    'Read through the query below — then try writing it yourself on a similar task.',
+  'feedback.solution': 'Correct query',
+  'feedback.explanation': 'Explanation',
+  'feedback.checkFailed': 'Could not check the task: {message}',
+  'sql.empty': 'The query is empty. Write a SQL query before checking.',
+  'sql.forbidden':
+    'Only SELECT / WITH queries are allowed — this one contains a forbidden command.',
+  'sql.multiple': 'Only one query can run at a time.',
+  'sql.noResult': 'The query returned no result. Make sure it is a SELECT query.',
+  'sql.error': 'SQL error: {message}',
 };

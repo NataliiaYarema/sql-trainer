@@ -50,6 +50,9 @@ export function t(key, vars = {}) {
   // tests/verifyI18n.mjs.
   const entry = DICTS[current][key] ?? DICTS[DEFAULT_LANG][key];
   if (entry === undefined) return key;
+  // Масив віддаємо як є: так у словнику лежать набори фраз, з яких вікно
+  // перевірки щоразу бере випадкову. Підстановок у них немає.
+  if (Array.isArray(entry)) return entry;
   const template = typeof entry === 'string' ? entry : pluralForm(entry, current, vars.count ?? 0);
   return fill(template, vars);
 }

@@ -11,11 +11,16 @@
 // REPLACE(рядок, що, на що) — оператора REPLACE у PostgreSQL немає
 // (SQLite-івський REPLACE INTO сюди не стосується), а CREATE OR REPLACE
 // ловиться словом create.
+import { t } from '../i18n/index.js';
+
 export const FORBIDDEN_STATEMENT =
   /\b(insert|update|delete|drop|alter|create|attach|detach|pragma|vacuum|begin|commit|rollback)\b/i;
 
-export const FORBIDDEN_STATEMENT_MESSAGE =
-  'Дозволені лише запити SELECT / WITH — цей запит містить заборонену команду.';
+// Функція, а не константа: константа зафіксувала б мову на момент завантаження
+// модуля, а мова змінюється в пам'яті, без перезавантаження сторінки.
+export function forbiddenStatementMessage() {
+  return t('sql.forbidden');
+}
 
 // Повертає знайдене заборонене слово або null. Слово в поверненні, а не
 // просто true, — щоб тест міг назвати, об що саме спіткнувся запит.

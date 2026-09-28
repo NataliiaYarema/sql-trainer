@@ -18,8 +18,8 @@ import { dashboardHtml } from '../src/ui/dashboard.js';
 import { theoryTopicHtml } from '../src/ui/theoryTopic.js';
 import topics from '../src/theory/topics.js';
 import {
-  SUCCESS_PHRASES,
-  FAILURE_PHRASES,
+  successPhrases,
+  failurePhrases,
   renderSuccess,
   renderFailure,
   renderGiveUp,
@@ -398,7 +398,7 @@ check('успіх не розкриває еталонний SQL', !fbRoot.inner
 renderFailure(fbRoot);
 check('невдача показує фразу', fbRoot.innerHTML.includes('feedback--error'));
 check('невдача не розкриває правильний запит', !fbRoot.innerHTML.includes('solution-sql'));
-check('невдача не містить пояснення', !fbRoot.innerHTML.includes('Пояснення'));
+check('невдача не містить пояснення', !fbRoot.innerHTML.includes(t('feedback.explanation')));
 check(
   'невдача не переказує пояснення завдання',
   !fbRoot.innerHTML.includes(escapeHtml(task.explanation))
@@ -406,13 +406,36 @@ check(
 
 // Панель показує саму фразу й нічого більше, тому фраза не має посилатися на
 // текст поруч: «як мало бути» чи «підказка нижче» вказували б у порожнечу.
-[...SUCCESS_PHRASES, ...FAILURE_PHRASES].forEach((phrase) => {
-  check(`фраза «${phrase}» не обіцяє розбору поруч`, !/нижче|Розберімо/.test(phrase));
+// Правило діє в кожній мові, тому й слова-маркери перелічені трьома мовами.
+LANGS.forEach((lang) => {
+  setLanguage(lang);
+  check(`${lang}: п'ять фраз успіху`, successPhrases().length === 5);
+  check(`${lang}: чотири фрази невдачі`, failurePhrases().length === 4);
+  [...successPhrases(), ...failurePhrases()].forEach((phrase) => {
+    check(
+      `${lang}: фраза «${phrase}» не обіцяє розбору поруч`,
+      // Межі слова обов'язкові: без них іспанське «trabajo» містить у собі
+      // «abajo» і чесна фраза падала б на перевірці.
+      !/нижче|Розберімо|below|abajo/i.test(phrase)
+    );
+  });
+  const root = fakeRoot();
+  renderFailure(root);
+  check(
+    `${lang}: вікно невдачі показує одну з фраз цієї мови`,
+    failurePhrases().some((phrase) => root.innerHTML.includes(escapeHtml(phrase)))
+  );
+  renderSuccess(root);
+  check(
+    `${lang}: вікно успіху показує одну з фраз цієї мови`,
+    successPhrases().some((phrase) => root.innerHTML.includes(escapeHtml(phrase)))
+  );
 });
+setLanguage('en');
 
 renderGiveUp(fbRoot, task);
 check("здача показує розв'язок", fbRoot.innerHTML.includes('solution-sql'));
-check('здача містить пояснення', fbRoot.innerHTML.includes('Пояснення'));
+check('здача містить пояснення', fbRoot.innerHTML.includes(t('feedback.explanation')));
 check("розв'язок підсвічено", fbRoot.innerHTML.includes('class="sql-keyword"'));
 check(
   "розв'язок показано без втрати символів",

@@ -1,6 +1,7 @@
 import { PGlite } from '@electric-sql/pglite';
 import { toResult } from './pgResult.js';
-import { FORBIDDEN_STATEMENT, FORBIDDEN_STATEMENT_MESSAGE } from './sqlGuard.js';
+import { FORBIDDEN_STATEMENT, forbiddenStatementMessage } from './sqlGuard.js';
+import { t } from '../i18n/index.js';
 import { ALL_FIXTURES_SQL } from '../tasks/fixtures.js';
 
 // Один інстанс PGlite на весь застосунок. Свіжа база під кожен запит коштує
@@ -33,10 +34,10 @@ export class SqlUserError extends Error {}
 async function runSelect(sql) {
   const trimmed = sql.trim();
   if (!trimmed) {
-    throw new SqlUserError('Запит порожній. Напиши SQL-запит перед перевіркою.');
+    throw new SqlUserError(t('sql.empty'));
   }
   if (FORBIDDEN_STATEMENT.test(trimmed)) {
-    throw new SqlUserError(FORBIDDEN_STATEMENT_MESSAGE);
+    throw new SqlUserError(forbiddenStatementMessage());
   }
 
   const db = await initDbOnce();
@@ -48,13 +49,13 @@ async function runSelect(sql) {
     result = await db.query(trimmed, [], { rowMode: 'array' });
   } catch (err) {
     if (/multiple commands/i.test(err.message)) {
-      throw new SqlUserError('Дозволено виконувати лише один запит за раз.');
+      throw new SqlUserError(t('sql.multiple'));
     }
-    throw new SqlUserError(`Помилка SQL: ${err.message}`);
+    throw new SqlUserError(t('sql.error', { message: err.message }));
   }
 
   if (!result.fields || result.fields.length === 0) {
-    throw new SqlUserError('Запит не повернув результату. Переконайтесь, що це SELECT-запит.');
+    throw new SqlUserError(t('sql.noResult'));
   }
 
   return toResult(result);

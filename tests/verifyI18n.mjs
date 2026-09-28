@@ -63,10 +63,16 @@ LANGS.forEach((lang) => {
 
 // Форми множини: скільки їх потрібно, вирішує сама мова, а не ми. Українській
 // треба one/few/many, англійській та іспанській — one/other.
+//
+// Масиви сюди не входять: це набори фраз, а не форми числа. Через це фільтр
+// перевіряє саме Array.isArray, а не лише typeof === 'object' — масив у JS
+// теж об'єкт, і без цього тест вимагав би від нього форму 'one'.
 LANGS.forEach((lang) => {
   const rules = new Intl.PluralRules(lang);
   const needed = new Set([1, 2, 3, 5, 11, 21, 100].map((n) => rules.select(n)));
-  const plurals = Object.entries(DICTS[lang]).filter(([, value]) => typeof value === 'object');
+  const plurals = Object.entries(DICTS[lang]).filter(
+    ([, value]) => typeof value === 'object' && !Array.isArray(value)
+  );
   plurals.forEach(([key, value]) => {
     const missing = [...needed].filter((form) => value[form] === undefined);
     check(`${lang}: ${key} має всі потрібні форми (${missing.join(', ')})`, missing.length === 0);
@@ -93,6 +99,18 @@ enKeys.forEach((key) => {
     );
   });
 });
+
+// Набір фраз, що загубив рядок в одній мові, звузив би різноманіття мовчки.
+Object.entries(en)
+  .filter(([, value]) => Array.isArray(value))
+  .forEach(([key, value]) => {
+    LANGS.filter((lang) => lang !== 'en').forEach((lang) => {
+      check(
+        `${lang}: ${key} має стільки ж фраз, скільки англійською`,
+        Array.isArray(DICTS[lang][key]) && DICTS[lang][key].length === value.length
+      );
+    });
+  });
 
 // Поведінка t()
 setLanguage('uk');
