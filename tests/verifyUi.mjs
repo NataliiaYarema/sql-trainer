@@ -1040,5 +1040,74 @@ const homeLabel = t('nav.home');
   check(`${where}: кожна кнопка «На головну» має гачок для кольору`, homeButtons === hooked);
 });
 
+// Замок на забутий літерал. Перелічені розмітки складаються лише з підписів
+// інтерфейсу — ні умов завдань, ні текстів теорії в них немає, тому жодної
+// кирилиці в англійському та іспанському прогоні бути не може.
+//
+// Банк завдань і теорія на цьому етапі лишаються українськими навмисно (їх
+// перекладають етапи 2 і 3), тому картка завдання, екран нотаток із записами
+// й тема теорії сюди не входять: у них лежать назви завдань і проза.
+const CYRILLIC = /[А-Яа-яІіЇїЄєҐґ]/;
+
+// Єдине законне виключення — сам перемикач мови: мови в ньому підписані
+// самоназвами («Українська»), і саме тому свою мову знаходить той, хто
+// поточної не розуміє. Тому перед перевіркою вирізаємо <select>.
+const withoutLangSelect = (html) => html.replace(/<select[\s\S]*?<\/select>/g, '');
+
+['en', 'es'].forEach((lang) => {
+  setLanguage(lang);
+  [
+    ['шапка', withoutLangSelect(progressHtml({ showBack: true }))],
+    [
+      'керування',
+      controlsHtml({ hintsRevealed: 1, totalHints: 3, isFirstTask: false, isLastTask: true }),
+    ],
+    [
+      'вибір рівня',
+      levelSelectHtml(
+        LEVELS.map((level) => ({
+          level,
+          name: levelName(level),
+          total: 5,
+          solved: 5,
+          noteCount: 1,
+        }))
+      ),
+    ],
+    [
+      'завершення рівня',
+      levelCompleteHtml({ level: 1, name: levelName(1), solved: 5, total: 5, skills: [] }),
+    ],
+    [
+      'діалог',
+      confirmDialogHtml({
+        title: t('dialog.clearProgress'),
+        note: t('dialog.irreversible'),
+        confirmLabel: t('dialog.clear'),
+      }),
+    ],
+    ['пісочниця', sandboxControlsHtml()],
+    ['схема пісочниці', sandboxSchemaHtml(['products(product_id INT, price NUMERIC)'])],
+    ['порожні нотатки', notesScreenHtml([])],
+    ['панель нотатки', notePanelHtml({ text: '', isOpen: false })],
+    ['таблиця результату', resultTableHtml({ columns: ['a'], values: [[1]] })],
+    [
+      'дашборд без даних',
+      dashboardHtml({
+        summary: { solved: 0, total: 125, activeDays: 0 },
+        lastActivity: null,
+        masteredSkills: [],
+        errorTopics: [],
+        hardTasks: [],
+      }),
+    ],
+    ['смужка завдань', taskNavHtml([{ index: 0, status: 'new', hasNote: false }], 0)],
+  ].forEach(([where, html]) => {
+    const found = html.match(CYRILLIC);
+    check(`${lang}: ${where} без української${found ? ` (${found[0]})` : ''}`, found === null);
+  });
+});
+setLanguage('uk');
+
 console.log(failures === 0 ? '\nУсі перевірки UI пройдено.' : `\n${failures} перевірок провалено.`);
 process.exit(failures === 0 ? 0 : 1);
