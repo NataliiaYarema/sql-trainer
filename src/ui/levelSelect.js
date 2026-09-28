@@ -1,10 +1,11 @@
 import { icon, escapeHtml } from '../utils/dom.js';
+import { t } from '../i18n/index.js';
 
 // levels: [{ level, name, total, solved, noteCount }]
 export function levelSelectHtml(levels) {
   return `
     <div class="level-select">
-      <h2 class="level-select__title">Обери рівень</h2>
+      <h2 class="level-select__title">${escapeHtml(t('levelSelect.title'))}</h2>
       <div class="level-select__grid">
         ${levels.map(levelCardHtml).join('')}
       </div>
@@ -19,15 +20,15 @@ function levelCardHtml({ level, name, total, solved, noteCount }) {
   return `
     <button class="level-card ${done ? 'level-card--done' : ''}" data-level="${level}">
       <span class="level-card__head">
-        <span class="level-card__number">${icon('i-target')}Рівень ${level}</span>
-        ${done ? `<span class="level-card__done">${icon('i-check')}пройдено</span>` : ''}
+        <span class="level-card__number">${icon('i-target')}${escapeHtml(t('levelSelect.level', { level }))}</span>
+        ${done ? `<span class="level-card__done">${icon('i-check')}${escapeHtml(t('levelSelect.done'))}</span>` : ''}
       </span>
       <span class="level-card__name">${escapeHtml(name)}</span>
       <span class="level-card__bar">
         <span class="level-card__fill" style="width: ${fillPercent}%"></span>
       </span>
       <span class="level-card__progress">${Math.round(fillPercent)}%</span>
-      ${noteCount > 0 ? `<span class="level-card__notes">Нотаток: ${noteCount}</span>` : ''}
+      ${noteCount > 0 ? `<span class="level-card__notes">${escapeHtml(t('levelSelect.notes', { count: noteCount }))}</span>` : ''}
     </button>
   `;
 }

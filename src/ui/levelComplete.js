@@ -1,5 +1,6 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 import { LEVELS } from '../tasks/index.js';
+import { t } from '../i18n/index.js';
 
 // Відмітка стоїть лише там, де вміння справді здобуте; решта показується
 // приглушено. Екран не має стверджувати «ви вмієте» тому, хто пʼять разів
@@ -9,7 +10,7 @@ function skillsHtml(skills) {
 
   return `
     <div class="final-screen__skills">
-      <h3 class="final-screen__skills-title">Ти тепер вмієш</h3>
+      <h3 class="final-screen__skills-title">${escapeHtml(t('levelDone.skills'))}</h3>
       <ul class="skill-items">
         ${skills
           .map(
@@ -32,22 +33,22 @@ export function levelCompleteHtml({ level, name, solved, total, skills = [] }) {
   return `
     <div class="final-screen">
       <div class="final-screen__icon">${icon('i-award')}</div>
-      <h2 class="final-screen__title">Рівень ${level} пройдено</h2>
+      <h2 class="final-screen__title">${escapeHtml(t('levelDone.title', { level }))}</h2>
       <p class="final-screen__text">
-        ${escapeHtml(name)} — розв'язано ${solved} з ${total} завдань.
-        ${allSolved ? '' : 'До решти можна повернутися будь-коли.'}
+        ${escapeHtml(t('levelDone.text', { name, solved, total }))}
+        ${allSolved ? '' : escapeHtml(t('levelDone.rest'))}
       </p>
       ${skillsHtml(skills)}
       <div class="final-screen__actions">
         ${
           hasNextLevel
             ? `<button class="btn btn--primary" data-action="next-level">
-                Рівень ${level + 1}${icon('i-arrow-right')}
+                ${escapeHtml(t('levelDone.nextLevel', { level: level + 1 }))}${icon('i-arrow-right')}
               </button>`
             : ''
         }
         <button class="btn btn--ghost" data-action="to-home">
-          ${icon('i-arrow-left')}На головну
+          ${icon('i-arrow-left')}${escapeHtml(t('nav.home'))}
         </button>
       </div>
     </div>

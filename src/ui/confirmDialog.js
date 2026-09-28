@@ -1,4 +1,5 @@
 import { escapeHtml } from '../utils/dom.js';
+import { t } from '../i18n/index.js';
 
 // Власне вікно підтвердження замість нативного confirm(). Причина одна й
 // вагома: у нативного кнопки називаються OK і Cancel, і перейменувати їх
@@ -10,7 +11,7 @@ export function confirmDialogHtml({ title, note, confirmLabel }) {
       <h3 class="modal__title">${escapeHtml(title)}</h3>
       <p class="modal__note">${escapeHtml(note)}</p>
       <div class="modal__actions">
-        <button class="btn btn--ghost" data-action="cancel">Скасувати</button>
+        <button class="btn btn--ghost" data-action="cancel">${escapeHtml(t('dialog.cancel'))}</button>
         <button class="btn btn--danger" data-action="confirm">${escapeHtml(confirmLabel)}</button>
       </div>
     </div>

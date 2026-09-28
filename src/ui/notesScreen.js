@@ -1,6 +1,7 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 import { askConfirm } from './confirmDialog.js';
 import { saveButtonLabel, SAVED_LABEL_MS } from './notePanel.js';
+import { t } from '../i18n/index.js';
 
 // entries: [{ taskId, level, levelName, index, title, context, taskText, note }] —
 // уже відсортовані за рівнем і номером завдання, модуль лише групує.
@@ -167,9 +168,9 @@ export function renderNotesScreen(root, entries, handlers) {
 
   root.querySelector('[data-action="delete-all-notes"]')?.addEventListener('click', async () => {
     const confirmed = await askConfirm({
-      title: 'Видалити всі нотатки?',
-      note: 'Цю дію не можна буде скасувати.',
-      confirmLabel: 'Видалити',
+      title: t('dialog.deleteNotes'),
+      note: t('dialog.irreversible'),
+      confirmLabel: t('dialog.delete'),
     });
     if (confirmed) handlers.onDeleteAllNotes();
   });

@@ -1,5 +1,6 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 import { askConfirm } from './confirmDialog.js';
+import { t } from '../i18n/index.js';
 
 const EMPTY_HINT = 'Даних поки немає — історія збирається з моменту, коли ти відкриваєш завдання.';
 
@@ -214,9 +215,9 @@ export function renderDashboard(root, metrics, handlers) {
   // Кнопки може не бути: на чистому дашборді очищати нічого.
   root.querySelector('[data-action="clear-all"]')?.addEventListener('click', async () => {
     const confirmed = await askConfirm({
-      title: 'Очистити весь прогрес?',
-      note: 'Цю дію не можна буде скасувати.',
-      confirmLabel: 'Очистити',
+      title: t('dialog.clearProgress'),
+      note: t('dialog.irreversible'),
+      confirmLabel: t('dialog.clear'),
     });
     if (confirmed) handlers.onClearAll();
   });

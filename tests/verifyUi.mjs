@@ -16,6 +16,7 @@ import { sandboxControlsHtml } from '../src/ui/sandbox.js';
 import { confirmDialogHtml } from '../src/ui/confirmDialog.js';
 import { dashboardHtml } from '../src/ui/dashboard.js';
 import { theoryTopicHtml } from '../src/ui/theoryTopic.js';
+import { theoryListHtml } from '../src/ui/theoryList.js';
 import topics from '../src/theory/topics.js';
 import {
   successPhrases,
@@ -231,7 +232,10 @@ const levelsWithNotes = levels.map((entry) => ({
   noteCount: entry.level === 2 ? 3 : 0,
 }));
 const notedSelectHtml = levelSelectHtml(levelsWithNotes);
-check('картка рівня показує кількість нотаток', notedSelectHtml.includes('Нотаток: 3'));
+check(
+  'картка рівня показує кількість нотаток',
+  notedSelectHtml.includes(t('levelSelect.notes', { count: 3 }))
+);
 check(
   'рівень без нотаток не показує лічильник',
   (notedSelectHtml.match(/level-card__notes/g) ?? []).length === 1
@@ -240,10 +244,13 @@ check('екран вибору без даних про нотатки не ла
 
 const doneHtml = levelCompleteHtml({ level: 3, name: levelName(3), solved: 4, total: 4 });
 check('екран завершення називає рівень', doneHtml.includes(escapeHtml(levelName(3))));
-check('екран завершення показує прогрес', doneHtml.includes('4 з 4'));
+check(
+  'екран завершення показує прогрес',
+  doneHtml.includes(escapeHtml(t('levelDone.text', { name: levelName(3), solved: 4, total: 4 })))
+);
 check('екран завершення веде до наступного рівня', doneHtml.includes('data-action="next-level"'));
 check('екран завершення веде на головну', doneHtml.includes('data-action="to-home"'));
-check('екран завершення називає вихід «На головну»', doneHtml.includes('На головну'));
+check('екран завершення називає вихід', doneHtml.includes(t('nav.home')));
 
 const lastLevelHtml = levelCompleteHtml({
   level: LEVELS.at(-1),
@@ -261,7 +268,7 @@ const doneWithSkills = levelCompleteHtml({
     { text: 'знаходити записи без відповідності', done: false },
   ],
 });
-check('екран завершення називає вміння', doneWithSkills.includes('Ти тепер вмієш'));
+check('екран завершення називає вміння', doneWithSkills.includes(t('levelDone.skills')));
 check('здобуте вміння позначене відміткою', doneWithSkills.includes('skill-item--done'));
 check('нездобуте вміння теж показане', doneWithSkills.includes('знаходити записи'));
 check(
@@ -271,13 +278,21 @@ check(
 check('без умінь блок не малюється', !doneHtml.includes('Ти тепер вмієш'));
 
 check('на останньому рівні немає кнопки наступного', !lastLevelHtml.includes('next-level'));
-check('екран завершення показує фактичний прогрес', lastLevelHtml.includes('2 з 4'));
+check(
+  'екран завершення показує фактичний прогрес',
+  lastLevelHtml.includes(
+    escapeHtml(t('levelDone.text', { name: levelName(LEVELS.at(-1)), solved: 2, total: 4 }))
+  )
+);
 
-const headerHtml = progressHtml({ levelName: "Рівень 3 · Об'єднання таблиць", showBack: true });
+const headerHtml = progressHtml({
+  levelName: t('taskCard.levelPill', { level: 3, name: levelName(3) }),
+  showBack: true,
+});
 check('шапка більше не показує лічильник', !headerHtml.includes("розв'язано"));
 check('шапка веде до дашборда', headerHtml.includes('data-action="dashboard"'));
 check('шапка веде до нотаток', headerHtml.includes('data-action="notes"'));
-check('шапка показує назву рівня', headerHtml.includes('Рівень 3'));
+check('шапка показує назву рівня', headerHtml.includes(escapeHtml(levelName(3))));
 check('шапка має вихід на головну', headerHtml.includes('data-action="to-home"'));
 check('верхня кнопка веде на головну', headerHtml.includes(t('nav.home')));
 check(
@@ -351,6 +366,46 @@ check('невідома мова не називається', parseRoute('#/fr/
 check('невідомий екран веде на головну', parseRoute('#/en/nonsense').screen === 'home');
 check('порожній hash веде на головну', parseRoute('').screen === 'home');
 check('порожній hash не називає мови', parseRoute('').lang === null);
+
+// Головна, завершення рівня й діалог — трьома мовами.
+LANGS.forEach((lang) => {
+  setLanguage(lang);
+  const levels = levelSelectHtml([
+    { level: 1, name: levelName(1), total: 5, solved: 5, noteCount: 2 },
+  ]);
+  check(`${lang}: головна просить обрати рівень`, levels.includes(t('levelSelect.title')));
+  check(`${lang}: пройдений рівень підписано`, levels.includes(t('levelSelect.done')));
+  check(`${lang}: нотатки рівня підписано`, levels.includes(t('levelSelect.notes', { count: 2 })));
+  check(`${lang}: картка рівня нумерується`, levels.includes(t('levelSelect.level', { level: 1 })));
+
+  const done = levelCompleteHtml({
+    level: 1,
+    name: levelName(1),
+    solved: 4,
+    total: 5,
+    skills: [{ text: 'SELECT', done: true }],
+  });
+  check(
+    `${lang}: завершення рівня має заголовок`,
+    done.includes(t('levelDone.title', { level: 1 }))
+  );
+  check(`${lang}: незавершений рівень запрошує повернутися`, done.includes(t('levelDone.rest')));
+  check(`${lang}: блок умінь підписано`, done.includes(t('levelDone.skills')));
+  check(
+    `${lang}: кнопка наступного рівня підписана`,
+    done.includes(t('levelDone.nextLevel', { level: 2 }))
+  );
+
+  const dialog = confirmDialogHtml({
+    title: t('dialog.clearProgress'),
+    note: t('dialog.irreversible'),
+    confirmLabel: t('dialog.clear'),
+  });
+  check(`${lang}: діалог має відмову`, dialog.includes(t('dialog.cancel')));
+  check(`${lang}: діалог має підтвердження`, dialog.includes(t('dialog.clear')));
+  check(`${lang}: список теорії підписано`, theoryListHtml(topics).includes(t('theoryList.title')));
+});
+setLanguage('en');
 
 // Перемикач мови: три варіанти, поточний вибраний, підпис — самоназвою.
 // Нативний <select>, тому перевіряємо саме <option>, а не власну розмітку.
@@ -698,14 +753,16 @@ const dialog = confirmDialogHtml({
 check('вікно показує запитання', dialog.includes('Очистити весь прогрес?'));
 check('вікно попереджає про необоротність', dialog.includes('Цю дію не можна буде скасувати.'));
 check('кнопка підтвердження названа своїм словом', />Очистити\s*<\/button>/.test(dialog));
-check('кнопка відмови називається «Скасувати»', />Скасувати\s*<\/button>/.test(dialog));
+check('кнопка відмови підписана', dialog.includes(`>${t('dialog.cancel')}</button>`));
 check('підтвердження небезпечного вигляду', dialog.includes('btn--danger'));
 check('відмова звичайного вигляду', dialog.includes('btn--ghost'));
 check('вікно позначене як діалог', dialog.includes('role="dialog"'));
-check(
-  'у вікні немає OK і Cancel',
-  !dialog.includes('>OK<') && !dialog.toLowerCase().includes('cancel<')
-);
+// Власне вікно замість нативного confirm() зроблено через те, що в нативного
+// кнопки звуться OK і Cancel, і перейменувати їх браузер не дозволяє. Тож
+// перевіряємо саме те, заради чого все робилося: підтвердження називає дію.
+// Слово Cancel на кнопці відмови англійською — правильне, і його тут не
+// забороняємо: проблемою було безлике «ОК» на питанні про знищення даних.
+check('підтвердження називає дію, а не каже ОК', !dialog.includes('>OK<'));
 check(
   'текст вікна екранується',
   confirmDialogHtml({ title: '<b>x</b>', note: 'n', confirmLabel: 'y' }).includes('&lt;b&gt;')
@@ -816,7 +873,7 @@ const homeLabel = t('nav.home');
   ['дашборд', dashboardHtml(dashMetrics)],
   ['нотатки', notesScreenHtml([])],
   ['пісочниця', sandboxControlsHtml()],
-  ['завершення рівня', doneHtml],
+  ['завершення рівня', levelCompleteHtml({ level: 3, name: levelName(3), solved: 4, total: 4 })],
   ['теорія', theoryTopicHtml(topics[0])],
   ['панель керування', controlsHtml({ hintsRevealed: 0, totalHints: 3 })],
 ].forEach(([where, html]) => {
