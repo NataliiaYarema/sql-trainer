@@ -1011,17 +1011,29 @@ body {
   margin-left: auto;
 }
 
-/* Перемикач мови стоїть у тому ж ряду, що й пункти шапки, тому виглядає як
-   вони: ті самі відступи, рамка й радіус, що в .btn--ghost. Нативний <select>
-   узято свідомо — клавіатура, вибір на телефоні й доступність працюють самі,
-   без коду на відкривання, закривання й клік поза межами. Плата за це —
-   стрілка залишається браузерною, і вирівняти її з іконками кнопок не можна. */
+/* Перемикач мови стоїть у тому ж ряду, що й пункти шапки, тому має ті самі
+   відступи, рамку й радіус. Колір — акцентний, як у «На головну»: та сама
+   пара «акцентний текст на приглушеному акцентному тлі», щоб у шапці не
+   з'явився третій власний вигляд кнопки.
+
+   Нативний <select> узято свідомо — клавіатура, вибір на телефоні й
+   доступність працюють самі, без коду на відкривання, закривання й клік поза
+   межами.
+
+   Стрілку натомість малюємо свою (appearance: none): браузерну не відсунути
+   від рамки — вона притиснута до краю, і padding-right розганяє лише текст.
+   Колір у ній записаний числом, бо var() всередині url() не працює; це той
+   самий #4f9cf9, що й --accent. Якщо акцент колись зміниться, цей рядок
+   доведеться правити разом із ним. */
 .lang-select {
-  padding: 9px 12px;
+  appearance: none;
+  padding: 9px 34px 9px 12px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: transparent;
-  color: var(--text-muted);
+  border: 1px solid rgba(79, 156, 249, 0.35);
+  background: var(--accent-soft)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%234f9cf9' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 14px center;
+  color: var(--accent);
   font-family: inherit;
   font-size: 14px;
   font-weight: 550;
@@ -1030,8 +1042,7 @@ body {
 }
 
 .lang-select:hover {
-  border-color: var(--text-dim);
-  color: var(--text);
+  border-color: var(--accent);
 }
 
 /* Розкритий список малює операційна система, і на темній темі він успадкував
