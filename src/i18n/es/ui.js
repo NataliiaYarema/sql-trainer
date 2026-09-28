@@ -24,6 +24,11 @@ export default {
   'level.6.name': 'Fechas y cadenas',
   'level.7.name': 'Condiciones y conjuntos',
   'level.8.name': 'Casos de analítica',
+  // Драбинка Básico → Intermedio → Avanzado обрана свідомо, і це не дослівний
+  // переклад: «Комплексне» (en: Complex) означає «поєднує кілька конструкцій»,
+  // а Avanzado — «складніше за рівнем». Точніший Complejo відкинуто за
+  // рішенням користувача: у трьох сходинках поспіль звична драбинка читається
+  // краще. Не «виправляти» назад.
   'tier.basic': 'Básico',
   'tier.medium': 'Intermedio',
   'tier.complex': 'Avanzado',
