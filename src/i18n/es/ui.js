@@ -24,8 +24,7 @@ export default {
   'level.6.name': 'Fechas y cadenas',
   'level.7.name': 'Condiciones y conjuntos',
   'level.8.name': 'Casos de analítica',
-  // Драбинка Básico → Intermedio → Avanzado, і так само в решті мов: Basic →
-  // Medium → Advanced, Базове → Середнє → Складне. Внутрішній ключ лишився
+  // Драбинка Básico → Intermedio → Avanzado. Внутрішній ключ лишився
   // 'complex' (він же tier у банку завдань), але підпис для користувача каже
   // про складність, а не про кількість поєднаних конструкцій — так драбинка
   // читається однаково в усіх трьох мовах. Не «виправляти» на Complejo.

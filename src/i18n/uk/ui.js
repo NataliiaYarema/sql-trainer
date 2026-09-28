@@ -23,7 +23,8 @@ export default {
   'level.8.name': 'Аналітичні кейси',
   'tier.basic': 'Базове',
   'tier.medium': 'Середнє',
-  'tier.complex': 'Складне',
+  // Середній рід — за «завданням», як і «Базове» та «Середнє» поряд.
+  'tier.complex': 'Просунуте',
   'taskCard.levelPill': 'Рівень {level} · {name}',
   'taskCard.solved': "вже розв'язано",
   'taskCard.case': 'Кейс: {title} — крок {step} з {total}',
