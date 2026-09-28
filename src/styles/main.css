@@ -1011,6 +1011,36 @@ body {
   margin-left: auto;
 }
 
+/* Перемикач мови стоїть у тому ж ряду, що й пункти шапки, тому виглядає як
+   вони: ті самі відступи, рамка й радіус, що в .btn--ghost. Нативний <select>
+   узято свідомо — клавіатура, вибір на телефоні й доступність працюють самі,
+   без коду на відкривання, закривання й клік поза межами. Плата за це —
+   стрілка залишається браузерною, і вирівняти її з іконками кнопок не можна. */
+.lang-select {
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lang-select:hover {
+  border-color: var(--text-dim);
+  color: var(--text);
+}
+
+/* Розкритий список малює операційна система, і на темній темі він успадкував
+   би світле тло сторінки. Колір явно задаємо самим пунктам. */
+.lang-select option {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
 /* ---------- Theory ---------- */
 
 .theory-list {

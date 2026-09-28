@@ -8,7 +8,8 @@ import { controlsHtml } from '../src/ui/controls.js';
 import { renderTaskCard } from '../src/ui/taskCard.js';
 import { renderHints } from '../src/ui/hintPanel.js';
 import { renderResultTable } from '../src/ui/resultTable.js';
-import { progressHtml, routeFor, parseRoute } from '../src/ui/progressBar.js';
+import { progressHtml, routeFor, parseRoute, languageSelectHtml } from '../src/ui/progressBar.js';
+import { t, setLanguage, LANGS } from '../src/i18n/index.js';
 import { notePanelHtml, saveButtonLabel } from '../src/ui/notePanel.js';
 import { notesScreenHtml } from '../src/ui/notesScreen.js';
 import { sandboxControlsHtml } from '../src/ui/sandbox.js';
@@ -211,7 +212,7 @@ check('шапка веде до дашборда', headerHtml.includes('data-act
 check('шапка веде до нотаток', headerHtml.includes('data-action="notes"'));
 check('шапка показує назву рівня', headerHtml.includes('Рівень 3'));
 check('шапка має вихід на головну', headerHtml.includes('data-action="to-home"'));
-check('верхня кнопка називається «На головну»', headerHtml.includes('На головну'));
+check('верхня кнопка веде на головну', headerHtml.includes(t('nav.home')));
 check(
   'вихід на головну стоїть праворуч від навігації',
   headerHtml.indexOf('data-action="notes"') < headerHtml.indexOf('data-action="to-home"')
@@ -283,6 +284,36 @@ check('невідома мова не називається', parseRoute('#/fr/
 check('невідомий екран веде на головну', parseRoute('#/en/nonsense').screen === 'home');
 check('порожній hash веде на головну', parseRoute('').screen === 'home');
 check('порожній hash не називає мови', parseRoute('').lang === null);
+
+// Перемикач мови: три варіанти, поточний вибраний, підпис — самоназвою.
+// Нативний <select>, тому перевіряємо саме <option>, а не власну розмітку.
+const langHtml = languageSelectHtml('en');
+check(
+  'перемикач має всі три мови',
+  LANGS.every((lang) => langHtml.includes(`value="${lang}"`))
+);
+check(
+  'мови підписані самоназвами',
+  langHtml.includes('Українська') && langHtml.includes('Español') && langHtml.includes('English')
+);
+check('поточна мова вибрана', langHtml.includes('value="en" selected'));
+check('невибрана мова не позначена', !langHtml.includes('value="uk" selected'));
+check('перемикач має гачок для обробника', langHtml.includes('data-action="lang"'));
+check('перемикач має доступну назву', langHtml.includes(t('nav.language')));
+check('шапка містить перемикач', progressHtml({}).includes('data-action="lang"'));
+
+// Підписи шапки беруться зі словника, а не з літералів.
+LANGS.forEach((lang) => {
+  setLanguage(lang);
+  const html = progressHtml({ showBack: true });
+  check(`${lang}: шапка підписує пісочницю`, html.includes(t('nav.sandbox')));
+  check(`${lang}: шапка підписує прогрес`, html.includes(t('nav.progress')));
+  check(`${lang}: шапка підписує нотатки`, html.includes(t('nav.notes')));
+  check(`${lang}: шапка підписує вихід`, html.includes(t('nav.home')));
+  check(`${lang}: маршрути шапки несуть цю саму мову`, html.includes(`href="#/${lang}/notes"`));
+  check(`${lang}: перемикач показує поточну мову`, html.includes(`value="${lang}" selected`));
+});
+setLanguage('en');
 
 // Вікно перевірки каже лише «правильно» чи «ні». Розбір — окремо: за кнопкою
 // «Здатися». Тому в обох гілках перевіряємо не текст, а його відсутність.
@@ -684,8 +715,14 @@ check(
 // Колір кнопки «На головну» тримається на селекторі [data-action='to-home'],
 // а не на окремому класі. Тому кожна така кнопка мусить нести цей атрибут —
 // інакше вона мовчки лишиться сірою серед синіх.
+//
+// Рахуємо в українському прогоні: підпис шапки вже приходить зі словника, а
+// модулі, які ще не перекладені, тримають той самий український літерал. Так
+// перевірка лишається чесною на кожному кроці етапу, а не лише в кінці.
+setLanguage('uk');
+const homeLabel = t('nav.home');
 [
-  ['шапка', headerHtml],
+  ['шапка', progressHtml({ showBack: true })],
   ['дашборд', dashboardHtml(dashMetrics)],
   ['нотатки', notesScreenHtml([])],
   ['пісочниця', sandboxControlsHtml()],
@@ -693,7 +730,7 @@ check(
   ['теорія', theoryTopicHtml(topics[0])],
   ['панель керування', controlsHtml({ hintsRevealed: 0, totalHints: 3 })],
 ].forEach(([where, html]) => {
-  const homeButtons = (html.match(/На головну/g) ?? []).length;
+  const homeButtons = (html.match(new RegExp(homeLabel, 'g')) ?? []).length;
   const hooked = (html.match(/data-action="to-home"/g) ?? []).length;
   check(`${where}: кожна кнопка «На головну» має гачок для кольору`, homeButtons === hooked);
 });
