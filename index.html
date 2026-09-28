@@ -1,19 +1,19 @@
 <!doctype html>
-<html lang="uk">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SQL-тренажер для дата-аналітики</title>
+    <title>SQL trainer for data analytics</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta
       name="description"
-      content="Тренажер SQL для дата-аналітики: 125 завдань на 8 рівнів, справжній PostgreSQL прямо в браузері."
+      content="SQL trainer for data analytics: 125 tasks across 8 levels, real PostgreSQL right in the browser."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="SQL-тренажер для дата-аналітики" />
+    <meta property="og:title" content="SQL trainer for data analytics" />
     <meta
       property="og:description"
-      content="125 завдань на 8 рівнів. Запити виконує справжній PostgreSQL у вкладці браузера."
+      content="125 tasks across 8 levels. Queries run on real PostgreSQL in a browser tab."
     />
     <meta property="og:url" content="https://sql-trainer-zeta.vercel.app/" />
     <meta property="og:image" content="https://sql-trainer-zeta.vercel.app/og-cover.png" />
@@ -222,8 +222,10 @@
             ><svg class="icon"><use href="#i-database" /></svg
           ></span>
           <div>
-            <h1 class="topbar__title">SQL-тренажер</h1>
-            <p class="topbar__subtitle">Практика SQL-запитів для дата-аналітики в PostgreSQL</p>
+            <h1 class="topbar__title" id="brand-title">SQL trainer</h1>
+            <p class="topbar__subtitle" id="brand-subtitle">
+              Practise SQL queries for data analytics in PostgreSQL
+            </p>
           </div>
         </div>
         <div id="progress-root" class="topbar__progress"></div>
@@ -241,9 +243,10 @@
           <div class="editor-block">
             <div class="editor-block__head">
               <span class="section-label"
-                ><svg class="icon"><use href="#i-play" /></svg>Твій SQL-запит</span
+                ><svg class="icon"><use href="#i-play" /></svg
+                ><span id="editor-label">Your SQL query</span></span
               >
-              <span class="editor-block__hint">Ctrl + Enter — перевірити</span>
+              <span class="editor-block__hint" id="editor-hint">Ctrl + Enter to check</span>
             </div>
             <div id="editor-root" class="editor-host"></div>
           </div>

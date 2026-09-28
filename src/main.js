@@ -12,7 +12,7 @@ import { renderNotePanel } from './ui/notePanel.js';
 import { renderControls } from './ui/controls.js';
 import { renderTaskNav } from './ui/taskNav.js';
 import { renderProgress, bindBackHome, routeFor, parseRoute } from './ui/progressBar.js';
-import { getLanguage } from './i18n/index.js';
+import { getLanguage, setLanguage, t } from './i18n/index.js';
 import { renderLevelSelect } from './ui/levelSelect.js';
 import { renderNotesScreen } from './ui/notesScreen.js';
 import { computeMetrics } from './analytics/metrics.js';
@@ -25,7 +25,13 @@ import { renderTheoryTopic } from './ui/theoryTopic.js';
 import { renderResultTable, clearResultTable } from './ui/resultTable.js';
 import * as schemas from './tasks/schemas.js';
 import { renderSandboxSchema, renderSandboxControls, sandboxInitialSql } from './ui/sandbox.js';
-import { loadSandboxSql, saveSandboxSql, clearSandboxSql } from './game/persistence.js';
+import {
+  loadSandboxSql,
+  saveSandboxSql,
+  clearSandboxSql,
+  loadLang,
+  saveLang,
+} from './game/persistence.js';
 import {
   renderSuccess,
   renderFailure,
@@ -71,6 +77,16 @@ let editor;
 // Пісочниця ділить редактор і панель результату з режимом завдань, тому
 // handleCheck має знати, що робити з натиснутим Ctrl+Enter.
 let sandboxMode = false;
+
+// Екран, на якому ми зараз: потрібен перемикачу мови, щоб зібрати ту саму
+// адресу в новій мові. Пише його setRoute — там, де адреса вже й так
+// визначається, тож розійтися вони не можуть.
+let currentScreenName = 'home';
+
+// Поточний екран як функція перемальовування. Перемикач мови малює саме її:
+// вгадувати екран за станом означало б розбирати сім випадків — головна, тема
+// теорії, завдання, завершення рівня, нотатки, дашборд, пісочниця.
+let repaint = () => showLevelSelect();
 
 function currentTask() {
   return levelTasks[currentIndex];
@@ -126,7 +142,9 @@ function flushPending() {
 // про такий маршрут не знає й віддав би 404.
 // replaceState, а не location.hash = …: присвоєння додає запис в історію, і
 // кнопка «назад» ходила б по вже показаних екранах замість виходу зі сторінки.
-function setRoute(route) {
+function setRoute(screen) {
+  currentScreenName = screen;
+  const route = routeFor(getLanguage(), screen);
   if (window.location.hash === route) return;
   window.history.replaceState(null, '', route);
 }
@@ -141,6 +159,35 @@ function screenForRoute(screen) {
   return showLevelSelect;
 }
 
+// Текст, який лежить просто в index.html: його не малює жоден рендер, тому
+// після зміни мови його треба підмінити руками. Атрибут lang на <html> — теж
+// частина цього: за ним браузер вибирає переноси й голос читалки.
+function applyStaticText() {
+  document.documentElement.lang = getLanguage();
+  document.title = t('app.title');
+  qs('#brand-title').textContent = t('app.brand');
+  qs('#brand-subtitle').textContent = t('app.subtitle');
+  qs('#editor-label').textContent = t('editor.label');
+  qs('#editor-hint').textContent = t('editor.hint');
+}
+
+// Мова змінюється в пам'яті, без перезавантаження: перезапуск сторінки означав
+// би ще ~1,2 с на завантаження wasm PGlite при кожному кліку по списку.
+//
+// flushPending спершу — інакше незбережена чернетка чи нотатка загубилася б на
+// перемальовуванні. Вікно перевірки й таблицю результату не перемальовуємо
+// свідомо: вони лишаються тією мовою, якою їх намалювали. Інакше довелося б
+// або підмінити показану випадкову фразу новою, або зберігати її індекс
+// заради випадку, що трапляється раз на сеанс.
+function applyLanguage(lang) {
+  flushPending();
+  setLanguage(lang);
+  saveLang(getLanguage());
+  setRoute(currentScreenName);
+  applyStaticText();
+  repaint();
+}
+
 // Навігація в шапці однакова на всіх екранах, тому обробники живуть в одному
 // місці. Стрілки навмисні: showDashboard і showNotes оголошені нижче, і пряме
 // посилання читалося б до ініціалізації.
@@ -148,6 +195,7 @@ const navHandlers = {
   onOpenDashboard: () => showDashboard(),
   onOpenNotes: () => showNotes(),
   onOpenSandbox: () => showSandbox(),
+  onPickLanguage: applyLanguage,
 };
 
 function pickStartIndex() {
@@ -378,6 +426,18 @@ function goToTask(index) {
   startTask();
 }
 
+// Тільки рендер, без скидання стану завдання. Цю саму функцію викликає
+// перемикач мови, а він не має ні згортати вже відкриті підказки, ні обнуляти
+// час розв'язання, ні писати в журнал нову подію «завдання відкрито».
+function renderTaskScreen() {
+  renderTaskHeader();
+  renderTaskNavPanel();
+  renderHints(roots.hints, currentTask().hints, hintsRevealed);
+  renderNoteBlock();
+  renderControlsPanel();
+  renderLevelProgress();
+}
+
 function startTask() {
   // Свіжовідкрите завдання не має успадковувати відкладений запис чернетки,
   // запланований ще для попереднього завдання (навіть якщо десь порядок
@@ -392,12 +452,9 @@ function startTask() {
   noteOpen = noteText !== '';
   clearFeedback(roots.feedback);
   clearResultTable(roots.result);
-  renderTaskHeader();
-  renderTaskNavPanel();
-  renderHints(roots.hints, currentTask().hints, hintsRevealed);
-  renderNoteBlock();
-  renderControlsPanel();
-  renderLevelProgress();
+  renderTaskScreen();
+  // Не () => startTask(): він скидав би підказки, таймер і журнал.
+  repaint = renderTaskScreen;
   editor.focus();
 }
 
@@ -432,11 +489,12 @@ function renderLevelDone() {
     { onNextLevel: () => openLevel(activeLevel + 1), onToHome: showLevelSelect }
   );
   renderLevelProgress();
+  repaint = () => renderLevelDone();
 }
 
 function showLevelSelect() {
   flushPending();
-  setRoute(routeFor(getLanguage(), 'home'));
+  setRoute('home');
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -456,13 +514,14 @@ function showLevelSelect() {
     openLevel
   );
   renderTheoryList(roots.theory, topics, showTheory);
+  repaint = () => showLevelSelect();
 }
 
 // Екран однієї теми теорії: та сама панель, що й вибір рівнів, але замість
 // сітки — текст теми з переходом на практику відповідного рівня.
 function showTheory(level) {
   flushPending();
-  setRoute(routeFor(getLanguage(), 'home'));
+  setRoute('home');
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -476,6 +535,7 @@ function showTheory(level) {
     onToHome: showLevelSelect,
     onRunInSandbox: showSandboxWithQuery,
   });
+  repaint = () => showTheory(level);
 }
 
 // Нотатка зберігає лише текст, тому назву, контекст і умову беремо з банку
@@ -520,7 +580,7 @@ function saveNotesScreenNote() {
 // Окремий екран за зразком showTheory: та сама панель, робоча панель схована.
 function showNotes() {
   flushPending();
-  setRoute(routeFor(getLanguage(), 'notes'));
+  setRoute('notes');
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -547,6 +607,7 @@ function showNotes() {
       showNotes();
     },
   });
+  repaint = () => showNotes();
 }
 
 // Статуси беремо зі стану, а час і помилки — з журналу: журнал увімкнений лише
@@ -565,7 +626,7 @@ function currentMetrics() {
 // Ще один екран за зразком showNotes: та сама панель, робоча панель схована.
 function showDashboard() {
   flushPending();
-  setRoute(routeFor(getLanguage(), 'dashboard'));
+  setRoute('dashboard');
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -586,13 +647,14 @@ function showDashboard() {
     },
     onToHome: showLevelSelect,
   });
+  repaint = () => showDashboard();
 }
 
 // На відміну від нотаток і дашборда, робоча панель лишається видимою: саме в
 // ній живуть редактор і таблиця результату.
 function showSandbox() {
   flushPending();
-  setRoute(routeFor(getLanguage(), 'sandbox'));
+  setRoute('sandbox');
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -610,6 +672,7 @@ function showSandbox() {
 
   editor.setValue(sandboxInitialSql(loadSandboxSql()));
   editor.focus();
+  repaint = () => showSandbox();
 }
 
 // Приклад із теорії відкривається виконаним: користувач натиснув «Виконати
@@ -628,7 +691,7 @@ async function showSandboxWithQuery(sql) {
 // а не перше нерозв'язане на рівні.
 function openLevel(level, startIndex) {
   // Єдиний вхід у завдання, що не проходить через clearTaskPanels.
-  setRoute(routeFor(getLanguage(), 'home'));
+  setRoute('home');
   sandboxMode = false;
   activeLevel = level;
   levelTasks = tasksByLevel(level);
@@ -640,12 +703,26 @@ function openLevel(level, startIndex) {
 }
 
 editor = createEditor(roots.editor, handleCheck, scheduleDraftSave);
-screenForRoute(parseRoute(window.location.hash).screen)();
+
+// Порядок такий: що в адресі → що збережено → англійська. Адреса має
+// пріоритет, бо саме за нею приходять по посиланню. setLanguage(undefined)
+// дає DEFAULT_LANG — тому валідація живе в ньому, а не тут.
+const startRoute = parseRoute(window.location.hash);
+setLanguage(startRoute.lang ?? loadLang() ?? undefined);
+applyStaticText();
+screenForRoute(startRoute.screen)();
 
 // Клік по пункту шапки hash не міняє (його перехоплює bindNav), тож сюди
-// потрапляє лише ручна правка адреси — але тоді екран має відповідати рядку.
+// потрапляє лише ручна правка адреси — але тоді рядку мусять відповідати
+// і екран, і мова.
 window.addEventListener('hashchange', () => {
-  screenForRoute(parseRoute(window.location.hash).screen)();
+  const route = parseRoute(window.location.hash);
+  if (route.lang && route.lang !== getLanguage()) {
+    setLanguage(route.lang);
+    saveLang(getLanguage());
+    applyStaticText();
+  }
+  screenForRoute(route.screen)();
 });
 
 // Автозбереження чернетки відкладене на 400 мс: перезавантаження сторінки в

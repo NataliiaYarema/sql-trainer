@@ -10,6 +10,11 @@ export default {
   'nav.notes': 'My notes',
   'nav.home': 'Home',
   'nav.language': 'Interface language',
+  'app.title': 'SQL trainer for data analytics',
+  'app.brand': 'SQL trainer',
+  'app.subtitle': 'Practise SQL queries for data analytics in PostgreSQL',
+  'editor.label': 'Your SQL query',
+  'editor.hint': 'Ctrl + Enter to check',
   'taskCard.counter': 'Task {current} of {total}',
   'result.rows': { one: '{count} row', other: '{count} rows' },
 };
