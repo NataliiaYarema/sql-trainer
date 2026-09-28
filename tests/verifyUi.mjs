@@ -9,7 +9,7 @@ import { renderTaskCard } from '../src/ui/taskCard.js';
 import { renderHints } from '../src/ui/hintPanel.js';
 import { renderResultTable, resultTableHtml } from '../src/ui/resultTable.js';
 import { progressHtml, routeFor, parseRoute, languageSelectHtml } from '../src/ui/progressBar.js';
-import { t, setLanguage, levelName, LANGS } from '../src/i18n/index.js';
+import { t, setLanguage, levelName, formatNumber, LANGS } from '../src/i18n/index.js';
 import { notePanelHtml, saveButtonLabel } from '../src/ui/notePanel.js';
 import { notesScreenHtml } from '../src/ui/notesScreen.js';
 import { sandboxControlsHtml, sandboxSchemaHtml } from '../src/ui/sandbox.js';
@@ -796,22 +796,28 @@ const dashMetrics = {
   hardTasks: [],
 };
 
+// Дашборд звіряємо українською: так підписи в назвах перевірок читаються
+// звично. За англійською й іспанською стежить наскрізний прогін нижче.
+setLanguage('uk');
 const dashHtml = dashboardHtml(dashMetrics);
 check("дашборд показує кількість розв'язаних", dashHtml.includes('>42<'));
-check('дашборд показує загальну кількість завдань', dashHtml.includes('зі 125'));
-check('дашборд показує днів активності', dashHtml.includes('Днів активності'));
+check(
+  'дашборд показує загальну кількість завдань',
+  dashHtml.includes(t('dashboard.outOf', { total: 125 }))
+);
+check('дашборд показує днів активності', dashHtml.includes(t('dashboard.activeDays')));
 check('зведення більше не показує серію днів', !dashHtml.includes('Серія днів'));
 check('зведення більше не показує загальний час', !dashHtml.includes('Загальний час'));
 check('зведення більше не показує медіану', !dashHtml.includes('Медіана'));
 check(
   'плитка останньої активності називає рівень і завдання',
-  dashHtml.includes('Рівень 5 · Завдання 8')
+  dashHtml.includes(t('dashboard.lastPlace', { level: 5, number: 8 }))
 );
-check('є кнопка продовжити', dashHtml.includes('Продовжити'));
+check('є кнопка продовжити', dashHtml.includes(t('dashboard.continue')));
 check('кнопка продовжити веде до того завдання', /data-level="5"\s+data-index="7"/.test(dashHtml));
 
-check('панель освоєних навичок є', dashHtml.includes('Освоєні навички'));
-check('навички згруповані за рівнями', dashHtml.includes('Рівень 1'));
+check('панель освоєних навичок є', dashHtml.includes(t('dashboard.mastered')));
+check('навички згруповані за рівнями', dashHtml.includes(t('levelSelect.level', { level: 1 })));
 check('навичка показується великими літерами', dashHtml.includes('ORDER BY'));
 check('календаря більше немає', !dashHtml.includes('class="heat"'));
 check('дашборд має кнопку на головну', dashHtml.includes('data-action="to-home"'));
@@ -852,7 +858,12 @@ check(
 
 // Наслідки пояснює вікно підтвердження, а не підпис під кнопкою: тримати
 // довгий текст на екрані означало б лякати ним щоразу, коли відкриваєш дашборд.
-check('кнопка очищення названа коротко', />Очистити\s*<\/button>/.test(dashHtml));
+// «Коротко» означає, що після підпису кнопка одразу закривається: колись тут
+// був цілий абзац попередження, і перевірка стежить, щоб він не повернувся.
+check(
+  'кнопка очищення названа коротко',
+  dashHtml.split(t('dialog.clear'))[1]?.trimStart().startsWith('</button>') === true
+);
 check('під кнопкою немає полотна тексту', !dashHtml.includes('dashboard__danger-note'));
 
 const freshDash = dashboardHtml({
@@ -862,12 +873,15 @@ const freshDash = dashboardHtml({
   errorTopics: [],
   hardTasks: [],
 });
-check('без журналу плитка каже, що ще не починали', freshDash.includes('Ще не починали'));
+check('без журналу плитка каже, що ще не починали', freshDash.includes(t('dashboard.notStarted')));
 check(
   'без журналу кнопка веде на перше завдання',
   /data-level="1"\s+data-index="0"/.test(freshDash)
 );
-check('без навичок пояснюється умова відмітки', freshDash.includes('коли всі завдання теми'));
+check(
+  'без навичок пояснюється умова відмітки',
+  freshDash.includes(escapeHtml(t('dashboard.masteryHint')))
+);
 check('на чистому дашборді нема чого очищати', !freshDash.includes('data-action="clear-all"'));
 check('на чистому дашборді немає й самого блоку', !freshDash.includes('dashboard__danger'));
 
@@ -915,31 +929,61 @@ const topicsDash = dashboardHtml({
   ],
 });
 
-check('панель типових помилок є', topicsDash.includes('Типові помилки'));
+check('панель типових помилок є', topicsDash.includes(t('dashboard.errors')));
 check('тема показується великими літерами', topicsDash.includes('WHERE'));
 check('поруч із темою кількість помилок', topicsDash.includes('>9<'));
-check('перший рядок показує кількість задач', topicsDash.includes('7 задач'));
-check('перший рядок показує середнє', topicsDash.includes('1,4'));
-check('перший рядок має кнопку потренувати', topicsDash.includes('потренувати'));
+check(
+  'перший рядок показує кількість задач',
+  topicsDash.includes(t('dashboard.taskCount', { count: 7 }))
+);
+check('перший рядок показує середнє', topicsDash.includes(formatNumber(1.4285, 1)));
+check('перший рядок має кнопку потренувати', topicsDash.includes(t('dashboard.practise')));
 check('кнопка веде до завдання теми', /data-level="1"\s+data-index="4"/.test(topicsDash));
-check('решта рядків кнопки не мають', (topicsDash.match(/потренувати/g) ?? []).length === 1);
-check('панель найважчих називається інакше', topicsDash.includes('Потребують повторення'));
+check('решта рядків кнопки не мають', topicsDash.split(t('dashboard.practise')).length - 1 === 1);
+check('панель найважчих називається інакше', topicsDash.includes(t('dashboard.hardTasks')));
 check('старої назви немає', !topicsDash.includes('Найважчі завдання'));
 check('слабкої теми окремою панеллю немає', !topicsDash.includes('Що дається важко'));
 check(
   'назва завдання не вставляє сирий HTML',
   topicsDash.includes('&lt;b&gt;по регіонах&lt;/b&gt;')
 );
-check('видно кількість невдалих спроб', topicsDash.includes('невдалих спроб: 7'));
-check("статус розв'язаного підписано", topicsDash.includes("розв'язано"));
-check('статус підгляданого підписано', topicsDash.includes('підглянуто'));
+check(
+  'видно кількість невдалих спроб',
+  topicsDash.includes(
+    escapeHtml(
+      t('dashboard.hardNote', { level: 3, number: 7, fails: 7, status: t('status.solved') })
+    )
+  )
+);
+check("статус розв'язаного підписано", topicsDash.includes(escapeHtml(t('status.solved'))));
+check('статус підгляданого підписано', topicsDash.includes(escapeHtml(t('status.revealed'))));
 check('рядок веде до свого завдання', /data-level="5"\s+data-index="1"/.test(topicsDash));
 
 const emptyTops = dashboardHtml({ ...dashMetrics, errorTopics: [], hardTasks: [] });
 check(
   'обидві панелі без даних показують підпис',
-  (emptyTops.match(/Даних поки немає/g) ?? []).length >= 2
+  emptyTops.split(escapeHtml(t('dashboard.emptyHint'))).length - 1 >= 2
 );
+
+// Дашборд рештою мов: підписи панелей і відмінки задач.
+LANGS.filter((lang) => lang !== 'uk').forEach((lang) => {
+  setLanguage(lang);
+  const html = dashboardHtml(dashMetrics);
+  [
+    ['заголовок', t('dashboard.title')],
+    ['плитку зі числом розвʼязаних', t('dashboard.solved')],
+    ['освоєні навички', t('dashboard.mastered')],
+    ['типові помилки', t('dashboard.errors')],
+    ['потребують повторення', t('dashboard.hardTasks')],
+  ].forEach(([what, expected]) => {
+    check(`${lang}: дашборд підписує ${what}`, html.includes(escapeHtml(expected)));
+  });
+  check(
+    `${lang}: відмінок задач із Intl.PluralRules`,
+    t('dashboard.taskCount', { count: 1 }) !== t('dashboard.taskCount', { count: 5 })
+  );
+});
+setLanguage('uk');
 
 // Колір кнопки «На головну» тримається на селекторі [data-action='to-home'],
 // а не на окремому класі. Тому кожна така кнопка мусить нести цей атрибут —

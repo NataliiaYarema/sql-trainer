@@ -1,25 +1,6 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 import { askConfirm } from './confirmDialog.js';
-import { t } from '../i18n/index.js';
-
-const EMPTY_HINT = 'Даних поки немає — історія збирається з моменту, коли ти відкриваєш завдання.';
-
-const MASTERY_HINT = 'Відмітка зʼявиться, коли всі завдання теми будуть розвʼязані.';
-
-// 1 задача / 2 задачі / 5 задач.
-function taskWord(count) {
-  const lastTwo = count % 100;
-  const last = count % 10;
-  if (lastTwo >= 11 && lastTwo <= 14) return 'задач';
-  if (last === 1) return 'задача';
-  if (last >= 2 && last <= 4) return 'задачі';
-  return 'задач';
-}
-
-// Кома як десятковий роздільник: у решті інтерфейсу числа теж українські.
-function formatRate(value) {
-  return value.toFixed(1).replace('.', ',');
-}
+import { t, formatNumber } from '../i18n/index.js';
 
 function panelHtml(title, body) {
   return `
@@ -36,12 +17,12 @@ function summaryHtml({ solved, total, activeDays }, lastActivity) {
   return `
     <div class="stat-grid">
       <div class="stat-tile stat-tile--hero">
-        <div class="stat-tile__label">Розв'язано</div>
+        <div class="stat-tile__label">${escapeHtml(t('dashboard.solved'))}</div>
         <div class="stat-tile__hero">${solved}</div>
-        <div class="stat-tile__note">зі ${total}</div>
+        <div class="stat-tile__note">${escapeHtml(t('dashboard.outOf', { total }))}</div>
       </div>
       <div class="stat-tile">
-        <div class="stat-tile__label">Днів активності</div>
+        <div class="stat-tile__label">${escapeHtml(t('dashboard.activeDays'))}</div>
         <div class="stat-tile__value">${activeDays}</div>
       </div>
       ${lastActivityHtml(lastActivity)}
@@ -54,21 +35,21 @@ function summaryHtml({ solved, total, activeDays }, lastActivity) {
 function lastActivityHtml(lastActivity) {
   const body = lastActivity
     ? `<div class="stat-tile__value stat-tile__value--sm">
-         Рівень ${lastActivity.level} · Завдання ${lastActivity.index + 1}
+         ${escapeHtml(t('dashboard.lastPlace', { level: lastActivity.level, number: lastActivity.index + 1 }))}
        </div>
        <div class="stat-tile__note">${escapeHtml(lastActivity.title)}</div>`
-    : `<div class="stat-tile__value stat-tile__value--sm">Ще не починали</div>`;
+    : `<div class="stat-tile__value stat-tile__value--sm">${escapeHtml(t('dashboard.notStarted'))}</div>`;
 
   const level = lastActivity ? lastActivity.level : 1;
   const index = lastActivity ? lastActivity.index : 0;
-  const label = lastActivity ? 'Продовжити' : 'Почати';
+  const label = lastActivity ? t('dashboard.continue') : t('dashboard.start');
 
   return `
     <div class="stat-tile">
-      <div class="stat-tile__label">Остання активність</div>
+      <div class="stat-tile__label">${escapeHtml(t('dashboard.lastActivity'))}</div>
       ${body}
       <button class="btn btn--primary stat-tile__action" data-level="${level}" data-index="${index}">
-        ${label}${icon('i-arrow-right')}
+        ${escapeHtml(label)}${icon('i-arrow-right')}
       </button>
     </div>
   `;
@@ -76,14 +57,17 @@ function lastActivityHtml(lastActivity) {
 
 function masteredSkillsHtml(groups) {
   if (groups.length === 0) {
-    return panelHtml('Освоєні навички', `<p class="dashboard__empty">${MASTERY_HINT}</p>`);
+    return panelHtml(
+      t('dashboard.mastered'),
+      `<p class="dashboard__empty">${escapeHtml(t('dashboard.masteryHint'))}</p>`
+    );
   }
 
   const rows = groups
     .map(
       ({ level, topics }) => `
       <li class="skill-row">
-        <span class="skill-row__level">Рівень ${level}</span>
+        <span class="skill-row__level">${escapeHtml(t('levelSelect.level', { level }))}</span>
         <span class="skill-row__chips">
           ${topics.map((topic) => `<span class="skill-chip">✓ ${escapeHtml(topic)}</span>`).join('')}
         </span>
@@ -91,12 +75,15 @@ function masteredSkillsHtml(groups) {
     )
     .join('');
 
-  return panelHtml('Освоєні навички', `<ul class="skill-list">${rows}</ul>`);
+  return panelHtml(t('dashboard.mastered'), `<ul class="skill-list">${rows}</ul>`);
 }
 
 function errorTopicsHtml(topics) {
   if (topics.length === 0) {
-    return panelHtml('Типові помилки', `<p class="dashboard__empty">${EMPTY_HINT}</p>`);
+    return panelHtml(
+      t('dashboard.errors'),
+      `<p class="dashboard__empty">${escapeHtml(t('dashboard.emptyHint'))}</p>`
+    );
   }
 
   const max = topics[0].fails;
@@ -104,20 +91,25 @@ function errorTopicsHtml(topics) {
   // перетворила б панель на список кнопок і сховала б головне.
   const rows = topics.map((topic, i) => errorTopicRowHtml(topic, max, i === 0)).join('');
 
-  return panelHtml('Типові помилки', `<ul class="rank-list">${rows}</ul>`);
+  return panelHtml(t('dashboard.errors'), `<ul class="rank-list">${rows}</ul>`);
 }
 
 function errorTopicRowHtml({ label, fails, tasksTouched, failsPerTask, practice }, max, isFirst) {
   const note = isFirst
     ? `<div class="rank-row__note">
-         ${tasksTouched} ${taskWord(tasksTouched)} · середня кількість спроб ${formatRate(failsPerTask)}
+         ${escapeHtml(
+           t('dashboard.errorNote', {
+             tasks: t('dashboard.taskCount', { count: tasksTouched }),
+             rate: formatNumber(failsPerTask, 1),
+           })
+         )}
        </div>`
     : '';
   const action =
     isFirst && practice
       ? `<button class="btn btn--ghost rank-row__action"
                  data-level="${practice.level}" data-index="${practice.index}">
-           потренувати${icon('i-arrow-right')}
+           ${escapeHtml(t('dashboard.practise'))}${icon('i-arrow-right')}
          </button>`
       : '';
 
@@ -136,15 +128,12 @@ function errorTopicRowHtml({ label, fails, tasksTouched, failsPerTask, practice 
   `;
 }
 
-const STATUS_LABELS = {
-  solved: "розв'язано",
-  revealed: 'підглянуто',
-  new: 'ще ні',
-};
-
 function hardTasksHtml(hardTasks) {
   if (hardTasks.length === 0) {
-    return panelHtml('Потребують повторення', `<p class="dashboard__empty">${EMPTY_HINT}</p>`);
+    return panelHtml(
+      t('dashboard.hardTasks'),
+      `<p class="dashboard__empty">${escapeHtml(t('dashboard.emptyHint'))}</p>`
+    );
   }
 
   const rows = hardTasks
@@ -154,17 +143,17 @@ function hardTasksHtml(hardTasks) {
         <div class="hard-task__main">
           <div class="hard-task__title">${escapeHtml(title)}</div>
           <div class="hard-task__note">
-            Рівень ${level} · завдання ${index + 1} · невдалих спроб: ${fails} · ${STATUS_LABELS[status]}
+            ${escapeHtml(t('dashboard.hardNote', { level, number: index + 1, fails, status: t(`status.${status}`) }))}
           </div>
         </div>
         <button class="btn btn--ghost" data-level="${level}" data-index="${index}">
-          Перейти${icon('i-arrow-right')}
+          ${escapeHtml(t('dashboard.goTo'))}${icon('i-arrow-right')}
         </button>
       </li>`
     )
     .join('');
 
-  return panelHtml('Потребують повторення', `<ul class="hard-task-list">${rows}</ul>`);
+  return panelHtml(t('dashboard.hardTasks'), `<ul class="hard-task-list">${rows}</ul>`);
 }
 
 export function dashboardHtml(metrics) {
@@ -176,23 +165,23 @@ export function dashboardHtml(metrics) {
   return `
     <div class="dashboard">
       <div class="dashboard__head">
-        <span class="level-pill">${icon('i-award')}Мій прогрес</span>
+        <span class="level-pill">${icon('i-award')}${escapeHtml(t('dashboard.pill'))}</span>
       </div>
-      <h2 class="dashboard__title">Дашборд</h2>
+      <h2 class="dashboard__title">${escapeHtml(t('dashboard.title'))}</h2>
       ${summaryHtml(metrics.summary, metrics.lastActivity)}
       ${masteredSkillsHtml(metrics.masteredSkills)}
       ${errorTopicsHtml(metrics.errorTopics)}
       ${hardTasksHtml(metrics.hardTasks)}
       <div class="dashboard__actions">
         <button class="btn btn--ghost" data-action="to-home">
-          ${icon('i-arrow-left')}На головну
+          ${icon('i-arrow-left')}${escapeHtml(t('nav.home'))}
         </button>
       </div>
       ${
         hasSomethingToClear
           ? `<div class="dashboard__danger">
         <button class="btn btn--danger" data-action="clear-all">
-          ${icon('i-refresh')}Очистити
+          ${icon('i-refresh')}${escapeHtml(t('dialog.clear'))}
         </button>
       </div>`
           : ''
