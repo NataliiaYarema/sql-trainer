@@ -27,7 +27,7 @@ export default {
   'level.8.name': 'Analytics case studies',
   'tier.basic': 'Basic',
   'tier.medium': 'Medium',
-  'tier.complex': 'Complex',
+  'tier.complex': 'Advanced',
   'taskCard.levelPill': 'Level {level} · {name}',
   'taskCard.solved': 'already solved',
   'taskCard.case': 'Case study: {title} — step {step} of {total}',
