@@ -68,6 +68,28 @@ export function saveSandboxSql(sql) {
   }
 }
 
+// Мова в окремому ключі, а не в STORAGE_KEY: це налаштування, а не прогрес,
+// тому «Очистити весь прогрес» його не скидає. Ключ читається ще до першого
+// рендера, тоді як стан прогресу — разом із банком завдань.
+const LANG_KEY = 'sqlTrainer:v1:lang';
+
+export function loadLang() {
+  try {
+    return localStorage.getItem(LANG_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function saveLang(lang) {
+  try {
+    localStorage.setItem(LANG_KEY, lang);
+  } catch {
+    // Приватний режим браузера може забороняти запис — мова просто не
+    // запам'ятається до наступного разу.
+  }
+}
+
 // Прибираємо ключ, а не пишемо порожній рядок: порожнє значення означало б
 // «користувач стер текст сам», і пісочниця відкрилася б без початкового запиту.
 export function clearSandboxSql() {

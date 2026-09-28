@@ -1,4 +1,5 @@
 import { GameState } from '../src/game/state.js';
+import { loadLang, saveLang } from '../src/game/persistence.js';
 
 // У Node немає localStorage, але persistence.js ловить це в try/catch,
 // тому GameState стартує з порожнього стану і його можна перевіряти тут.
@@ -180,6 +181,41 @@ check('чернетка відомого id лишається', cleaned.getDraf
 check('нотатка невідомого id прибирається', cleaned.getNote('ZZZ') === '');
 check('нотатка відомого id лишається', cleaned.getNote('A1') === 'жива нотатка');
 check('лічильник нотаток не рахує привидів', cleaned.notedCountForLevel(1) === 1);
+
+delete globalThis.localStorage;
+
+// Мова живе в окремому ключі, а не в стані прогресу: це налаштування, і
+// «Очистити весь прогрес» не має його скидати.
+check('без сховища мова невідома', loadLang() === null);
+check(
+  'запис без сховища не кидає винятку',
+  (() => {
+    saveLang('es');
+    return true;
+  })()
+);
+
+const store = {};
+globalThis.localStorage = {
+  getItem(key) {
+    return Object.hasOwn(store, key) ? store[key] : null;
+  },
+  setItem(key, next) {
+    store[key] = next;
+  },
+  removeItem(key) {
+    delete store[key];
+  },
+};
+
+saveLang('es');
+check('мова зберігається й читається назад', loadLang() === 'es');
+check('мова лежить під власним ключем', Object.keys(store).join() === 'sqlTrainer:v1:lang');
+
+const langState = new GameState(tasks);
+langState.saveNote('A1', 'нотатка');
+langState.resetProgress();
+check('очищення прогресу не скидає мову', loadLang() === 'es');
 
 delete globalThis.localStorage;
 
