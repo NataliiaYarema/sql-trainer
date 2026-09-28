@@ -2,6 +2,7 @@ import { icon, escapeHtml } from '../utils/dom.js';
 import { topicKeywords } from '../theory/topics.js';
 import { highlightSql } from './sqlHighlight.js';
 import { resultTableHtml } from './resultTable.js';
+import { t } from '../i18n/index.js';
 
 // Кнопка «Виконати запит» переносить SQL у пісочницю. Запит передається
 // індексом блоку в темі, а не текстом у data-атрибуті: SQL довелося б
@@ -35,7 +36,7 @@ function caseHtml(item, index) {
       <ol class="theory-case__steps">
         ${item.steps.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}
       </ol>
-      ${resultTableHtml(item.result, { label: 'Результат' })}
+      ${resultTableHtml(item.result, { label: t('result.label') })}
       <p class="theory-case__reading">${escapeHtml(item.reading)}</p>
 
       <div class="theory-case__watch">

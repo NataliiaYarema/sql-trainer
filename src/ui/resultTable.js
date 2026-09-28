@@ -1,4 +1,5 @@
 import { icon, escapeHtml } from '../utils/dom.js';
+import { t } from '../i18n/index.js';
 
 const MAX_ROWS = 100;
 
@@ -15,18 +16,21 @@ function renderCell(value) {
 // Чиста функція розмітки — за конвенцією проєкту. Теорії потрібна та сама
 // таблиця, що й під запитом користувача: якби вона малювала свою, результат
 // у теорії й у вправі виглядали б по-різному без жодної на те причини.
-export function resultTableHtml(result, { label = 'Результат твого запиту' } = {}) {
+export function resultTableHtml(result, { label } = {}) {
   if (!result) return '';
 
   const rows = result.values.slice(0, MAX_ROWS);
   const truncated = result.values.length > MAX_ROWS;
+  // Підпис за замовчуванням беремо тут, а не в значенні параметра: значення
+  // параметра обчислилося б раз на завантаження модуля й зафіксувало мову.
+  const heading = label ?? t('result.yourQuery');
 
   return `
     <div class="result-block">
       <div class="result-block__head">
-        <span class="section-label">${icon('i-table')}${escapeHtml(label)}</span>
+        <span class="section-label">${icon('i-table')}${escapeHtml(heading)}</span>
         <span class="result-block__meta">
-          ${result.values.length} рядк(ів)${truncated ? `, показано перші ${MAX_ROWS}` : ''}
+          ${escapeHtml(t('result.rows', { count: result.values.length }))}${truncated ? escapeHtml(t('result.truncated', { count: MAX_ROWS })) : ''}
         </span>
       </div>
       <div class="table-scroll">

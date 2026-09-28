@@ -1,4 +1,5 @@
 import { icon, escapeHtml, dedent } from '../utils/dom.js';
+import { t } from '../i18n/index.js';
 
 // Порожній редактор не підказує, з чого почати. Цей запит одразу показує і
 // синтаксис, і те, що дані в базі справжні. Записаний він так само, як
@@ -48,12 +49,10 @@ export function sandboxSchemaHtml(schemaLines) {
   return `
     <div class="sandbox-schema">
       <div class="sandbox-schema__head">
-        <span class="level-pill">${icon('i-table')}Пісочниця</span>
+        <span class="level-pill">${icon('i-table')}${escapeHtml(t('sandbox.pill'))}</span>
       </div>
-      <h2 class="sandbox-schema__title">Таблиці бази</h2>
-      <p class="sandbox-schema__hint">
-        Експериментуй із SQL-запитами та досліджуй таблиці.
-      </p>
+      <h2 class="sandbox-schema__title">${escapeHtml(t('sandbox.title'))}</h2>
+      <p class="sandbox-schema__hint">${escapeHtml(t('sandbox.hint'))}</p>
       ${schemaLines.map(parseSchemaLine).map(tableHtml).join('')}
     </div>
   `;
@@ -76,12 +75,12 @@ export function sandboxControlsHtml() {
   return `
     <div class="controls">
       <button class="btn btn--primary" data-action="run">
-        ${icon('i-play')}Виконати
+        ${icon('i-play')}${escapeHtml(t('sandbox.run'))}
       </button>
     </div>
     <div class="controls-home">
       <button class="btn btn--ghost" data-action="to-home">
-        ${icon('i-arrow-left')}На головну
+        ${icon('i-arrow-left')}${escapeHtml(t('nav.home'))}
       </button>
     </div>
   `;

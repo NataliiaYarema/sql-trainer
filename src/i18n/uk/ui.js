@@ -97,4 +97,11 @@ export default {
   'notes.editAria': 'Нотатка до завдання {number}',
   'notes.showTask': 'Показати умову',
   'notes.goToTask': 'Перейти до завдання',
+  'sandbox.pill': 'Пісочниця',
+  'sandbox.title': 'Таблиці бази',
+  'sandbox.hint': 'Експериментуй із SQL-запитами та досліджуй таблиці.',
+  'sandbox.run': 'Виконати',
+  'result.yourQuery': 'Результат твого запиту',
+  'result.label': 'Результат',
+  'result.truncated': ', показано перші {count}',
 };

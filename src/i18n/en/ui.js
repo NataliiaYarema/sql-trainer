@@ -104,4 +104,11 @@ export default {
   'notes.editAria': 'Note on task {number}',
   'notes.showTask': 'Show the task',
   'notes.goToTask': 'Go to the task',
+  'sandbox.pill': 'Sandbox',
+  'sandbox.title': 'Tables in the database',
+  'sandbox.hint': 'Experiment with SQL queries and explore the tables.',
+  'sandbox.run': 'Run',
+  'result.yourQuery': 'Your query result',
+  'result.label': 'Result',
+  'result.truncated': ', first {count} shown',
 };

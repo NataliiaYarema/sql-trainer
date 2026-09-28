@@ -99,4 +99,11 @@ export default {
   'notes.editAria': 'Nota del ejercicio {number}',
   'notes.showTask': 'Ver el enunciado',
   'notes.goToTask': 'Ir al ejercicio',
+  'sandbox.pill': 'Zona de pruebas',
+  'sandbox.title': 'Tablas de la base',
+  'sandbox.hint': 'Experimenta con consultas SQL y explora las tablas.',
+  'sandbox.run': 'Ejecutar',
+  'result.yourQuery': 'Resultado de tu consulta',
+  'result.label': 'Resultado',
+  'result.truncated': ', se muestran las primeras {count}',
 };

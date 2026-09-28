@@ -7,12 +7,12 @@ import { taskNavHtml } from '../src/ui/taskNav.js';
 import { controlsHtml } from '../src/ui/controls.js';
 import { renderTaskCard } from '../src/ui/taskCard.js';
 import { renderHints } from '../src/ui/hintPanel.js';
-import { renderResultTable } from '../src/ui/resultTable.js';
+import { renderResultTable, resultTableHtml } from '../src/ui/resultTable.js';
 import { progressHtml, routeFor, parseRoute, languageSelectHtml } from '../src/ui/progressBar.js';
 import { t, setLanguage, levelName, LANGS } from '../src/i18n/index.js';
 import { notePanelHtml, saveButtonLabel } from '../src/ui/notePanel.js';
 import { notesScreenHtml } from '../src/ui/notesScreen.js';
-import { sandboxControlsHtml } from '../src/ui/sandbox.js';
+import { sandboxControlsHtml, sandboxSchemaHtml } from '../src/ui/sandbox.js';
 import { confirmDialogHtml } from '../src/ui/confirmDialog.js';
 import { dashboardHtml } from '../src/ui/dashboard.js';
 import { theoryTopicHtml } from '../src/ui/theoryTopic.js';
@@ -366,6 +366,29 @@ check('невідома мова не називається', parseRoute('#/fr/
 check('невідомий екран веде на головну', parseRoute('#/en/nonsense').screen === 'home');
 check('порожній hash веде на головну', parseRoute('').screen === 'home');
 check('порожній hash не називає мови', parseRoute('').lang === null);
+
+// Пісочниця й таблиця результату — трьома мовами.
+LANGS.forEach((lang) => {
+  setLanguage(lang);
+  const schema = sandboxSchemaHtml(['products(product_id INT, price NUMERIC)']);
+  check(`${lang}: пісочниця підписує таблиці`, schema.includes(escapeHtml(t('sandbox.title'))));
+  check(`${lang}: пісочниця має підказку`, schema.includes(escapeHtml(t('sandbox.hint'))));
+  check(`${lang}: кнопка виконання підписана`, sandboxControlsHtml().includes(t('sandbox.run')));
+
+  const table = resultTableHtml({ columns: ['a'], values: [[1]] });
+  check(
+    `${lang}: таблиця має підпис за замовчуванням`,
+    table.includes(escapeHtml(t('result.yourQuery')))
+  );
+  check(`${lang}: таблиця рахує рядки`, table.includes(t('result.rows', { count: 1 })));
+  check(
+    `${lang}: власний підпис таблиці не перетирається`,
+    resultTableHtml({ columns: ['a'], values: [[1]] }, { label: t('result.label') }).includes(
+      escapeHtml(t('result.label'))
+    )
+  );
+});
+setLanguage('en');
 
 // Нотатки — трьома мовами: панель під завданням і окремий екран.
 LANGS.forEach((lang) => {
