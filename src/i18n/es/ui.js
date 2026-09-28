@@ -131,7 +131,10 @@ export default {
   'dashboard.goTo': 'Ir',
   'dashboard.taskCount': { one: '{count} ejercicio', other: '{count} ejercicios' },
   'status.solved': 'resuelto',
-  'status.revealed': 'solución vista',
+  // Саме «solución», а не «pista»: цей статус ставить кнопка «Показати
+  // відповідь», а підказки на статус не впливають зовсім. Слово pista до того
+  // ж зайняте — ним підписані кнопка підказки та її лічильник.
+  'status.revealed': 'solución consultada',
   'status.new': 'todavía no',
   'theory.pill': 'Teoría · nivel {level}',
   'theory.examples': 'Cómo se ve',
