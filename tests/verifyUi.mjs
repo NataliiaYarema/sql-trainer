@@ -367,6 +367,55 @@ check('невідомий екран веде на головну', parseRoute('
 check('порожній hash веде на головну', parseRoute('').screen === 'home');
 check('порожній hash не називає мови', parseRoute('').lang === null);
 
+// Нотатки — трьома мовами: панель під завданням і окремий екран.
+LANGS.forEach((lang) => {
+  setLanguage(lang);
+  check(`${lang}: кнопка збереження підписана`, saveButtonLabel(false).includes(t('note.save')));
+  check(`${lang}: підтвердження збереження`, saveButtonLabel(true).includes(t('note.saved')));
+
+  const panel = notePanelHtml({ text: '', isOpen: false });
+  check(`${lang}: панель нотатки підписана`, panel.includes(t('note.mine')));
+  check(`${lang}: поле має підказку`, panel.includes(escapeHtml(t('note.placeholder'))));
+  check(`${lang}: є вставка запиту`, panel.includes(t('note.insertQuery')));
+
+  const empty = notesScreenHtml([]);
+  check(
+    `${lang}: порожній екран нотаток має підказку`,
+    empty.includes(escapeHtml(t('notes.empty')))
+  );
+  check(`${lang}: порожній екран не пропонує видалити всі`, !empty.includes(t('notes.deleteAll')));
+
+  const filled = notesScreenHtml([
+    {
+      taskId: 'L1-a',
+      level: 1,
+      levelName: levelName(1),
+      index: 0,
+      title: 'Назва завдання',
+      context: 'Контекст',
+      taskText: 'Умова',
+      note: 'моя нотатка',
+    },
+  ]);
+  check(`${lang}: екран нотаток має заголовок`, filled.includes(t('notes.title')));
+  check(
+    `${lang}: група підписана рівнем`,
+    filled.includes(escapeHtml(t('notes.group', { level: 1, name: levelName(1) })))
+  );
+  check(
+    `${lang}: запис підписаний номером і назвою`,
+    filled.includes(escapeHtml(t('notes.entry', { number: 1, title: 'Назва завдання' })))
+  );
+  check(`${lang}: є перехід до завдання`, filled.includes(t('notes.goToTask')));
+  check(`${lang}: умову можна розгорнути`, filled.includes(t('notes.showTask')));
+  check(
+    `${lang}: видалення має доступну назву`,
+    filled.includes(escapeHtml(t('notes.deleteAria', { number: 1 })))
+  );
+  check(`${lang}: список пропонує видалити всі`, filled.includes(t('notes.deleteAll')));
+});
+setLanguage('en');
+
 // Головна, завершення рівня й діалог — трьома мовами.
 LANGS.forEach((lang) => {
   setLanguage(lang);
@@ -617,9 +666,12 @@ check('панель нотатки має кнопку збереження', em
 
 // Підпис кнопки — окрема чиста функція, бо підтвердження «Збережено» ставиться
 // точковою заміною тексту, а не перерендером панелі (див. коментар у notePanel.js).
-check('кнопка збереження підписана «Зберегти»', saveButtonLabel(false).includes('Зберегти'));
-check('після збереження підпис змінюється', saveButtonLabel(true).includes('Збережено'));
-check('підпис «Збережено» не лишає старого слова', !saveButtonLabel(true).includes('>Зберегти<'));
+check('кнопка збереження підписана', saveButtonLabel(false).includes(t('note.save')));
+check('після збереження підпис змінюється', saveButtonLabel(true).includes(t('note.saved')));
+check(
+  'підпис підтвердження не лишає старого слова',
+  !saveButtonLabel(true).includes(`>${t('note.save')}<`)
+);
 
 const filledNote = notePanelHtml({ text: '1 < 2 & "лапки"', isOpen: true });
 check('нотатка розгортається', /<details[^>]*\bopen\b/.test(filledNote));
@@ -662,14 +714,21 @@ const noteEntries = [
 const notesHtml = notesScreenHtml(noteEntries);
 check('екран нотаток групує за рівнями', (notesHtml.match(/notes-group"/g) ?? []).length === 2);
 check('екран нотаток показує всі записи', (notesHtml.match(/note-entry"/g) ?? []).length === 3);
-check('запис нумерує завдання з одиниці', notesHtml.includes('Завдання 4 · Четверте завдання'));
+check(
+  'запис нумерує завдання з одиниці',
+  notesHtml.includes(escapeHtml(t('notes.entry', { number: 4, title: 'Четверте завдання' })))
+);
 check('запис показує текст нотатки', /<textarea[^>]*>моя думка<[/]textarea>/.test(notesHtml));
 check('нотатка не вставляє сирий HTML', notesHtml.includes('через &lt;b&gt;JOIN&lt;/b&gt;'));
-check('запис ховає умову під розгортанням', notesHtml.includes('Показати умову'));
+check('запис ховає умову під розгортанням', notesHtml.includes(t('notes.showTask')));
 check('запис містить бізнес-контекст', notesHtml.includes('Контекст четвертого'));
 check('запис містить текст завдання', notesHtml.includes('Умова четвертого'));
 check('запис веде до свого завдання', /data-level="3"\s+data-index="2"/.test(notesHtml));
-check('порядок рівнів збережено', notesHtml.indexOf('Рівень 1') < notesHtml.indexOf('Рівень 3'));
+check(
+  'порядок рівнів збережено',
+  notesHtml.indexOf(t('levelSelect.level', { level: 1 })) <
+    notesHtml.indexOf(t('levelSelect.level', { level: 3 }))
+);
 
 // Нотатку можна правити прямо тут: текст лежить у textarea, а не в <div>.
 check(
@@ -685,7 +744,7 @@ check(
   'кожен запис має кнопку збереження',
   (notesHtml.match(/data-action="save-note"/g) ?? []).length === 3
 );
-check('кнопка збереження підписана', notesHtml.includes('Зберегти'));
+check('кнопка збереження в списку підписана', notesHtml.includes(t('note.save')));
 
 // Видалення: по одній кнопці на запис плюс одна на весь екран.
 check(
@@ -697,11 +756,11 @@ check('екран має видалення всіх нотаток', notesHtml.
 check('видалення всіх — небезпечного вигляду', notesHtml.includes('btn--danger'));
 
 const emptyNotesHtml = notesScreenHtml([]);
-check('без нотаток показується пояснення', emptyNotesHtml.includes('Тут поки що порожньо'));
+check('без нотаток показується пояснення', emptyNotesHtml.includes(escapeHtml(t('notes.empty'))));
 check('порожній екран не має записів', !emptyNotesHtml.includes('note-entry"'));
 check('порожній екран веде на головну', emptyNotesHtml.includes('data-action="to-home"'));
 check('без нотаток немає що видаляти', !emptyNotesHtml.includes('data-action="delete-all-notes"'));
-check('екран нотаток називає вихід «На головну»', notesHtml.includes('На головну'));
+check('екран нотаток називає вихід', notesHtml.includes(t('nav.home')));
 
 const dashMetrics = {
   summary: { solved: 42, total: 125, activeDays: 9 },

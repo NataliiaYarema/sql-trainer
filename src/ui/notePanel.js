@@ -1,4 +1,5 @@
 import { icon, escapeHtml } from '../utils/dom.js';
+import { t } from '../i18n/index.js';
 
 // Скільки показувати підтвердження після натискання «Зберегти».
 export const SAVED_LABEL_MS = 2000;
@@ -9,7 +10,7 @@ let savedTimer = null;
 // точковою заміною тексту кнопки, а не перерендером панелі — інакше поле
 // нотатки втрачало б фокус і позицію курсора просто під час набору.
 export function saveButtonLabel(justSaved) {
-  return `${icon('i-check')}${justSaved ? 'Збережено' : 'Зберегти'}`;
+  return `${icon('i-check')}${escapeHtml(justSaved ? t('note.saved') : t('note.save'))}`;
 }
 
 // Нативний <details> дає згортання й доступність без власного JS — стан
@@ -18,19 +19,19 @@ export function notePanelHtml({ text, isOpen }) {
   return `
     <details class="note-panel"${isOpen ? ' open' : ''}>
       <summary class="note-panel__summary">
-        ${icon('i-note')}Моя нотатка${text === '' ? '' : '<span class="note-panel__dot"></span>'}
+        ${icon('i-note')}${escapeHtml(t('note.mine'))}${text === '' ? '' : '<span class="note-panel__dot"></span>'}
       </summary>
       <textarea
         class="note-panel__text"
         rows="6"
-        placeholder="Коментар, висновок або альтернативне рішення…"
+        placeholder="${escapeHtml(t('note.placeholder'))}"
       >${escapeHtml(text)}</textarea>
       <div class="note-panel__actions">
         <button class="btn btn--ghost" data-action="save-note">
           ${saveButtonLabel(false)}
         </button>
         <button class="btn btn--ghost" data-action="insert-query">
-          ${icon('i-play')}Вставити мій запит
+          ${icon('i-play')}${escapeHtml(t('note.insertQuery'))}
         </button>
       </div>
     </details>

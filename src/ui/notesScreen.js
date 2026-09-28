@@ -8,7 +8,7 @@ import { t } from '../i18n/index.js';
 export function notesScreenHtml(entries) {
   const body =
     entries.length === 0
-      ? `<p class="notes-screen__empty">Тут поки що порожньо. Додавай нотатки до завдань, щоб легко повертатися до власних ідей! Відкрий будь-яке завдання, розгорни блок «Моя нотатка» — і запиши свій висновок або альтернативне рішення.</p>`
+      ? `<p class="notes-screen__empty">${escapeHtml(t('notes.empty'))}</p>`
       : groupsOf(entries).map(groupHtml).join('');
 
   // Видаляти всі нема сенсу пропонувати, коли видаляти нічого.
@@ -18,20 +18,20 @@ export function notesScreenHtml(entries) {
       : `
       <div class="notes-screen__danger">
         <button class="btn btn--danger" data-action="delete-all-notes">
-          ${icon('i-x')}Видалити всі
+          ${icon('i-x')}${escapeHtml(t('notes.deleteAll'))}
         </button>
       </div>`;
 
   return `
     <div class="notes-screen">
       <div class="notes-screen__head">
-        <span class="level-pill">${icon('i-note')}Мої нотатки</span>
+        <span class="level-pill">${icon('i-note')}${escapeHtml(t('notes.pill'))}</span>
       </div>
-      <h2 class="notes-screen__title">Нотатки до завдань</h2>
+      <h2 class="notes-screen__title">${escapeHtml(t('notes.title'))}</h2>
       ${body}
       <div class="notes-screen__actions">
         <button class="btn btn--ghost" data-action="to-home">
-          ${icon('i-arrow-left')}На головну
+          ${icon('i-arrow-left')}${escapeHtml(t('nav.home'))}
         </button>
       </div>
       ${dangerZone}
@@ -56,7 +56,7 @@ function groupsOf(entries) {
 function groupHtml({ level, levelName, items }) {
   return `
     <section class="notes-group">
-      <h3 class="notes-group__title">Рівень ${level} · ${escapeHtml(levelName)}</h3>
+      <h3 class="notes-group__title">${escapeHtml(t('notes.group', { level, name: levelName }))}</h3>
       ${items.map(entryHtml).join('')}
     </section>
   `;
@@ -66,13 +66,13 @@ function entryHtml({ taskId, level, index, title, context, taskText, note }) {
   return `
     <article class="note-entry">
       <div class="note-entry__head">
-        <span>Завдання ${index + 1} · ${escapeHtml(title)}</span>
+        <span>${escapeHtml(t('notes.entry', { number: index + 1, title }))}</span>
         <button
           class="note-entry__delete"
           data-action="delete-note"
           data-note-id="${escapeHtml(taskId)}"
-          title="Видалити цю нотатку"
-          aria-label="Видалити нотатку до завдання ${index + 1}"
+          title="${escapeHtml(t('notes.deleteOne'))}"
+          aria-label="${escapeHtml(t('notes.deleteAria', { number: index + 1 }))}"
         >${icon('i-x')}</button>
       </div>
       <textarea
@@ -80,7 +80,7 @@ function entryHtml({ taskId, level, index, title, context, taskText, note }) {
         data-action="edit-note"
         data-note-id="${escapeHtml(taskId)}"
         rows="3"
-        aria-label="Нотатка до завдання ${index + 1}"
+        aria-label="${escapeHtml(t('notes.editAria', { number: index + 1 }))}"
       >${escapeHtml(note)}</textarea>
       <div class="note-entry__edit-actions">
         <button
@@ -90,18 +90,18 @@ function entryHtml({ taskId, level, index, title, context, taskText, note }) {
         >${saveButtonLabel(false)}</button>
       </div>
       <details class="note-entry__condition">
-        <summary>Показати умову</summary>
+        <summary>${escapeHtml(t('notes.showTask'))}</summary>
         <div class="note-entry__block">
-          <div class="section-label">${icon('i-briefcase')}Бізнес-контекст</div>
+          <div class="section-label">${icon('i-briefcase')}${escapeHtml(t('taskCard.context'))}</div>
           <div class="note-entry__text">${escapeHtml(context)}</div>
         </div>
         <div class="note-entry__block">
-          <div class="section-label">${icon('i-target')}Завдання</div>
+          <div class="section-label">${icon('i-target')}${escapeHtml(t('taskCard.task'))}</div>
           <div class="note-entry__text">${escapeHtml(taskText)}</div>
         </div>
       </details>
       <button class="btn btn--primary" data-level="${level}" data-index="${index}">
-        Перейти до завдання${icon('i-arrow-right')}
+        ${escapeHtml(t('notes.goToTask'))}${icon('i-arrow-right')}
       </button>
     </article>
   `;
