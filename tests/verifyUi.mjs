@@ -8,7 +8,7 @@ import { controlsHtml } from '../src/ui/controls.js';
 import { renderTaskCard } from '../src/ui/taskCard.js';
 import { renderHints } from '../src/ui/hintPanel.js';
 import { renderResultTable } from '../src/ui/resultTable.js';
-import { progressHtml } from '../src/ui/progressBar.js';
+import { progressHtml, routeFor, parseRoute } from '../src/ui/progressBar.js';
 import { notePanelHtml, saveButtonLabel } from '../src/ui/notePanel.js';
 import { notesScreenHtml } from '../src/ui/notesScreen.js';
 import { sandboxControlsHtml } from '../src/ui/sandbox.js';
@@ -251,10 +251,10 @@ const navTag = (html, action) =>
   html.match(new RegExp(`<a[^>]*data-action="${action}"[^>]*>`))?.[0] ?? '';
 
 [
-  ['sandbox', '#/sandbox'],
-  ['dashboard', '#/progress'],
-  ['notes', '#/notes'],
-  ['to-home', '#/'],
+  ['sandbox', '#/en/sandbox'],
+  ['dashboard', '#/en/progress'],
+  ['notes', '#/en/notes'],
+  ['to-home', '#/en/'],
 ].forEach(([action, href]) => {
   const tag = navTag(headerHtml, action);
   check(`шапка: «${action}» — посилання`, tag !== '');
@@ -265,6 +265,24 @@ check(
   'у шапці не лишилося кнопок навігації',
   !/<button[^>]*data-action="(sandbox|dashboard|notes|to-home)"/.test(headerHtml)
 );
+
+// Мова — перший сегмент hash. Три випадки мусять мати відповідь: нормальна
+// адреса, стара закладка без префікса й сміття в рядку.
+check('маршрут пісочниці несе мову', routeFor('en', 'sandbox') === '#/en/sandbox');
+check('маршрут дашборда зветься progress', routeFor('uk', 'dashboard') === '#/uk/progress');
+check('головна — це мова й косий риск', routeFor('es', 'home') === '#/es/');
+check('маршрут нотаток', routeFor('es', 'notes') === '#/es/notes');
+
+check('повний маршрут читається назад', parseRoute('#/es/notes').screen === 'notes');
+check('мова дістається з маршруту', parseRoute('#/es/notes').lang === 'es');
+check('головна читається', parseRoute('#/uk/').screen === 'home');
+check('головна без косого риска теж', parseRoute('#/uk').screen === 'home');
+check('стара закладка лишає екран', parseRoute('#/notes').screen === 'notes');
+check('стара закладка не називає мови', parseRoute('#/notes').lang === null);
+check('невідома мова не називається', parseRoute('#/fr/notes').lang === null);
+check('невідомий екран веде на головну', parseRoute('#/en/nonsense').screen === 'home');
+check('порожній hash веде на головну', parseRoute('').screen === 'home');
+check('порожній hash не називає мови', parseRoute('').lang === null);
 
 // Вікно перевірки каже лише «правильно» чи «ні». Розбір — окремо: за кнопкою
 // «Здатися». Тому в обох гілках перевіряємо не текст, а його відсутність.

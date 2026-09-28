@@ -11,7 +11,8 @@ import { renderHints } from './ui/hintPanel.js';
 import { renderNotePanel } from './ui/notePanel.js';
 import { renderControls } from './ui/controls.js';
 import { renderTaskNav } from './ui/taskNav.js';
-import { renderProgress, bindBackHome, NAV_ROUTES } from './ui/progressBar.js';
+import { renderProgress, bindBackHome, routeFor, parseRoute } from './ui/progressBar.js';
+import { getLanguage } from './i18n/index.js';
 import { renderLevelSelect } from './ui/levelSelect.js';
 import { renderNotesScreen } from './ui/notesScreen.js';
 import { computeMetrics } from './analytics/metrics.js';
@@ -130,12 +131,13 @@ function setRoute(route) {
   window.history.replaceState(null, '', route);
 }
 
-// Екрани завдань і теорії власної адреси не мають — усі вони під NAV_ROUTES.home,
-// тому невідомий hash так само веде на головну.
-function screenForRoute(hash) {
-  if (hash === NAV_ROUTES.sandbox) return showSandbox;
-  if (hash === NAV_ROUTES.dashboard) return showDashboard;
-  if (hash === NAV_ROUTES.notes) return showNotes;
+// Екрани завдань і теорії власної адреси не мають — усі вони під головною,
+// тому невідомий hash так само веде на головну. Мову з адреси розбирає
+// parseRoute; сюди приходить уже лише назва екрана.
+function screenForRoute(screen) {
+  if (screen === 'sandbox') return showSandbox;
+  if (screen === 'dashboard') return showDashboard;
+  if (screen === 'notes') return showNotes;
   return showLevelSelect;
 }
 
@@ -434,7 +436,7 @@ function renderLevelDone() {
 
 function showLevelSelect() {
   flushPending();
-  setRoute(NAV_ROUTES.home);
+  setRoute(routeFor(getLanguage(), 'home'));
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -460,7 +462,7 @@ function showLevelSelect() {
 // сітки — текст теми з переходом на практику відповідного рівня.
 function showTheory(level) {
   flushPending();
-  setRoute(NAV_ROUTES.home);
+  setRoute(routeFor(getLanguage(), 'home'));
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -518,7 +520,7 @@ function saveNotesScreenNote() {
 // Окремий екран за зразком showTheory: та сама панель, робоча панель схована.
 function showNotes() {
   flushPending();
-  setRoute(NAV_ROUTES.notes);
+  setRoute(routeFor(getLanguage(), 'notes'));
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -563,7 +565,7 @@ function currentMetrics() {
 // Ще один екран за зразком showNotes: та сама панель, робоча панель схована.
 function showDashboard() {
   flushPending();
-  setRoute(NAV_ROUTES.dashboard);
+  setRoute(routeFor(getLanguage(), 'dashboard'));
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -590,7 +592,7 @@ function showDashboard() {
 // ній живуть редактор і таблиця результату.
 function showSandbox() {
   flushPending();
-  setRoute(NAV_ROUTES.sandbox);
+  setRoute(routeFor(getLanguage(), 'sandbox'));
   activeLevel = null;
   levelTasks = [];
   clearTaskPanels();
@@ -626,7 +628,7 @@ async function showSandboxWithQuery(sql) {
 // а не перше нерозв'язане на рівні.
 function openLevel(level, startIndex) {
   // Єдиний вхід у завдання, що не проходить через clearTaskPanels.
-  setRoute(NAV_ROUTES.home);
+  setRoute(routeFor(getLanguage(), 'home'));
   sandboxMode = false;
   activeLevel = level;
   levelTasks = tasksByLevel(level);
@@ -638,11 +640,13 @@ function openLevel(level, startIndex) {
 }
 
 editor = createEditor(roots.editor, handleCheck, scheduleDraftSave);
-screenForRoute(window.location.hash)();
+screenForRoute(parseRoute(window.location.hash).screen)();
 
 // Клік по пункту шапки hash не міняє (його перехоплює bindNav), тож сюди
 // потрапляє лише ручна правка адреси — але тоді екран має відповідати рядку.
-window.addEventListener('hashchange', () => screenForRoute(window.location.hash)());
+window.addEventListener('hashchange', () => {
+  screenForRoute(parseRoute(window.location.hash).screen)();
+});
 
 // Автозбереження чернетки відкладене на 400 мс: перезавантаження сторінки в
 // цьому вікні губило б останню серію натискань, якщо її не дописати примусово.

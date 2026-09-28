@@ -1,13 +1,38 @@
 import { icon, escapeHtml } from '../utils/dom.js';
+import { isLang, getLanguage } from '../i18n/index.js';
 
 // Маршрути в hash, а не в шляху: сайт роздається як статика без сервера, і
 // /notes новою вкладкою дав би 404. Hash обробляє сама сторінка.
-export const NAV_ROUTES = {
-  home: '#/',
-  sandbox: '#/sandbox',
-  dashboard: '#/progress',
-  notes: '#/notes',
+//
+// Мова — перший сегмент: посиланням на конкретну мову можна поділитися, і
+// перезавантаження її не губить. Другий сегмент — екран, і назви лишилися ті
+// самі, що були до появи мови, тому стара закладка виду #/notes не ламається.
+const SEGMENTS = { home: '', sandbox: 'sandbox', dashboard: 'progress', notes: 'notes' };
+
+const SCREEN_BY_SEGMENT = {
+  '': 'home',
+  sandbox: 'sandbox',
+  progress: 'dashboard',
+  notes: 'notes',
 };
+
+export function routeFor(lang, screen) {
+  return `#/${lang}/${SEGMENTS[screen] ?? ''}`;
+}
+
+// Віддає мову окремо від екрана й не вигадує її сам: коли в адресі мови немає
+// (стара закладка) або вона невідома, тут null, а вибір роблять сховище й
+// DEFAULT_LANG у main.js.
+//
+// Невідома мова веде на головну разом з усім рештою рядка: витягувати екран
+// з-під зламаного префікса (#/fr/notes) означало б окрему гілку заради
+// випадку, який виникає лише з описки в адресному рядку.
+export function parseRoute(hash) {
+  const parts = hash.replace(/^#\/?/, '').split('/');
+  const lang = isLang(parts[0]) ? parts[0] : null;
+  const segment = lang ? (parts[1] ?? '') : parts[0];
+  return { lang, screen: SCREEN_BY_SEGMENT[segment] ?? 'home' };
+}
 
 // Лічильник розв'язаних із шапки прибрано: його місце зайняла навігація.
 // Кнопки «Мій прогрес» і «Мої нотатки» показуються на всіх екранах, щоб із
@@ -29,21 +54,23 @@ function navLink(route, action, iconId, label) {
 }
 
 export function progressHtml({ levelName, showBack, active }) {
+  const lang = getLanguage();
+
   return `
     <div class="progress">
       ${levelName ? `<span class="progress__level">${escapeHtml(levelName)}</span>` : ''}
       <div class="progress__nav">
-        ${active === 'sandbox' ? '' : navLink(NAV_ROUTES.sandbox, 'sandbox', 'i-table', 'Пісочниця')}
+        ${active === 'sandbox' ? '' : navLink(routeFor(lang, 'sandbox'), 'sandbox', 'i-table', 'Пісочниця')}
         ${
           active === 'dashboard'
             ? ''
-            : navLink(NAV_ROUTES.dashboard, 'dashboard', 'i-award', 'Мій прогрес')
+            : navLink(routeFor(lang, 'dashboard'), 'dashboard', 'i-award', 'Мій прогрес')
         }
-        ${active === 'notes' ? '' : navLink(NAV_ROUTES.notes, 'notes', 'i-note', 'Мої нотатки')}
+        ${active === 'notes' ? '' : navLink(routeFor(lang, 'notes'), 'notes', 'i-note', 'Мої нотатки')}
         ${
           showBack
             ? `
-              <a class="btn btn--ghost btn--back" href="${NAV_ROUTES.home}" data-action="to-home">
+              <a class="btn btn--ghost btn--back" href="${routeFor(lang, 'home')}" data-action="to-home">
                 ${icon('i-arrow-left')}На головну
               </a>
             `
