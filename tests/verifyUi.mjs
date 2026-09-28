@@ -367,6 +367,38 @@ check('невідомий екран веде на головну', parseRoute('
 check('порожній hash веде на головну', parseRoute('').screen === 'home');
 check('порожній hash не називає мови', parseRoute('').lang === null);
 
+// Підписи екрана теорії — трьома мовами. Самі тексти тем українські до
+// етапу 3, тому звіряємо саме обрамлення.
+LANGS.forEach((lang) => {
+  setLanguage(lang);
+  const html = theoryTopicHtml(topics[0]);
+  check(
+    `${lang}: тема підписує рівень`,
+    html.includes(escapeHtml(t('theory.pill', { level: topics[0].level })))
+  );
+  check(`${lang}: тема підписує приклади`, html.includes(escapeHtml(t('theory.examples'))));
+  check(`${lang}: тема підписує пастки`, html.includes(escapeHtml(t('theory.pitfalls'))));
+  check(
+    `${lang}: кнопка виконання прикладу підписана`,
+    html.includes(escapeHtml(t('theory.runQuery')))
+  );
+  check(
+    `${lang}: кнопка практики підписана`,
+    html.includes(escapeHtml(t('theory.toPractice', { level: topics[0].level })))
+  );
+
+  const caseTopic = topics.find((topic) => topic.cases);
+  const caseHtml = theoryTopicHtml(caseTopic);
+  check(`${lang}: кейси підписані`, caseHtml.includes(escapeHtml(t('theory.cases'))));
+  check(`${lang}: застереження кейса підписані`, caseHtml.includes(escapeHtml(t('case.watchOut'))));
+  check(`${lang}: кейс каже, про що він`, caseHtml.includes(escapeHtml(t('case.about'))));
+  check(
+    `${lang}: підпис таблиці кейса зі словника`,
+    caseHtml.includes(escapeHtml(t('result.label')))
+  );
+});
+setLanguage('en');
+
 // Пісочниця й таблиця результату — трьома мовами.
 LANGS.forEach((lang) => {
   setLanguage(lang);

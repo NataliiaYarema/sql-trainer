@@ -11,7 +11,7 @@ function runButtonHtml(action, indexAttr, index) {
   return `
     <div class="theory-run">
       <button class="btn btn--ghost" data-action="${action}" ${indexAttr}="${index}">
-        ${icon('i-play')}Виконати запит
+        ${icon('i-play')}${escapeHtml(t('theory.runQuery'))}
       </button>
     </div>
   `;
@@ -22,9 +22,9 @@ function caseHtml(item, index) {
     <article class="theory-case">
       <h3 class="theory-case__title">${escapeHtml(item.title)}</h3>
       <dl class="theory-case__meta">
-        <dt>Про що</dt>
+        <dt>${escapeHtml(t('case.about'))}</dt>
         <dd>${escapeHtml(item.about)}</dd>
-        <dt>Коли потрібен</dt>
+        <dt>${escapeHtml(t('case.whenNeeded'))}</dt>
         <dd>${escapeHtml(item.whenNeeded)}</dd>
       </dl>
       <blockquote class="theory-case__question">
@@ -40,7 +40,7 @@ function caseHtml(item, index) {
       <p class="theory-case__reading">${escapeHtml(item.reading)}</p>
 
       <div class="theory-case__watch">
-        <div class="theory-case__watch-label">На що звернути увагу</div>
+        <div class="theory-case__watch-label">${escapeHtml(t('case.watchOut'))}</div>
         <ul>
           ${item.watchOut.map((w) => `<li>${escapeHtml(w)}</li>`).join('')}
         </ul>
@@ -53,7 +53,7 @@ export function theoryTopicHtml(topic) {
   return `
     <div class="theory-topic">
       <div class="theory-topic__head">
-        <span class="level-pill">${icon('i-book')}Теорія · рівень ${topic.level}</span>
+        <span class="level-pill">${icon('i-book')}${escapeHtml(t('theory.pill', { level: topic.level }))}</span>
       </div>
 
       <h2 class="theory-topic__title">
@@ -66,13 +66,13 @@ export function theoryTopicHtml(topic) {
       ${
         topic.cases
           ? `<div class="task-section">
-        <div class="section-label">${icon('i-play')}Як це розбирають на роботі</div>
+        <div class="section-label">${icon('i-play')}${escapeHtml(t('theory.cases'))}</div>
         <div class="theory-cases">
           ${topic.cases.map(caseHtml).join('')}
         </div>
       </div>`
           : `<div class="task-section">
-        <div class="section-label">${icon('i-play')}Як це виглядає</div>
+        <div class="section-label">${icon('i-play')}${escapeHtml(t('theory.examples'))}</div>
         <div class="theory-examples">
           ${topic.examples.map(exampleHtml).join('')}
         </div>
@@ -80,7 +80,7 @@ export function theoryTopicHtml(topic) {
       }
 
       <div class="task-section">
-        <div class="section-label">${icon('i-bulb')}На чому спотикаються</div>
+        <div class="section-label">${icon('i-bulb')}${escapeHtml(t('theory.pitfalls'))}</div>
         <div class="theory-pitfalls">
           ${topic.pitfalls.map(pitfallHtml).join('')}
         </div>
@@ -89,7 +89,7 @@ export function theoryTopicHtml(topic) {
       ${
         topic.tips
           ? `<div class="task-section">
-        <div class="section-label">${icon('i-bulb')}Практичні поради</div>
+        <div class="section-label">${icon('i-bulb')}${escapeHtml(t('theory.tips'))}</div>
         <ul class="theory-tips">
           ${topic.tips
             .map(
@@ -110,10 +110,10 @@ export function theoryTopicHtml(topic) {
 
       <div class="theory-topic__actions">
         <button class="btn btn--primary" data-action="to-practice">
-          Практика: Рівень ${topic.level}${icon('i-arrow-right')}
+          ${escapeHtml(t('theory.toPractice', { level: topic.level }))}${icon('i-arrow-right')}
         </button>
         <button class="btn btn--ghost" data-action="to-home">
-          ${icon('i-arrow-left')}На головну
+          ${icon('i-arrow-left')}${escapeHtml(t('nav.home'))}
         </button>
       </div>
     </div>
