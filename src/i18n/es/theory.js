@@ -64,157 +64,158 @@ export default {
 
   2: {
     summary:
-      'GROUP BY junta las filas en montones por un valor común, y un agregado (COUNT, SUM, AVG, MIN, MAX) convierte cada montón en una fila de la respuesta.',
+      'GROUP BY agrupa las filas según un valor común, y un agregado (COUNT, SUM, AVG, MIN, MAX) resume cada grupo en una fila del resultado.',
     summaryBlocks: [
       [
-        'En un SELECT con GROUP BY solo se pueden tomar las columnas por las que se agrupó, más agregados del resto.',
-        'HAVING es un filtro de los propios grupos: actúa después del recuento, mientras que WHERE descarta filas sueltas antes de agrupar.',
+        'En un SELECT con GROUP BY, solo puedes seleccionar las columnas por las que se agrupa y los agregados aplicados al resto.',
+        'HAVING es un filtro aplicado a los grupos: se ejecuta después de agrupar y calcular los agregados, mientras que WHERE descarta filas antes de agrupar.',
       ],
     ],
     examples: [
       {
         label: 'Una suma dentro de cada grupo',
         result:
-          'Una fila por categoría: cuántas unidades de esa categoría hay en total en el almacén, del montón más grande al más pequeño.',
+          'Una fila por categoría: cuántas unidades de esa categoría hay en total en el almacén, de la categoría con más unidades a la que tiene menos.',
       },
       {
-        label: 'Varios agregados en una sola pasada',
+        label: 'Varios agregados en una sola consulta',
         result:
-          'Una fila por responsable: cuántos pedidos llevó y cuál es su ticket medio, redondeado a céntimos.',
+          'Una fila por responsable: cuántos pedidos gestionó y cuál es el importe medio de sus pedidos, redondeado a céntimos.',
       },
       {
         label: 'MIN y MAX: los límites de cada grupo',
         result:
-          'Cinco categorías, cada una con el precio de su producto más barato y del más caro. Stationery va de 4.20 a 15.00 y Furniture de 45.50 a 430.00.',
+          'Cinco categorías, cada una con el precio de su producto más barato y del más caro. Stationery tiene precios de 4.20 a 15.00 y Furniture, de 45.50 a 430.00.',
       },
       {
         label: 'HAVING: un filtro de los grupos ya formados',
         result:
-          'Solo los clientes cuyo importe total de pedidos superó 1000. Los clientes con un importe menor se agrupan igualmente, pero no entran en la respuesta.',
+          'Solo los clientes cuyo importe total de pedidos superó 1000. Los clientes con un importe menor también forman un grupo, pero no aparecen en el resultado.',
       },
       {
         label: 'COUNT(*) frente a COUNT(columna)',
         result:
-          'Dos números distintos: 12 y 11. COUNT(*) cuenta todas las filas y COUNT(department) solo aquellas en las que department no es NULL.',
+          'Dos valores distintos: 12 y 11. COUNT(*) cuenta todas las filas, mientras que COUNT(department) solo cuenta las filas en las que department no es NULL.',
       },
     ],
     pitfalls: [
       {
-        title: 'WHERE no ve los agregados',
-        text: 'WHERE COUNT(*) > 4 es un error, porque WHERE actúa antes de que los grupos existan siquiera. Las condiciones sobre COUNT, SUM o AVG van en HAVING. Y al revés: una condición normal sobre una fila (por ejemplo price > 100) sale más barata en WHERE que en HAVING.',
+        title: 'WHERE no puede usar los agregados',
+        text: 'WHERE COUNT(*) > 4 es un error porque WHERE actúa antes de que los grupos se formen. Las condiciones sobre COUNT, SUM o AVG van en HAVING. En cambio, una condición normal sobre una fila, como price > 100, se puede aplicar en WHERE y puede ser más eficiente que aplicarla después de agrupar.',
       },
       {
         title: 'Una columna fuera de GROUP BY y fuera de un agregado',
-        text: 'Si eliges una columna que no está ni en GROUP BY ni dentro de un agregado, PostgreSQL se niega a ejecutar la consulta: «column must appear in the GROUP BY clause». No es tiquismiquis: sin esa regla no quedaría claro qué valor del grupo tendría que mostrar esa columna.',
+        text: 'Si seleccionas una columna que no está ni en GROUP BY ni dentro de un agregado, PostgreSQL se niega a ejecutar la consulta: «column must appear in the GROUP BY clause». No es una limitación arbitraria: sin esta regla, no estaría claro qué valor del grupo debería mostrar esa columna.',
       },
       {
-        title: 'AVG se salta los NULL en lugar de contarlos como ceros',
-        text: 'AVG(salary) sobre 10 filas en las que dos salarios están vacíos divide la suma por 8 y no por 10. Si un valor vacío tiene que significar cero, hay que decirlo de forma explícita: AVG(COALESCE(salary, 0)).',
+        title: 'AVG ignora los NULL en lugar de contarlos como ceros',
+        text: 'AVG(salary) sobre 10 filas en las que dos salarios son NULL divide la suma entre 8, no entre 10. Si un valor NULL debe interpretarse como cero, hay que indicarlo de forma explícita: AVG(COALESCE(salary, 0)).',
       },
     ],
   },
 
   3: {
     summary:
-      'JOIN cose las filas de dos tablas según la condición del ON, que normalmente es una coincidencia de identificadores.',
+      'JOIN combina las filas de dos tablas según la condición de ON, que normalmente comprueba que dos identificadores coinciden.',
     summaryBlocks: [
       [
-        'INNER JOIN deja solo las parejas en las que se encontraron las dos mitades.',
-        'LEFT JOIN conserva todas las filas de la tabla izquierda y pone NULL donde no se encontró pareja.',
+        'INNER JOIN deja solo las parejas de filas en las que hay coincidencia en ambas tablas.',
+        'LEFT JOIN conserva todas las filas de la tabla izquierda y rellena con NULL las columnas de la tabla derecha cuando no encuentra una coincidencia.',
       ],
-      'Justo por eso la pareja LEFT JOIN + IS NULL responde a la pregunta «y quién no tiene nada».',
+      'Por eso, la combinación LEFT JOIN + IS NULL permite responder a la pregunta «¿quién no tiene nada?».',
     ],
     examples: [
       {
         label: 'INNER JOIN: solo las coincidencias',
         result:
-          'Los pedidos de junio con el nombre del cliente al lado. Un cliente sin pedidos en junio no aparecerá ni una vez. Aquí la palabra INNER es opcional: un JOIN a secas significa exactamente lo mismo, pero en el título del tema la construcción lleva su nombre completo.',
+          'Los pedidos de junio con el nombre del cliente junto al pedido. Un cliente sin pedidos en junio no aparecerá en el resultado. Aquí la palabra INNER es opcional: un JOIN a secas significa exactamente lo mismo. Aun así, en el título del tema usamos el nombre completo de la construcción.',
       },
       {
         label: 'LEFT JOIN + IS NULL: encontrar a quienes no tienen nada',
         result:
-          'Los clientes que no hicieron ningún pedido. LEFT JOIN los dejó en la selección con las columnas del pedido vacías, y WHERE conservó justamente esas filas.',
+          'Los clientes que no hicieron ningún pedido. LEFT JOIN conserva esos clientes y establece las columnas de orders en NULL cuando no encuentra ningún pedido. WHERE conserva precisamente esas filas.',
       },
       {
         label: 'JOIN + GROUP BY: los productos más vendidos por unidades',
         result:
-          'Los cinco productos que se compraron en mayor cantidad. Primero las líneas de pedido reciben el nombre del producto y después el resultado se agrupa.',
+          'Los cinco productos que se vendieron en mayor cantidad. Primero, las líneas de pedido se combinan con el nombre del producto y después el resultado se agrupa.',
       },
       {
-        label: 'USING: una cadena de tres tablas escrita más corta',
+        label: 'USING: una cadena de tres tablas escrita de forma más concisa',
         result:
-          'Las cinco líneas más antiguas con la fecha del pedido y el nombre del producto: ahora la cadena tiene de verdad tres tablas. USING (order_id) es más corto que ON o.order_id = oi.order_id y además deja en el resultado una sola columna order_id en lugar de dos con el mismo nombre.',
+          'Las cinco líneas de pedido más antiguas, con la fecha del pedido y el nombre del producto. Esta consulta combina tres tablas. USING (order_id) es más corto que ON o.order_id = oi.order_id y, además, deja una sola columna order_id en el resultado en lugar de dos columnas con el mismo nombre.',
       },
     ],
     pitfalls: [
       {
         title: 'Un JOIN sin ON multiplica las filas',
-        text: 'Si se olvida la condición de unión, cada fila de la tabla izquierda se pega con cada fila de la derecha: 8 clientes y 31 pedidos dan 248 filas en lugar de 31. Un crecimiento repentino del número de filas es la primera señal de un ON perdido.',
+        text: 'Si se olvida la condición de unión, cada fila de la tabla izquierda se combina con cada fila de la tabla derecha: 8 clientes y 31 pedidos dan 248 filas en lugar de 31. Un aumento repentino del número de filas es una primera señal de que falta la condición ON.',
       },
       {
-        title: 'Una condición sobre la tabla derecha en WHERE mata un LEFT JOIN',
-        text: 'LEFT JOIN orders o ... WHERE o.amount > 100 tira a todos los clientes sin pedidos, porque NULL no es mayor que 100, y el LEFT JOIN se convierte en silencio en un INNER. Si hay que conservar a los clientes sin pedidos, la condición va en el ON: ON o.customer_id = c.customer_id AND o.amount > 100.',
+        title:
+          'Una condición sobre la tabla derecha en WHERE puede anular el efecto de un LEFT JOIN',
+        text: 'LEFT JOIN orders o ... WHERE o.amount > 100 elimina a todos los clientes sin pedidos, porque NULL no es mayor que 100. Como consecuencia, las filas que LEFT JOIN había conservado para esos clientes quedan descartadas por WHERE. Si hay que conservar a los clientes sin pedidos, la condición puede ir en ON: ON o.customer_id = c.customer_id AND o.amount > 100.',
       },
       {
         title: 'COUNT(*) después de un LEFT JOIN cuenta 1 en lugar de 0',
-        text: 'Un LEFT JOIN deja la fila incluso cuando a la derecha no se encontró nada, simplemente con las columnas vacías. COUNT(*) cuenta filas, así que para un cliente sin ningún pedido devuelve 1. Hay que contar una columna de la tabla derecha: COUNT(o.order_id) da un 0 honesto, porque COUNT no cuenta los NULL.',
+        text: 'Un LEFT JOIN conserva la fila incluso cuando no encuentra ninguna coincidencia en la tabla derecha, dejando sus columnas en NULL. COUNT(*) cuenta filas, así que para un cliente sin ningún pedido devuelve 1. Hay que contar una columna de la tabla derecha: COUNT(o.order_id) devuelve 0, porque COUNT no cuenta los valores NULL.',
       },
     ],
   },
 
   4: {
-    summary: 'Una subconsulta es una consulta dentro de otra, puesta entre paréntesis.',
+    summary: 'Una subconsulta es una consulta dentro de otra, escrita entre paréntesis.',
     summaryBlocks: [
       [
-        'Una subconsulta escalar calcula lo más a menudo un solo número (por ejemplo el salario medio) con el que después se compara cada fila.',
-        'Un CTE es la misma subconsulta, pero llevada arriba con WITH y con nombre: a partir de ahí se usa como si fuera una tabla normal.',
+        'Una subconsulta escalar suele calcular un único valor, por ejemplo el salario medio, que después se compara con cada fila.',
+        'Un CTE es una subconsulta a la que se le da un nombre mediante WITH y que, a partir de ese momento, se puede usar como si fuera una tabla normal.',
       ],
-      'El resultado es el mismo, se lee mejor, y un CTE se puede usar varias veces o servir de base para el siguiente. Cuando una solución ya no cabe en la cabeza, repártela en pasos con nombre.',
+      'El resultado puede ser el mismo, pero la consulta resulta más fácil de leer. Además, un CTE se puede usar varias veces o servir de base para otro CTE. Cuando una solución empieza a ser difícil de seguir, divídela en pasos con nombre.',
     ],
     examples: [
       {
         label: 'Una subconsulta escalar en WHERE',
         result:
-          'Primero se calcula el precio medio de la electrónica: un solo número. Después cada producto de cualquier categoría se compara justamente con él.',
+          'Primero se calcula el precio medio de los productos de electrónica: un único valor. Después, cada producto, independientemente de su categoría, se compara con ese valor.',
       },
       {
         label: 'Una subconsulta en la lista de columnas',
         result:
-          'Los productos de los que quedan menos de 10 unidades y, al lado, cuánto más barato es cada uno que el producto más caro de la lista de precios.',
+          'Los productos de los que quedan menos de 10 unidades y, al lado, cuánto más barato es cada uno que el producto más caro de la tabla.',
       },
       {
-        label: 'NOT IN: excluir con una lista ya hecha',
+        label: 'NOT IN: excluir con una lista ya creada',
         result:
-          'Una fila: Sofia Rossi, la única clienta sin ningún pedido. La subconsulta reúne primero la lista de quienes pidieron, y la consulta externa descarta a todos los de esa lista.',
+          'Una fila: Sofia Rossi, la única clienta sin ningún pedido. La subconsulta obtiene primero la lista de clientes que han hecho algún pedido, y la consulta externa excluye a todos los clientes de esa lista.',
       },
       {
-        label: 'NOT EXISTS: excluir con una condición',
+        label: 'NOT EXISTS: excluir mediante una condición',
         result:
-          'La misma Sofia Rossi, pero por otro camino: aquí la subconsulta no reúne una lista, sino que para cada cliente pregunta «¿existe al menos un pedido?». Justo por eso en el SELECT hay un 1: el valor no hace falta, lo que importa es que la fila exista.',
+          'La misma Sofia Rossi, pero por otro camino: aquí la subconsulta no crea una lista, sino que, para cada cliente, comprueba si existe al menos un pedido. Por eso aparece un 1 en el SELECT: el valor en sí no importa; lo importante es que exista una fila.',
       },
       {
-        label: 'WITH: darle nombre a un paso intermedio',
+        label: 'WITH: dar nombre a un paso intermedio',
         result:
-          'Las fechas en las que llegó más de un pedido. El primer paso cuenta los pedidos por día y el segundo filtra el resultado ya hecho.',
+          'Las fechas en las que se recibió más de un pedido. El primer paso cuenta los pedidos por día y el segundo filtra el resultado.',
       },
       {
         label: 'Dos CTE seguidos',
         result:
-          'Los clientes cuyo importe de compras es superior al importe medio por cliente. El segundo CTE se construye sobre el primero, y así el problema se parte en dos pasos sencillos.',
+          'Los clientes cuyo importe total de compras es superior al importe medio por cliente. El segundo CTE se construye a partir del primero, de modo que el problema se divide en dos pasos sencillos.',
       },
     ],
     pitfalls: [
       {
         title: 'Una subconsulta escalar tiene que devolver un solo valor',
-        text: 'La forma price > (SELECT ...) espera exactamente una fila y una columna. Si la subconsulta devuelve varias filas, habrá un error. Cuando lo que hace falta son varios valores, se usa IN en lugar de >: WHERE customer_id IN (SELECT customer_id FROM orders).',
+        text: 'La expresión price > (SELECT ...) espera exactamente una fila y una columna. Si la subconsulta devuelve varias filas, se producirá un error. Cuando necesitas comparar con varios valores, usa IN en lugar de >: WHERE customer_id IN (SELECT customer_id FROM orders).',
       },
       {
-        title: 'NOT IN se rompe con NULL',
-        text: 'Si entre los valores de la subconsulta aparece aunque sea un NULL, NOT IN no devuelve ninguna fila, y además no habrá ningún error. Para preguntas del tipo «quién no está en la lista» es más seguro escribir NOT EXISTS o LEFT JOIN ... IS NULL.',
+        title: 'NOT IN da problemas con NULL',
+        text: 'Si entre los valores de la subconsulta aparece aunque sea un NULL, NOT IN puede no devolver ninguna fila, sin que se produzca ningún error. Para preguntas del tipo «¿quién no está en la lista?», NOT EXISTS suele ser una opción más segura, o también puedes usar LEFT JOIN ... IS NULL.',
       },
       {
-        title: 'Un CTE vive solo dentro de su propia consulta',
-        text: 'Tras el punto y coma, el nombre declarado en WITH desaparece: no es una tabla que hayas creado. Y a un CTE solo se le puede hacer referencia por debajo del lugar donde se declaró: el segundo CTE ve al primero, pero no al contrario.',
+        title: 'Un CTE solo vive dentro de su propia consulta',
+        text: 'Después del punto y coma, el nombre declarado en WITH deja de existir: no es una tabla que hayas creado. Además, un CTE solo puede hacer referencia a los CTE declarados antes que él. El segundo CTE puede usar el primero, pero no al contrario.',
       },
     ],
   },
