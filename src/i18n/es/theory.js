@@ -218,4 +218,208 @@ export default {
       },
     ],
   },
+
+  5: {
+    summary:
+      'Una función de ventana calcula igual que un agregado, pero no pega las filas: cada fila se queda en su sitio y recibe una columna más. Qué hay que calcular exactamente lo decide OVER.',
+    summaryBlocks: [
+      [
+        'PARTITION BY divide la tabla en partes independientes, por ejemplo cada departamento por separado.',
+        'ORDER BY marca el orden de las filas dentro de esa parte.',
+      ],
+      'Así aparecen la numeración (ROW_NUMBER, RANK), el acceso a las filas vecinas (LAG, LEAD) y los totales acumulados.',
+      'Es la respuesta a la pregunta «y cómo se ve esta fila frente a su propio grupo».',
+    ],
+    examples: [
+      {
+        label: 'Numerar dentro de cada grupo',
+        result:
+          'Los 25 productos siguen ahí, cada uno con su puesto por precio dentro de su categoría. La numeración empieza otra vez desde 1 en cada categoría.',
+      },
+      {
+        label: 'RANK y DENSE_RANK: dos formas de tratar los empates',
+        result:
+          'Los ocho productos más caros. Office Chair y Docking Station cuestan 210 los dos y los dos reciben el quinto puesto; a partir de ahí los caminos se separan: RANK salta al séptimo y DENSE_RANK va al sexto. La diferencia solo se ve donde hay empate, así que mirarlas por separado no sirve de nada.',
+      },
+      {
+        label: 'Comparar una fila con su propio grupo',
+        result:
+          'Cada empleado y la diferencia entre su salario y el salario más bajo de su departamento. GROUP BY no serviría aquí: dejaría una fila por departamento.',
+      },
+      {
+        label: 'LAG y LEAD: asomarse a la fila vecina',
+        result:
+          'Cada pedido ve a sus vecinos por fecha: LAG da el importe del anterior y LEAD el del siguiente. En la primera fila prev_amount está vacío porque simplemente no hay anterior, y sobre eso se construye la diferencia «actual menos anterior».',
+      },
+      {
+        label: 'NTILE: repartir en partes iguales',
+        result:
+          'Los productos repartidos por precio en cuatro grupos de tamaño parecido: 1 es el cuarto más barato de la lista de precios y 4 el más caro.',
+      },
+      {
+        label: 'El marco de la ventana: una media móvil',
+        result:
+          'Para cada pedido, el importe medio de él y de los dos anteriores. ROWS BETWEEN estrecha la ventana de «toda la parte» a tres filas vecinas.',
+      },
+    ],
+    pitfalls: [
+      {
+        title: 'OVER no se puede escribir en WHERE',
+        text: 'Las ventanas se calculan cuando WHERE ya ha descartado filas, así que WHERE ROW_NUMBER() OVER (...) = 1 es un error. La forma que funciona: calcular el número en un CTE y filtrar con la consulta externa por la columna ya hecha.',
+      },
+      {
+        title: 'RANK, DENSE_RANK y ROW_NUMBER cuentan de forma distinta',
+        text: 'Con valores iguales, RANK deja huecos (1, 2, 2, 4), DENSE_RANK no los deja (1, 2, 2, 3) y ROW_NUMBER simplemente numera de corrido (1, 2, 3, 4) y elige el orden entre iguales de forma arbitraria. Sin esa diferencia, la pregunta «quién está en segundo puesto» no tiene una respuesta única.',
+      },
+      {
+        title: 'PARTITION BY no es GROUP BY',
+        text: 'GROUP BY reduce el número de filas y PARTITION BY nunca lo hace. Si esperabas una fila por departamento en la respuesta y salieron tantas filas como empleados, lo que hacía falta era un agregado normal y no una función de ventana.',
+      },
+    ],
+  },
+
+  6: {
+    summary:
+      'Las fechas en PostgreSQL son un tipo propio y no texto, y por eso la aritmética funciona con ellas.',
+    summaryBlocks: [
+      [
+        'DATE_TRUNC recorta una fecha hasta el inicio de un periodo —un mes, un trimestre, un año— y así es como los informes mensuales obtienen un solo valor para todo el mes.',
+        'EXTRACT saca un número de una fecha: el año, el mes, el día de la semana.',
+        "Sumar INTERVAL '30 days' da una fecha nueva.",
+        'AGE calcula la diferencia entre dos fechas con las palabras «tantos años, meses y días».',
+        'TO_CHAR convierte una fecha en texto según una plantilla, y con eso se hacen las etiquetas legibles.',
+      ],
+      'Las funciones de cadena resuelven otro problema: ordenar lo que llegó de un formulario.',
+      [
+        'TRIM quita los espacios de los extremos.',
+        'INITCAP hace «Nombre Apellido» a partir de cualquier combinación de mayúsculas.',
+        'SPLIT_PART corta un valor por un separador.',
+        'SUBSTRING junto con POSITION saca un trozo por posición.',
+        'Lo que lo pega todo es el operador ||.',
+      ],
+    ],
+    examples: [
+      {
+        label: 'DATE_TRUNC: reducir las fechas al mes',
+        result:
+          'Seis filas, una por mes. DATE_TRUNC recortó cada fecha hasta el primer día de su mes, así que todos los pedidos de enero se fundieron en una fila: 3 pedidos, ticket medio 131.83.',
+      },
+      {
+        label: 'EXTRACT: sacar una parte de la fecha',
+        result:
+          'Los cinco pedidos más antiguos con el número del día de la semana y el del mes. La numeración de los días empieza en cero-domingo, así que 5 es viernes, 4 es jueves y 6 es sábado.',
+      },
+      {
+        label: 'INTERVAL y AGE: aritmética de fechas',
+        result:
+          'El primer pedido, del 5 de enero, tiene fecha de pago el 4 de febrero, y del 1 de julio lo separan «5 mons 27 days». INTERVAL suma un intervalo a una fecha y devuelve una fecha; AGE resta una fecha de otra y devuelve un intervalo en palabras.',
+      },
+      {
+        label: 'TRIM e INITCAP: limpiar un nombre sin procesar',
+        result:
+          'Se ven al lado el valor sin procesar y el limpio: « anna kovalenko » se convierte en «Anna Kovalenko». En el tercer contacto el espacio doble de dentro sigue ahí: TRIM no lo ve.',
+      },
+      {
+        label: 'SPLIT_PART: cortar un valor por un separador',
+        result:
+          'Diez contactos con el dominio en una columna aparte: example.com, mail.ua, bondar.dev. El tercer argumento es el número del trozo, así que 2 significa «lo que va después de la arroba»; con 1 saldría el nombre del buzón.',
+      },
+      {
+        label: 'TO_CHAR y ||: montar una etiqueta legible',
+        result:
+          'Cinco etiquetas del tipo «05.01.2024 — 120.50»: TO_CHAR convirtió la fecha en texto según una plantilla y || la pegó con el importe.',
+      },
+    ],
+    pitfalls: [
+      {
+        title: 'EXTRACT da un número, no un texto con cero delante',
+        text: "EXTRACT(YEAR FROM d) || '-' || EXTRACT(MONTH FROM d) da 2024-1 y no 2024-01: un número no lleva cero delante. Comparar con una cadena (= '2024') sí se puede, por cierto: PostgreSQL la reduce a número por su cuenta. La etiqueta de un informe, en cambio, se hace con TO_CHAR(d, 'YYYY-MM'), que da 2024-01.",
+      },
+      {
+        title: 'TRIM quita los espacios solo de los extremos',
+        text: "TRIM('  a  b  ') devuelve 'a  b': el espacio doble de dentro se queda. Quitarlo es trabajo de REPLACE(x, '  ', ' '). Y REPLACE busca justamente parejas, así que con tres espacios seguidos uno sobrevive a una sola pasada.",
+      },
+      {
+        title: 'DATE_TRUNC da la primera fecha del periodo, no su nombre',
+        text: "DATE_TRUNC('month', DATE '2024-03-17') devuelve 2024-03-01: el inicio del periodo, una marca de tiempo. Eso viene bien para agrupar y ordenar, pero no es un rótulo: «marzo de 2024» lo hace TO_CHAR. Y al revés, no se puede ordenar por el nombre del mes en texto: un ORDER BY sobre él da April, February, January, porque el orden es alfabético.",
+      },
+      {
+        title: 'En SQLite esto se escribe de otra forma',
+        text: "El nivel 6 es donde los dialectos se separan más, y SQLite todavía aparece en proyectos antiguos y en entrevistas. Las equivalencias: DATE_TRUNC('month', d) ↔ date(d, 'start of month'), EXTRACT(YEAR FROM d) ↔ strftime('%Y', d), d + INTERVAL '30 days' ↔ date(d, '+30 days'). En nuestro entrenador solo funciona la columna de la izquierda.",
+      },
+    ],
+  },
+
+  7: {
+    summary:
+      'CASE permite devolver valores distintos según una condición. Comprueba las condiciones por turnos y devuelve el resultado de la primera que se cumple. Si no se cumple ninguna, se usa ELSE. Si no se indica ELSE, el resultado será NULL. END marca el final de la construcción CASE.',
+    summaryBlocks: [
+      'COALESCE se usa cuando hay que sustituir un NULL por otro valor. Devuelve el primer valor de la lista que no sea NULL. Viene bien, por ejemplo, cuando en lugar de un valor ausente hay que mostrar un texto claro o usar un valor de reserva.',
+      'NULLIF funciona en sentido contrario: convierte un valor concreto en NULL si coincide con el indicado. Se usa a menudo para convertir un cero en NULL antes de una división y evitar así dividir por cero.',
+      'UNION, UNION ALL, INTERSECT y EXCEPT permiten comparar o combinar los resultados de dos consultas.',
+      'A diferencia de JOIN, que añade columnas de otra tabla, las operaciones con conjuntos trabajan con filas: los resultados de dos consultas se combinan uno debajo de otro.',
+      [
+        'UNION combina los resultados y quita los duplicados.',
+        'UNION ALL combina los resultados y conserva los duplicados.',
+        'INTERSECT deja las filas que están en los dos resultados.',
+        'EXCEPT deja las filas del primer resultado que no están en el segundo.',
+      ],
+      'En las cuatro operaciones, las dos consultas tienen que devolver el mismo número de columnas, y las columnas correspondientes tienen que ser de tipos compatibles.',
+    ],
+    examples: [
+      {
+        label: 'CASE con ELSE: el nivel de retribución',
+        result:
+          'Doce filas del salario más alto al más bajo. Dos cayeron en high, siete en mid y tres en low. Las condiciones se comprueban de arriba abajo, así que Oksana, con 8100, se detiene en la primera rama y ya no ve la segunda.',
+      },
+      {
+        label: 'SUM(CASE): las filas se vuelven columnas',
+        result:
+          'Cinco filas, una por departamento, y una fila aparte para el empleado sin departamento. IT da 4 y 0; HR da 0 y 2. Así se construyen las tablas cruzadas: una categoría pasa a ser una columna en lugar de un valor dentro de una columna.',
+      },
+      {
+        label: 'COALESCE y NULLIF: dos acciones opuestas',
+        result:
+          "Doce filas en las que se ven las dos acciones a la vez. A Bohdan le falta el departamento, y COALESCE puso ahí «No indicado». A todos los de IT, NULLIF les hizo lo contrario y lo dejó vacío, porque su valor coincidía con el que pedimos ocultar. A ese mismo Bohdan hidden_it también le queda vacío, pero por otra razón: NULLIF(NULL, 'IT') da NULL por sí solo.",
+      },
+      {
+        label: 'UNION: combinar dos listas sin repeticiones',
+        result:
+          'Cinco filas: todas las categorías que tienen o un producto muy caro o uno muy barato. La misma consulta con UNION ALL da 15 filas: la categoría se repite tantas veces como productos suyos cumplen la condición.',
+      },
+      {
+        label: 'INTERSECT: la parte común de dos listas',
+        result:
+          'Tres categorías —Electronics, Furniture y Kitchen—: cada una tiene un producto desde 200 y otro más barato que 50. Es la mayor dispersión de precios del catálogo.',
+      },
+      {
+        label: 'EXCEPT: restar una lista de otra',
+        result:
+          'Tres filas: HR, Marketing y el departamento vacío, que son justamente los sitios donde nadie cobra 6000 o más. La fila vacía no es casualidad: las operaciones con conjuntos tratan NULL como un valor normal y lo emparejan con NULL, mientras que una comparación corriente NULL = NULL nunca es verdadera.',
+      },
+      {
+        label: 'CASE en ORDER BY: un orden propio que no está en los datos',
+        result:
+          'Primero toda la electrónica de lo más caro a lo más barato y después los muebles: Standing Desk a 430. Ni el alfabeto ni los números dan ese orden: ORDER BY acepta una expresión, y CASE convierte el nombre de la categoría en un número que la ordenación sigue. Ese número no se ve en el resultado.',
+      },
+    ],
+    pitfalls: [
+      {
+        title: 'Un CASE sin ELSE da NULL en silencio',
+        text: 'Si ninguna rama coincidió y no se escribió ELSE, CASE devuelve NULL: ni una cadena vacía ni un cero. En una tabla eso parece un hueco, y en los cálculos se comporta de formas distintas: COUNT no contará esa fila, SUM la ignorará y una concatenación con || convertirá en NULL el resultado completo.',
+      },
+      {
+        title: 'El orden de las ramas del CASE es la prioridad',
+        text: "Las ramas se comprueban de arriba abajo y gana la primera que coincide. Por eso una condición más amplia no puede ir antes de una más estrecha: en CASE WHEN price < 200 THEN 'standard' WHEN price < 50 THEN 'budget' END la segunda rama no se cumplirá nunca, porque todo lo más barato que 50 ya encajó en la primera. No habrá error, habrá un resultado silenciosamente incorrecto.",
+      },
+      {
+        title: 'UNION quita los duplicados y UNION ALL no',
+        text: 'Con nuestros datos se ve literalmente: combinar las categorías de productos caros y baratos con UNION da 5 filas y con UNION ALL da 15. La eliminación de duplicados no es gratis: para encontrar las repeticiones la base tiene que hacer trabajo extra —hashing u ordenación, según lo que elija el planificador—. Si a conciencia no hay repeticiones, o no molestan, usa UNION ALL.',
+      },
+      {
+        title: 'EXCEPT es asimétrico',
+        text: 'A EXCEPT B y B EXCEPT A son preguntas distintas con respuestas distintas. Las categorías menos las categorías con productos caros dan 2 filas (Sports y Stationery, donde no hay nada desde 200), y al revés dan 0, porque cada categoría con un producto caro está también entre todas las categorías. Un resultado vacío aquí no es «no se encontró nada», sino la señal de que los operandos están al revés.',
+      },
+    ],
+  },
 };
