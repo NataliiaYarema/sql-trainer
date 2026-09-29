@@ -422,4 +422,172 @@ export default {
       },
     ],
   },
+
+  8: {
+    subtitle: 'cohorts, funnels, retention, LTV and RFM',
+    summary:
+      'Cohorts, funnels, retention, LTV and RFM are the metrics that show the real state and growth of a product. Each of them is not just a separate function but a whole chain of logical steps.',
+    summaryBlocks: [
+      'At this level you bring everything you have learnt together into one analytical system:',
+      [
+        'WITH (CTE) becomes the backbone of your code: it lays complex calculations out as transparent, named stages.',
+        'DATE_TRUNC cuts a date down to the start of a month or a week, and that is exactly how a raw stream of signups turns into readable cohorts.',
+        'COUNT(DISTINCT …) counts unique people rather than events, keeping the active audience from being distorted.',
+        'FILTER (WHERE …) computes subsets of the data in a single pass, letting you assemble funnels without bulky unions.',
+        'LAG places the current period next to the previous one in one row, for a quick calculation of dynamics (MoM / YoY).',
+        'NTILE splits users evenly into groups by their activity or ticket, for building RFM segmentation.',
+      ],
+      'The main rule of an analyst: writing the SQL is only part of the job. The most important thing is to understand the business request correctly and to compute exactly what the business needs.',
+    ],
+    cases: [
+      {
+        title: 'Cohort retention analysis',
+        about:
+          'Track the groups of users who signed up in the same month and see whether they come back later.',
+        whenNeeded:
+          'When you are asked “how many of the January people are still with us in March” or “how does retention change from cohort to cohort”.',
+        question:
+          'How many users who signed up in January are still active in February? And in March? How does retention change from cohort to cohort?',
+        steps: [
+          'Step 1 (cohort): assigns every user their signup month, once and for good.',
+          'Step 2 (activity): puts the user’s cohort next to the month of each of their activities.',
+          'Step 3: the final selection counts how many people from the cohort stayed active month_no months later.',
+        ],
+        reading:
+          'month_no is the age of the cohort rather than the calendar: zero means the signup month. The January 2023 cohort of seven people gave five active in month zero and three in month one. The series does not have to fall monotonically: a user can skip a month and come back, and that is exactly why retention is computed as a matrix rather than as one number.',
+        watchOut: [
+          'A cohort is determined by the signup date, and it stays with the user for good. If you group by the event date, the same user lands in several months at once — and the cohort stops being a cohort.',
+          'Active users by month is not retention, however similar the series may look. In it the newcomers cannot be told from those who came back, so its fall or growth says nothing about whether people are staying with the product.',
+          'What has to be counted is unique people rather than events: everyone in a cohort has to be counted once, however many activities they may have had in a month.',
+          'The last cohort always looks worse than the rest — simply because its observation window is shorter. In a report it is either excluded or labelled separately.',
+        ],
+      },
+      {
+        title: 'The conversion funnel',
+        about:
+          'Walk the sequence of steps towards a purchase and find where the most people are lost.',
+        whenNeeded: 'Analysis of payment, signup, subscription — any sequence of actions.',
+        question: 'At which step of the funnel do we lose the most? Where should we optimise?',
+        steps: [
+          'Step 1 (session_depth): determines the deepest step reached for every session.',
+          'Step 2: the final selection counts the sessions that reached at least each step — which is exactly why the conditions are cumulative (>= 1, >= 2, …) rather than equalities.',
+        ],
+        reading:
+          '1187 sessions started and 274 ended in a purchase — that is 23%. The largest loss stands at the very beginning: 344 sessions did not even reach a product view, and that is more than at any later step. So what has to be optimised is the entrance rather than the payment.',
+        watchOut: [
+          'The unit of counting decides everything. Count unique people over the whole period and the one who came in ten times and bought once lands in every step equally. What comes out is a comforting “conversion” that describes different moments in the lives of the same people rather than one walk through the funnel.',
+          'The step conditions have to be cumulative: a session that reached the purchase counts towards all the earlier steps too. With an equality instead of “at least”, the steps stop adding up into a funnel.',
+          'The order of the steps is set explicitly rather than by the alphabet or by the order of appearance in the data. If your funnel has different stages, it is exactly this list that changes — and the whole result depends on its order.',
+        ],
+      },
+      {
+        title: 'LTV by signup cohort',
+        about:
+          'How much money a user brings in over their whole life, and how that changes from cohort to cohort.',
+        whenNeeded:
+          'When you need to understand whether acquisition pays off and whether the quality of new users is deteriorating.',
+        question:
+          'What is the LTV of the users by signup month? Is it falling in the fresh cohorts?',
+        steps: [
+          'Step 1 (user_ltv): gives one row per user — the total of their purchases, or zero if they bought nothing (LEFT JOIN plus COALESCE).',
+          'Step 2: the final selection averages those numbers over the cohort and adds the median, to make the skew visible.',
+        ],
+        reading:
+          'In the January cohort the average LTV is 238.79 and the median is 13.16. A difference of eighteen times means that the average is pulled up by a few large buyers, while a typical user of the cohort brings in almost nothing. Reporting the average alone here is misleading yourself.',
+        watchOut: [
+          'Computing an “average of a sum” with one aggregate will not work: PostgreSQL does not allow nesting an aggregate inside an aggregate. And it is right not to — first the purchases are reduced to one number per user, and only then are those numbers averaged over the cohort. Two meaningful steps, two levels of grouping.',
+          'A LEFT JOIN is mandatory. With a plain join the users who bought nothing disappear from the calculation, and you average the buyers rather than the whole cohort — the LTV comes out inflated. COALESCE is what makes their zero actually reach the average.',
+          'The median is worth computing next to the average whenever money is involved: the distribution of purchases is almost never symmetric, and it is exactly the gap between those two numbers that shows how misleading the average is.',
+          'Fresh cohorts almost always look worse — they simply had less time to buy. Cohorts can only be compared honestly over an equal observation window.',
+        ],
+      },
+      {
+        title: 'RFM segmentation',
+        about:
+          'Lay the buyers out into groups by three dimensions — when they last bought, how often, and for how much.',
+        whenNeeded:
+          'When you have to decide whom to email, whom to retain, and whom it is no longer worth touching.',
+        question:
+          'Split the buyers into segments: VIP, Loyal, Potential, At-Risk, Lost. How many people are in each, and how much do they bring in?',
+        steps: [
+          'Step 1 (metrics): computes three numbers for every buyer — recency, frequency, amount.',
+          'Step 2 (scores): turns each of them into an NTILE(4) quartile independently of the others.',
+          'Step 3: the final CASE folds the three quartiles into a segment name, and the order of the branches here is the priority.',
+        ],
+        reading:
+          '136 buyers laid out into five groups of entirely different value: the average ticket of Loyal is 610.87 and of Lost 96.05, that is six times less. The smallest group is the most interesting one here: five At-Risk people spent a fair amount but have not come back for a long time — and they are exactly the ones it makes sense to win back first.',
+        watchOut: [
+          'A split by money alone is not RFM yet. Someone who spent a lot a year ago and left ends up in the same group as someone who buys every month. Telling those two people apart is the very point of the method, and all three dimensions are needed for it rather than one.',
+          'Recency is computed from the end of the data and not from today. On a historical set CURRENT_DATE would make every buyer look abandoned, and the whole split would drift — which is why the date is fixed in the query explicitly.',
+          'The order of the CASE branches is the priority rather than decoration: the first condition that matches takes the buyer, and the rest are not considered. Swap the lines around and the segments come out different.',
+          'Quartiles are equal by the number of participants and not by the amount of money. “The top 25% of buyers” and “a quarter of the revenue” are different things, and confusing them in a report is dangerous.',
+        ],
+      },
+      {
+        title: 'Month-on-month change',
+        about: 'Compare a metric with the previous period and see the trend and the anomalies.',
+        whenNeeded: 'Monthly reports on revenue, active users, conversion.',
+        question: 'By how much did the revenue change from month to month? Where are the dips?',
+        steps: [
+          'Step 1 (monthly): reduces the purchases to one row per month.',
+          'Step 2: LAG(revenue) OVER (ORDER BY month) places the previous month’s revenue alongside.',
+          'Step 3: the percentage is computed from that one, not from the current month.',
+        ],
+        reading:
+          'In the first month both columns are empty — there is no previous one, and that is the correct result rather than a fault. Further on, a sharp jump in March and a moderate dip in April are visible. But the first months here are very small in volume, so the percentages explode in them: on a small base any change looks like drama.',
+        watchOut: [
+          'The denominator has to hold the previous period rather than the current one. Otherwise what comes out is not “how much we grew relative to last time” but the share of the growth in the new volume — a different quantity, and one that is not comparable between months on top of that.',
+          'A NULL in the first row is normal rather than missing data: there is simply nothing to compare with. Replacing it with a zero means inventing a fall of a hundred per cent.',
+          'A window without ORDER BY makes “the previous row” simply “some neighbouring row”. The order inside a window is set separately from the output order, and relying on the ORDER BY at the end of the query is not allowed here.',
+          'The last month in the data is almost always incomplete, so its dip may be not an event but merely the fact that the month is not over yet.',
+        ],
+      },
+    ],
+    pitfalls: [
+      {
+        title: 'COUNT(*) counts events, not people',
+        text: 'Active users get counted by events and the number comes out several times larger than the truth. In this data it is 3218 against 190. The cure is COUNT(DISTINCT user_id).',
+      },
+      {
+        title: 'A cohort is determined by the signup date',
+        text: 'If you group by the event date, the same user lands in several months at once, and the cohort stops being a cohort.',
+      },
+      {
+        title: 'The last cohort always looks worse',
+        text: 'Its observation window is shorter. In this data the June 2024 cohort has retention of exactly 0%, because the next month simply is not in the data. That is not a fault but an incomplete cohort, and in a report it has to be either excluded or labelled.',
+      },
+      {
+        title: 'LAG without ORDER BY makes no sense',
+        text: 'Without an ORDER BY inside the window, “the previous row” means “some neighbouring row”, and the number may come out different every time. A NULL in the first row, on the other hand, is normal: there really is no previous month, and replacing it with a zero means inventing a fall of 100%.',
+      },
+      {
+        title: 'NTILE divides by count, not by amount',
+        text: 'Quartiles are equal by the number of participants rather than by money. In this data the top quartile of 34 buyers gives 55% of all the revenue — so “the top 25%” and “a quarter of the revenue” are different things.',
+      },
+      {
+        title: 'Step-by-step conversion is not end-to-end conversion',
+        text: '71% × 64% × 69% × 74% gives 23%, not 71%. Confusing those two numbers is a classic cause of inflated reports.',
+      },
+    ],
+    tips: [
+      {
+        text: 'Read the question twice and say the metric out loud: retention, funnel, LTV or segmentation. Half of the wrong queries are correct SQL for a different metric.',
+      },
+      {
+        text: 'Settle the terms at the start rather than after the report: are “active” people or events; is “conversion” step-by-step or end-to-end; is “retention” counted from the signup date or from the first purchase.',
+      },
+      {
+        text: 'WITH makes the logic explicit: every stage gets a name, and the query reads top to bottom like a description of the calculation.',
+      },
+      {
+        text: 'Check that the result is sensible before carrying it further: a cohort does not grow over time, conversion is never above 100%, LTV is never negative. Breaking such a rule means an error in the query rather than a discovery.',
+      },
+      {
+        text: 'Document your assumptions in a comment right inside the query — in a month you will no longer remember why recency is computed from that particular date.',
+      },
+      {
+        text: 'The last month in the data is almost always incomplete, and its retention is understated by construction. Either exclude it from the report or label it right on the chart.',
+      },
+    ],
+  },
 };

@@ -422,4 +422,173 @@ export default {
       },
     ],
   },
+
+  8: {
+    subtitle: 'cohortes, embudos, retención, LTV y RFM',
+    summary:
+      'Las cohortes, los embudos, la retención, el LTV y el RFM son las métricas que muestran el estado real y el crecimiento de un producto. Cada una no es solo una función aparte, sino toda una cadena de pasos lógicos.',
+    summaryBlocks: [
+      'En este nivel reúnes todo lo aprendido en un único sistema analítico:',
+      [
+        'WITH (CTE) pasa a ser la base de tu código: reparte los cálculos complejos en etapas transparentes y con nombre.',
+        'DATE_TRUNC recorta una fecha hasta el inicio de un mes o de una semana, y así es como un flujo bruto de registros se convierte en cohortes legibles.',
+        'COUNT(DISTINCT …) cuenta personas únicas y no eventos, con lo que la audiencia activa no queda distorsionada.',
+        'FILTER (WHERE …) calcula subconjuntos de los datos en una sola pasada y permite montar embudos sin uniones pesadas.',
+        'LAG pone el periodo actual junto al anterior en una misma fila, para calcular rápido la evolución (MoM / YoY).',
+        'NTILE reparte a los usuarios de forma uniforme en grupos según su actividad o su ticket, para construir una segmentación RFM.',
+      ],
+      'La regla principal de quien analiza datos: escribir el SQL es solo parte del trabajo. Lo más importante es entender bien la petición del negocio y calcular exactamente lo que el negocio necesita.',
+    ],
+    cases: [
+      {
+        title: 'Análisis de retención por cohortes',
+        about:
+          'Seguir los grupos de usuarios que se registraron el mismo mes y ver si vuelven después.',
+        whenNeeded:
+          'Cuando preguntan «cuántos de los de enero nos quedan en marzo» o «cómo cambia la retención de una cohorte a otra».',
+        question:
+          '¿Cuántos usuarios que se registraron en enero siguen activos en febrero? ¿Y en marzo? ¿Cómo cambia la retención de una cohorte a otra?',
+        steps: [
+          'Paso 1 (cohort): asigna a cada usuario su mes de registro, una vez y para siempre.',
+          'Paso 2 (activity): pone la cohorte del usuario junto al mes de cada una de sus actividades.',
+          'Paso 3: la selección final cuenta cuántas personas de la cohorte siguieron activas month_no meses después.',
+        ],
+        reading:
+          'month_no es la edad de la cohorte y no el calendario: el cero significa el mes de registro. La cohorte de enero de 2023, de siete personas, dio cinco activas en el mes cero y tres en el mes uno. La serie no tiene que bajar de forma monótona: un usuario puede saltarse un mes y volver, y justo por eso la retención se calcula como una matriz y no como un solo número.',
+        watchOut: [
+          'La cohorte la determina la fecha de registro, y se queda con el usuario para siempre. Si agrupas por la fecha del evento, el mismo usuario cae en varios meses a la vez y la cohorte deja de ser una cohorte.',
+          'Los usuarios activos por mes no son la retención, por parecida que sea la serie. En ella no se distinguen los recién llegados de quienes volvieron, así que su caída o su subida no dice nada sobre si la gente se queda con el producto.',
+          'Hay que contar personas únicas y no eventos: en una cohorte cada uno tiene que contarse una vez, por muchas actividades que haya tenido en el mes.',
+          'La última cohorte siempre parece peor que el resto, simplemente porque su ventana de observación es más corta. En un informe se excluye o se etiqueta aparte.',
+        ],
+      },
+      {
+        title: 'El embudo de conversión',
+        about:
+          'Recorrer la secuencia de pasos hasta la compra y encontrar dónde se pierde más gente.',
+        whenNeeded:
+          'Análisis del pago, del registro, de la suscripción: cualquier secuencia de acciones.',
+        question: '¿En qué paso del embudo perdemos más? ¿Dónde hay que optimizar?',
+        steps: [
+          'Paso 1 (session_depth): determina para cada sesión el paso más profundo al que llegó.',
+          'Paso 2: la selección final cuenta las sesiones que llegaron al menos a cada paso, y justo por eso las condiciones son acumulativas (>= 1, >= 2, …) y no igualdades.',
+        ],
+        reading:
+          'Empezaron 1187 sesiones y 274 terminaron en compra: eso es el 23 %. La mayor pérdida está justo al principio: 344 sesiones no llegaron ni a ver un producto, y eso es más que en cualquier paso posterior. Así que lo que hay que optimizar es la entrada y no el pago.',
+        watchOut: [
+          'La unidad de recuento lo decide todo. Si cuentas personas únicas de todo el periodo, quien entró diez veces y compró una cae por igual en todos los pasos. Sale una «conversión» reconfortante que describe momentos distintos de la vida de las mismas personas y no un único recorrido del embudo.',
+          'Las condiciones de los pasos tienen que ser acumulativas: una sesión que llegó a la compra cuenta también en todos los pasos anteriores. Con una igualdad en lugar de «al menos», los pasos dejan de sumar un embudo.',
+          'El orden de los pasos se indica de forma explícita y no por alfabeto ni por el orden en que aparecen en los datos. Si tu embudo tiene otras etapas, lo que cambia es justamente esa lista, y de su orden depende todo el resultado.',
+        ],
+      },
+      {
+        title: 'LTV por cohorte de registro',
+        about:
+          'Cuánto dinero aporta un usuario en todo su ciclo de vida y cómo cambia eso de una cohorte a otra.',
+        whenNeeded:
+          'Cuando hay que entender si la captación se amortiza y si no está empeorando la calidad de los usuarios nuevos.',
+        question:
+          '¿Cuál es el LTV de los usuarios por mes de registro? ¿Está bajando en las cohortes recientes?',
+        steps: [
+          'Paso 1 (user_ltv): da una fila por usuario, con el importe de sus compras o un cero si no compró nada (LEFT JOIN más COALESCE).',
+          'Paso 2: la selección final promedia esos números por cohorte y añade la mediana para ver el sesgo.',
+        ],
+        reading:
+          'En la cohorte de enero el LTV medio es 238,79 y el mediano 13,16. Una diferencia de dieciocho veces significa que la media la tira hacia arriba un puñado de compradores grandes, mientras que el usuario típico de la cohorte no aporta casi nada. Informar aquí solo de la media es engañarse a uno mismo.',
+        watchOut: [
+          'Calcular una «media de una suma» con un solo agregado no se puede: PostgreSQL no permite anidar un agregado dentro de otro. Y hace bien: primero las compras se reducen a un número por usuario y solo después esos números se promedian por cohorte. Dos pasos con sentido, dos niveles de agrupación.',
+          'El LEFT JOIN es obligatorio. Con una unión normal, los usuarios que no compraron nada desaparecen del cálculo y promedias a los compradores en lugar de a toda la cohorte, con lo que el LTV sale inflado. COALESCE es lo que hace que su cero llegue de verdad a la media.',
+          'La mediana conviene calcularla junto a la media siempre que se trate de dinero: la distribución de las compras casi nunca es simétrica, y es justamente la distancia entre esos dos números la que muestra lo engañosa que es la media.',
+          'Las cohortes recientes casi siempre parecen peores: simplemente tuvieron menos tiempo para comprar. Las cohortes solo se pueden comparar con honestidad sobre una ventana de observación igual.',
+        ],
+      },
+      {
+        title: 'Segmentación RFM',
+        about:
+          'Repartir a los compradores en grupos según tres dimensiones: cuándo compraron por última vez, con qué frecuencia y por cuánto.',
+        whenNeeded:
+          'Cuando hay que decidir a quién escribir, a quién retener y a quién ya no vale la pena molestar.',
+        question:
+          'Divide a los compradores en segmentos: VIP, Loyal, Potential, At-Risk, Lost. ¿Cuánta gente hay en cada uno y cuánto aportan?',
+        steps: [
+          'Paso 1 (metrics): calcula para cada comprador tres números: recencia, frecuencia e importe.',
+          'Paso 2 (scores): convierte cada uno de ellos en un cuartil NTILE(4) de forma independiente de los demás.',
+          'Paso 3: el CASE final junta los tres cuartiles en el nombre de un segmento, y aquí el orden de las ramas es la prioridad.',
+        ],
+        reading:
+          '136 compradores se repartieron en cinco grupos de valor muy distinto: el ticket medio de Loyal es 610,87 y el de Lost 96,05, o sea seis veces menos. Aquí el grupo más pequeño es el más interesante: cinco personas At-Risk gastaban bastante pero no vuelven desde hace tiempo, y son justo a quienes tiene sentido recuperar primero.',
+        watchOut: [
+          'Repartir solo por dinero todavía no es RFM. Quien gastó mucho hace un año y se fue acaba en el mismo grupo que quien compra cada mes. Distinguir a esas dos personas es la esencia del método, y para eso hacen falta las tres dimensiones y no una.',
+          'La recencia se calcula desde el final de los datos y no desde hoy. Sobre un conjunto histórico, CURRENT_DATE haría parecer abandonado a cada comprador y todo el reparto se desplazaría, y por eso la fecha está fijada de forma explícita en la consulta.',
+          'El orden de las ramas del CASE es la prioridad y no una cuestión de forma: la primera condición que coincide se lleva al comprador y las demás ya no se miran. Cambia las líneas de sitio y los segmentos saldrán distintos.',
+          'Los cuartiles son iguales por número de participantes y no por cantidad de dinero. «El 25 % de arriba de los compradores» y «una cuarta parte de los ingresos» son cosas distintas, y confundirlas en un informe es peligroso.',
+        ],
+      },
+      {
+        title: 'El cambio de un mes a otro',
+        about: 'Comparar una métrica con el periodo anterior y ver la tendencia y las anomalías.',
+        whenNeeded: 'Informes mensuales de ingresos, usuarios activos, conversión.',
+        question: '¿Cuánto cambiaron los ingresos de un mes a otro? ¿Dónde hay caídas?',
+        steps: [
+          'Paso 1 (monthly): reduce las compras a una fila por mes.',
+          'Paso 2: LAG(revenue) OVER (ORDER BY month) pone al lado los ingresos del mes anterior.',
+          'Paso 3: el porcentaje se calcula sobre esos y no sobre el mes actual.',
+        ],
+        reading:
+          'En el primer mes las dos columnas están vacías: no hay mes anterior, y ese es el resultado correcto y no una avería. Más adelante se ve un salto fuerte en marzo y una caída moderada en abril. Pero aquí los primeros meses son muy pequeños en volumen, así que los porcentajes estallan en ellos: sobre una base pequeña cualquier cambio parece un drama.',
+        watchOut: [
+          'En el denominador tiene que estar el periodo anterior y no el actual. Si no, sale no «cuánto crecimos respecto a la vez anterior», sino la parte del crecimiento dentro del volumen nuevo: otra magnitud y, además, no comparable entre meses.',
+          'Un NULL en la primera fila es lo normal y no un dato que falte: simplemente no hay con qué comparar. Sustituirlo por un cero significa inventarse una caída del cien por cien.',
+          'Una ventana sin ORDER BY convierte «la fila anterior» en «alguna fila vecina». El orden dentro de una ventana se indica aparte del orden de salida, y aquí no se puede confiar en el ORDER BY del final de la consulta.',
+          'El último mes de los datos casi siempre está incompleto, así que su caída puede no ser un acontecimiento, sino solo el hecho de que el mes todavía no ha terminado.',
+        ],
+      },
+    ],
+    pitfalls: [
+      {
+        title: 'COUNT(*) cuenta eventos, no personas',
+        text: 'Los usuarios activos se cuentan por eventos y el número sale varias veces mayor que la verdad. En estos datos son 3218 frente a 190. Lo cura COUNT(DISTINCT user_id).',
+      },
+      {
+        title: 'La cohorte la determina la fecha de registro',
+        text: 'Si agrupas por la fecha del evento, el mismo usuario cae en varios meses a la vez y la cohorte deja de ser una cohorte.',
+      },
+      {
+        title: 'La última cohorte siempre parece peor',
+        text: 'Su ventana de observación es más corta. En estos datos la cohorte de junio de 2024 tiene una retención de exactamente 0 %, porque el mes siguiente simplemente no está en los datos. No es una avería, sino una cohorte incompleta, y en un informe hay que excluirla o etiquetarla.',
+      },
+      {
+        title: 'LAG sin ORDER BY no tiene sentido',
+        text: 'Sin un ORDER BY dentro de la ventana, «la fila anterior» significa «alguna fila vecina» y el número puede salir distinto cada vez. Un NULL en la primera fila, en cambio, es lo normal: de verdad no hay mes anterior, y sustituirlo por un cero significa inventarse una caída del 100 %.',
+      },
+      {
+        title: 'NTILE divide por cantidad, no por importe',
+        text: 'Los cuartiles son iguales por número de participantes y no por dinero. En estos datos el cuartil superior, de 34 compradores, da el 55 % de todos los ingresos, así que «el 25 % de arriba» y «una cuarta parte de los ingresos» son cosas distintas.',
+      },
+      {
+        title: 'La conversión paso a paso no es la conversión de extremo a extremo',
+        text: '71 % × 64 % × 69 % × 74 % da 23 % y no 71 %. Confundir esos dos números es una causa clásica de informes inflados.',
+      },
+    ],
+    tips: [
+      {
+        text: 'Lee la pregunta dos veces y di la métrica en voz alta: retención, embudo, LTV o segmentación. La mitad de las consultas equivocadas son SQL correcto para otra métrica.',
+      },
+      {
+        text: 'Aclara los términos al principio y no después del informe: si «activos» son personas o eventos; si «conversión» es paso a paso o de extremo a extremo; si «retención» se cuenta desde la fecha de registro o desde la primera compra.',
+      },
+      {
+        text: 'WITH hace explícita la lógica: cada etapa recibe un nombre y la consulta se lee de arriba abajo, como la descripción de un cálculo.',
+      },
+      {
+        text: 'Comprueba que el resultado sea razonable antes de llevarlo más lejos: una cohorte no crece con el tiempo, una conversión nunca pasa del 100 %, un LTV nunca es negativo. Romper una de esas reglas significa un error en la consulta y no un descubrimiento.',
+      },
+      {
+        text: 'Documenta tus supuestos en un comentario dentro de la propia consulta: dentro de un mes ya no recordarás por qué la recencia se calcula justo desde esa fecha.',
+      },
+      {
+        text: 'El último mes de los datos casi siempre está incompleto y su retención sale subestimada por construcción. O lo excluyes del informe o lo etiquetas directamente en el gráfico.',
+      },
+    ],
+  },
 };
