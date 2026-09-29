@@ -249,7 +249,7 @@ export default {
       {
         label: 'LAG and LEAD — peek into a neighbouring row',
         result:
-          'Every order sees its neighbours by date: LAG gives the amount of the previous one, LEAD the amount of the next. In the very first row prev_amount is empty, because there simply is no previous one — and the “current minus previous” difference is built on exactly that.',
+          'Every order sees its neighbours by date: LAG gives the amount of the previous one, LEAD the amount of the next. In the very first row prev_amount is NULL, because there simply is no previous one — and the “current minus previous” difference is built on exactly that.',
       },
       {
         label: 'NTILE — lay the rows out into equal parts',
