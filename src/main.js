@@ -1,5 +1,5 @@
 import './styles/main.css';
-import tasks, { LEVELS, tasksByLevel, tasksByCaseStudy } from './tasks/index.js';
+import tasks, { LEVELS, tasksByCaseStudy, tasksFor } from './tasks/index.js';
 import { executeUserQuery, executeReferenceQuery, SqlUserError } from './db/sqlEngine.js';
 import { compareResults } from './compare/resultComparer.js';
 import { GameState } from './game/state.js';
@@ -55,7 +55,18 @@ const roots = {
   result: qs('#result-root'),
 };
 
+// GameState отримує структуру: від завдання їй потрібні лише id і level, тому
+// при зміні мови прогрес не перебудовується — нема чого ламати.
 const gameState = new GameState(tasks);
+
+// А все, що показується на екрані, береться звідси: той самий банк, але з
+// текстом поточної мови. Поки рівень не перекладений, поля лишаються
+// українськими (див. tasksFor).
+let localizedTasks = tasksFor(getLanguage());
+
+function levelTasksOf(level) {
+  return localizedTasks.filter((task) => task.level === level);
+}
 const eventLog = new EventLog();
 
 // Час відкриття завдання потрібен, щоб порахувати, скільки пішло на розв'язок.
@@ -183,6 +194,10 @@ function applyLanguage(lang) {
   flushPending();
   setLanguage(lang);
   saveLang(getLanguage());
+  localizedTasks = tasksFor(getLanguage());
+  // Відкритий рівень тримає власний зріз банку — без цього рядка картка
+  // лишилася б попередньою мовою до наступного переходу між завданнями.
+  if (activeLevel !== null) levelTasks = levelTasksOf(activeLevel);
   setRoute(currentScreenName);
   applyStaticText();
   repaint();
@@ -513,7 +528,7 @@ function showLevelSelect() {
     LEVELS.map((level) => ({
       level,
       name: levelName(level),
-      total: tasksByLevel(level).length,
+      total: levelTasksOf(level).length,
       solved: gameState.solvedCountForLevel(level),
       noteCount: gameState.notedCountForLevel(level),
     })),
@@ -548,7 +563,7 @@ function showTheory(level) {
 // завдань за id — так список ніколи не показує застарілу редакцію завдання.
 function noteEntries() {
   return LEVELS.flatMap((level) =>
-    tasksByLevel(level)
+    levelTasksOf(level)
       .map((task, index) => ({ task, index }))
       .filter(({ task }) => gameState.hasNote(task.id))
       .map(({ task, index }) => ({
@@ -626,7 +641,12 @@ function currentStatuses() {
 }
 
 function currentMetrics() {
-  return computeMetrics({ tasks, statuses: currentStatuses(), events: eventLog.all() });
+  // Саме localizedTasks: дашборд показує назви завдань, а не лише їхні id.
+  return computeMetrics({
+    tasks: localizedTasks,
+    statuses: currentStatuses(),
+    events: eventLog.all(),
+  });
 }
 
 // Ще один екран за зразком showNotes: та сама панель, робоча панель схована.
@@ -700,7 +720,7 @@ function openLevel(level, startIndex) {
   setRoute('home');
   sandboxMode = false;
   activeLevel = level;
-  levelTasks = tasksByLevel(level);
+  levelTasks = levelTasksOf(level);
   currentIndex = startIndex ?? pickStartIndex();
   roots.theory.innerHTML = '';
   roots.workPanel.hidden = false;

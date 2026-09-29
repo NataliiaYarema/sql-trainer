@@ -6,6 +6,8 @@ import tasks, {
   tasksByLevel,
 } from '../src/tasks/index.js';
 import * as schemas from '../src/tasks/schemas.js';
+import enTaskText from '../src/i18n/en/tasks/index.js';
+import esTaskText from '../src/i18n/es/tasks/index.js';
 import { levelName, setLanguage, LANGS } from '../src/i18n/index.js';
 import { dedent } from '../src/utils/dom.js';
 import { checkSqlFormatting } from './sqlFormat.mjs';
@@ -295,6 +297,177 @@ for (const task of tasks) {
 }
 
 await closeAll();
+
+// ─── Переклад завдань ───────────────────────────────────────────────────────
+//
+// Українська — джерело: вона лишається в src/tasks/level*.js поряд зі своїм
+// referenceSql. Англійський та іспанський текст накладається поверх, тому тут
+// перевіряється саме він.
+const TRANSLATIONS = { en: enTaskText, es: esTaskText };
+
+// Напівперекладений рівень — гірше за неперекладений: сім завдань англійською
+// й вісім українською читаються як поломка. Переліку готових рівнів ніде не
+// ведемо, правило виводиться з самих даних.
+Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+  LEVELS.forEach((level) => {
+    const ids = tasksByLevel(level).map((task) => task.id);
+    const done = ids.filter((id) => dict[id] !== undefined).length;
+    check(
+      `${lang}: рівень ${level} перекладений повністю або ніяк (${done}/${ids.length})`,
+      done === 0 || done === ids.length
+    );
+  });
+});
+
+// Ключ, якого немає в банку, — це або описка, або завдання, яке перейменували
+// чи прибрали. Без цієї перевірки такий текст лежав би мертвим вантажем.
+const bankIds = new Set(tasks.map((task) => task.id));
+Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+  Object.keys(dict).forEach((id) => {
+    check(`${lang}: ${id} існує в банку`, bankIds.has(id));
+  });
+});
+
+// Повнота полів: у перекладеного завдання мусить бути все, що показує картка.
+const filled = (value) => typeof value === 'string' && value.trim() !== '';
+Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+  Object.entries(dict).forEach(([id, text]) => {
+    check(
+      `${lang}: ${id} має назву, контекст, умову й пояснення`,
+      filled(text.title) &&
+        filled(text.context) &&
+        filled(text.taskText) &&
+        filled(text.explanation)
+    );
+    check(
+      `${lang}: ${id} має три непорожні підказки`,
+      Array.isArray(text.hints) && text.hints.length === 3 && text.hints.every(filled)
+    );
+  });
+});
+
+// Скелет у третій підказці — це SQL, і він мовно незалежний. Перекладається
+// лише слово перед двокрапкою.
+const SKELETON_PREFIX = /^(Скелет|Skeleton|Plantilla):\s*/;
+tasks.forEach((task) => {
+  const source = task.hints[2];
+  check(`${task.id}: третя підказка — скелет`, SKELETON_PREFIX.test(source));
+  const sql = source.replace(SKELETON_PREFIX, '');
+  Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+    const text = dict[task.id];
+    if (!text) return;
+    check(
+      `${lang}: ${task.id} — скелет не змінився`,
+      SKELETON_PREFIX.test(text.hints[2]) && text.hints[2].replace(SKELETON_PREFIX, '') === sql
+    );
+  });
+});
+
+// Набір SQL-конструкцій у тексті мусить бути той самий у трьох мовах: це ловить
+// перекладений ключовий вислів (GROUP BY → AGRUPAR POR), чого прогін
+// referenceSql не побачить ніколи — сам запит же не змінився.
+//
+// Регістр важливий. Шукаємо лише великими літерами, бо англійська проза рясніє
+// словами in, on, as, all — і без урахування регістру тест захлинувся б у
+// хибних спрацюваннях.
+const SQL_WORDS = [
+  'SELECT',
+  'FROM',
+  'WHERE',
+  'GROUP BY',
+  'HAVING',
+  'ORDER BY',
+  'LIMIT',
+  'OFFSET',
+  'DISTINCT',
+  'INNER JOIN',
+  'LEFT JOIN',
+  'RIGHT JOIN',
+  'FULL OUTER JOIN',
+  'CROSS JOIN',
+  'JOIN',
+  'WITH',
+  'UNION ALL',
+  'UNION',
+  'INTERSECT',
+  'EXCEPT',
+  'CASE',
+  'WHEN',
+  'THEN',
+  'ELSE',
+  'COUNT',
+  'SUM',
+  'AVG',
+  'MIN',
+  'MAX',
+  'ROUND',
+  'COALESCE',
+  'NULLIF',
+  'CAST',
+  'EXTRACT',
+  'DATE_TRUNC',
+  'TO_CHAR',
+  'AGE',
+  'INTERVAL',
+  'SPLIT_PART',
+  'TRIM',
+  'UPPER',
+  'LOWER',
+  'INITCAP',
+  'REPLACE',
+  'LENGTH',
+  'CONCAT',
+  'SUBSTRING',
+  'POSITION',
+  'LEAD',
+  'LAG',
+  'RANK',
+  'DENSE_RANK',
+  'ROW_NUMBER',
+  'NTILE',
+  'OVER',
+  'PARTITION BY',
+  'FILTER',
+  'EXISTS',
+  'NOT IN',
+  'BETWEEN',
+  'LIKE',
+  'ILIKE',
+  'IS NULL',
+  'NULL',
+  'CTE',
+];
+
+const sqlWordsIn = (text) =>
+  [...new Set(SQL_WORDS.filter((word) => text.includes(word)))].sort().join(' ');
+
+const textOf = (source) =>
+  [source.title, source.context, source.taskText, ...source.hints, source.explanation].join(' ');
+
+tasks.forEach((task) => {
+  const expected = sqlWordsIn(textOf(task));
+  Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+    const text = dict[task.id];
+    if (!text) return;
+    check(
+      `${lang}: ${task.id} — ті самі конструкції SQL у тексті`,
+      sqlWordsIn(textOf(text)) === expected
+    );
+  });
+});
+
+// Назва наскрізного кейса перекладається окремим полем, бо caseStudy.id і .step
+// — структура.
+tasks.forEach((task) => {
+  Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+    const text = dict[task.id];
+    if (!text) return;
+    check(
+      `${lang}: ${task.id} — назва кейса є тоді й лише тоді, коли є кейс`,
+      Boolean(task.caseStudy) === Boolean(text.caseStudyTitle)
+    );
+  });
+});
 
 console.log(
   failures === 0

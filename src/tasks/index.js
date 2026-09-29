@@ -6,6 +6,8 @@ import level5 from './level5.js';
 import level6 from './level6.js';
 import level7 from './level7.js';
 import level8 from './level8.js';
+import enTaskText from '../i18n/en/tasks/index.js';
+import esTaskText from '../i18n/es/tasks/index.js';
 
 const tasks = [
   ...level1,
@@ -19,6 +21,38 @@ const tasks = [
 ];
 
 export default tasks;
+
+// Український текст живе поряд зі своїм referenceSql — саме їхня сусідність не
+// дає їм розійтися, коли додається нове завдання. Переклад пишеться потім і
+// окремо, тому лежить у теках мов і накладається поверх.
+//
+// Асиметрія тут навмисна: для інтерфейсу джерело — англійська (t() падає на
+// неї), для завдань — українська. Не шукати український текст у src/i18n/uk/.
+const TASK_TEXT = { en: enTaskText, es: esTaskText };
+
+// Завдання з текстом потрібної мови. Немає перекладу — лишається українське
+// поле: так виглядає проміжний стан, поки рівні перекладаються по одному.
+// Default-експорт навмисно лишається українським масивом: його читають тести,
+// яким мова байдужа (склад рівнів, унікальність id, прогін еталонних запитів).
+export function tasksFor(lang) {
+  const dict = TASK_TEXT[lang];
+  if (!dict) return tasks;
+
+  return tasks.map((task) => {
+    const text = dict[task.id];
+    if (!text) return task;
+    return {
+      ...task,
+      title: text.title,
+      context: text.context,
+      taskText: text.taskText,
+      hints: text.hints,
+      explanation: text.explanation,
+      // caseStudy.id і .step — структура, перекладається лише назва.
+      ...(task.caseStudy ? { caseStudy: { ...task.caseStudy, title: text.caseStudyTitle } } : {}),
+    };
+  });
+}
 
 export const LEVELS = [...new Set(tasks.map((task) => task.level))].sort((a, b) => a - b);
 
