@@ -9,55 +9,55 @@
 export default {
   1: {
     summary:
-      'Una consulta empieza con que nombras las columnas que necesitas (SELECT) y la tabla (FROM).',
+      'Una consulta empieza indicando las columnas que necesitas (SELECT) y la tabla que quieres consultar (FROM).',
     summaryBlocks: [
       [
         'WHERE deja solo las filas que cumplen una condición.',
         'ORDER BY ordena las filas que han quedado.',
-        'LIMIT recorta el resultado a las primeras.',
+        'LIMIT limita el resultado a las primeras filas.',
       ],
       'El orden de las partes es fijo: SELECT → FROM → WHERE → ORDER BY → LIMIT.',
-      'En este nivel harán falta además los agregados COUNT, SUM, MIN, MAX: sin GROUP BY comprimen toda la selección en una sola fila.',
+      'En este nivel también necesitarás los agregados COUNT, SUM, MIN y MAX. Sin GROUP BY, agregan toda la selección en una sola fila.',
     ],
     examples: [
       {
-        label: 'ORDER BY + LIMIT: la cima de la lista',
+        label: 'ORDER BY + LIMIT: los primeros de la lista',
         result:
-          'Los tres productos más caros: Standing Desk a 430, Coffee Machine a 380 y 4K Monitor a 320. LIMIT recorta una lista ya ordenada, así que sin ORDER BY daría simplemente tres filas cualesquiera.',
+          'Los tres productos más caros: Standing Desk a 430, Coffee Machine a 380 y 4K Monitor a 320. LIMIT recorta una lista ya ordenada, así que sin ORDER BY devolvería tres filas en un orden no especificado.',
       },
       {
         label: 'DISTINCT: quitar las repeticiones',
         result:
-          'Una columna con la lista de categorías, cada una exactamente una vez, sin tener en cuenta cuántos productos hay en ella.',
+          'Una columna con la lista de categorías, cada una exactamente una vez, independientemente de cuántos productos haya en cada categoría.',
       },
       {
         label: 'BETWEEN: un rango en lugar de dos comparaciones',
         result:
-          'Los productos con un precio de 50 a 150, ambos incluidos, del más barato al más caro. Lo mismo que price >= 50 AND price <= 150.',
+          'Los productos con un precio de 50 a 150, ambos incluidos, del más barato al más caro. Es lo mismo que price >= 50 AND price <= 150.',
       },
       {
         label: 'LIKE: buscar por un fragmento de texto',
         result:
-          'Los nombres que llevan «Set» en alguna parte. El carácter % significa «cualquier cantidad de caracteres».',
+          'Los nombres que contienen «Set» en alguna parte. El carácter % significa «cero o más caracteres».',
       },
       {
         label: 'Agregados sin GROUP BY',
         result:
-          'Exactamente una fila con tres números de toda la tabla: cuántos productos hay, el precio más bajo y el más alto.',
+          'Exactamente una fila con tres valores calculados sobre toda la tabla: cuántos productos hay, el precio más bajo y el más alto.',
       },
     ],
     pitfalls: [
       {
-        title: 'ORDER BY por sí solo no limita nada',
-        text: 'Ordenar solo cambia el orden de las filas: siguen siendo las mismas. Para tomar los tres productos más caros hacen falta las dos partes: ORDER BY price DESC LIMIT 3.',
+        title: 'ORDER BY por sí solo no limita el número de filas',
+        text: 'Ordenar solo cambia el orden de las filas: siguen siendo las mismas. Para obtener los tres productos más caros hacen falta las dos partes: ORDER BY price DESC LIMIT 3.',
       },
       {
         title: '= NULL no funcionará nunca',
-        text: 'NULL significa «valor desconocido», y cualquier comparación con él no da «sí» ni «no», sino «desconocido». Por eso WHERE department = NULL devuelve siempre vacío; lo correcto es escribir IS NULL o IS NOT NULL.',
+        text: 'NULL significa «valor desconocido», y cualquier comparación con él da UNKNOWN, no «sí» ni «no». Por eso WHERE department = NULL no devuelve ninguna fila. Lo correcto es usar IS NULL o IS NOT NULL.',
       },
       {
         title: 'El texto va entre comillas simples',
-        text: 'WHERE category = \'Kitchen\' funciona y WHERE category = "Kitchen" no: PostgreSQL toma las comillas dobles por el nombre de una columna y no por texto, y se quejará de que la columna «Kitchen» no existe.',
+        text: 'WHERE category = \'Kitchen\' funciona, mientras que WHERE category = "Kitchen" no. PostgreSQL interpreta las comillas dobles como identificadores, no como texto, por lo que interpreta "Kitchen" como el nombre de una columna y dará un error indicando que la columna «Kitchen» no existe.',
       },
     ],
   },
