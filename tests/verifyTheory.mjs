@@ -8,6 +8,8 @@ import { highlightSql } from '../src/ui/sqlHighlight.js';
 import { checkSqlFormatting } from './sqlFormat.mjs';
 import { forbiddenStatementIn } from '../src/db/sqlGuard.js';
 import { runQuery, closeAll } from './pgHarness.mjs';
+import enTheory from '../src/i18n/en/theory.js';
+import esTheory from '../src/i18n/es/theory.js';
 
 let failures = 0;
 
@@ -529,6 +531,216 @@ check(
   'тема без порад не показує порожнього розділу',
   !theoryTopicHtml(topicByLevel(2)).includes('theory-tips')
 );
+
+// ─── Переклад теорії ────────────────────────────────────────────────────────
+//
+// Українська — джерело: вона лишається в src/theory/topics.js поряд зі своїм SQL
+// і записаними результатами прогону. Англійський та іспанський текст
+// накладається поверх, тому перевіряється саме він.
+const TRANSLATIONS = { en: enTheory, es: esTheory };
+
+// Тема, перекладена наполовину, читається як поломка.
+Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+  const done = topics.filter((topic) => dict[topic.level] !== undefined).length;
+  check(
+    `${lang}: перекладено або всі теми, або жодної (${done}/${topics.length})`,
+    done === 0 || done === topics.length
+  );
+});
+
+// Ключ, якого немає серед рівнів, — описка.
+const topicLevels = new Set(topics.map((topic) => String(topic.level)));
+Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+  Object.keys(dict).forEach((key) => {
+    check(`${lang}: тема рівня ${key} існує`, topicLevels.has(String(key)));
+  });
+});
+
+// Паритет форми — ключова перевірка етапу. У summaryBlocks рядок малюється
+// абзацом, а вкладений масив — маркованим списком, тому форма мусить збігатися:
+// інакше та сама тема виглядала б у різних мовах по-різному, і жоден наявний
+// тест цього не побачив би.
+const blockShape = (blocks) =>
+  (blocks ?? []).map((b) => (Array.isArray(b) ? `list:${b.length}` : 'text')).join(',');
+
+topics.forEach((topic) => {
+  Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+    const text = dict[topic.level];
+    if (!text) return;
+    const label = `${lang}: тема ${topic.level}`;
+
+    check(
+      `${label} — вступ непорожній`,
+      typeof text.summary === 'string' && text.summary.trim().length > 40
+    );
+    check(
+      `${label} — та сама форма summaryBlocks`,
+      blockShape(text.summaryBlocks) === blockShape(topic.summaryBlocks)
+    );
+    check(
+      `${label} — підзаголовок є тоді й лише тоді, коли є в джерелі`,
+      Boolean(topic.subtitle) === Boolean(text.subtitle)
+    );
+    check(
+      `${label} — стільки ж прикладів`,
+      (text.examples ?? []).length === (topic.examples ?? []).length
+    );
+    check(`${label} — стільки ж кейсів`, (text.cases ?? []).length === (topic.cases ?? []).length);
+    check(`${label} — стільки ж пасток`, (text.pitfalls ?? []).length === topic.pitfalls.length);
+    check(`${label} — стільки ж порад`, (text.tips ?? []).length === (topic.tips ?? []).length);
+
+    (topic.examples ?? []).forEach((_, i) => {
+      const example = (text.examples ?? [])[i] ?? {};
+      check(
+        `${label}, приклад ${i + 1} — підпис і опис результату є`,
+        Boolean(example.label?.trim()) && Boolean(example.result?.trim())
+      );
+      check(
+        `${label}, приклад ${i + 1} — SQL не дублюється в перекладі`,
+        example.sql === undefined
+      );
+    });
+
+    (topic.cases ?? []).forEach((source, i) => {
+      const item = (text.cases ?? [])[i] ?? {};
+      const caseLabel = `${label}, кейс ${i + 1}`;
+      ['title', 'about', 'whenNeeded', 'question', 'reading'].forEach((field) => {
+        check(
+          `${caseLabel} — ${field} непорожнє`,
+          typeof item[field] === 'string' && item[field].trim() !== ''
+        );
+      });
+      check(`${caseLabel} — стільки ж кроків`, (item.steps ?? []).length === source.steps.length);
+      check(
+        `${caseLabel} — стільки ж застережень`,
+        (item.watchOut ?? []).length === source.watchOut.length
+      );
+      check(
+        `${caseLabel} — застереження без SQL`,
+        (item.watchOut ?? []).every((w) => !/\bSELECT\b/.test(w))
+      );
+      // Результат кейса — дані, звірені прогоном. У перекладі його бути не може:
+      // перекладена назва колонки зламала б звірку, а копія просто розійшлася б.
+      check(`${caseLabel} — результат не дублюється в перекладі`, item.result === undefined);
+      check(`${caseLabel} — SQL не дублюється в перекладі`, item.sql === undefined);
+    });
+
+    topic.pitfalls.forEach((_, i) => {
+      const pitfall = (text.pitfalls ?? [])[i] ?? {};
+      check(
+        `${label}, пастка ${i + 1} — заголовок і текст є`,
+        Boolean(pitfall.title?.trim()) && Boolean(pitfall.text?.trim())
+      );
+    });
+
+    (topic.tips ?? []).forEach((_, i) => {
+      const tip = (text.tips ?? [])[i] ?? {};
+      check(`${label}, порада ${i + 1} — текст є`, Boolean(tip.text?.trim()));
+    });
+  });
+});
+
+// Набір SQL-конструкцій у прозі теми мусить бути той самий у трьох мовах:
+// перекладений GROUP BY прогін запиту не зловить, бо сам запит не змінився.
+// Регістр важливий — англійська проза рясніє словами in, on, as, all.
+const SQL_WORDS = [
+  'SELECT',
+  'FROM',
+  'WHERE',
+  'GROUP BY',
+  'HAVING',
+  'ORDER BY',
+  'LIMIT',
+  'OFFSET',
+  'DISTINCT',
+  'INNER JOIN',
+  'LEFT JOIN',
+  'RIGHT JOIN',
+  'FULL OUTER JOIN',
+  'CROSS JOIN',
+  'JOIN',
+  'WITH',
+  'UNION ALL',
+  'UNION',
+  'INTERSECT',
+  'EXCEPT',
+  'CASE',
+  'WHEN',
+  'THEN',
+  'ELSE',
+  'COUNT',
+  'SUM',
+  'AVG',
+  'MIN',
+  'MAX',
+  'ROUND',
+  'COALESCE',
+  'NULLIF',
+  'CAST',
+  'EXTRACT',
+  'DATE_TRUNC',
+  'TO_CHAR',
+  'AGE',
+  'INTERVAL',
+  'SPLIT_PART',
+  'TRIM',
+  'UPPER',
+  'LOWER',
+  'INITCAP',
+  'REPLACE',
+  'LENGTH',
+  'CONCAT',
+  'SUBSTRING',
+  'POSITION',
+  'LEAD',
+  'LAG',
+  'RANK',
+  'DENSE_RANK',
+  'ROW_NUMBER',
+  'NTILE',
+  'OVER',
+  'PARTITION BY',
+  'FILTER',
+  'EXISTS',
+  'NOT IN',
+  'BETWEEN',
+  'LIKE',
+  'ILIKE',
+  'IS NULL',
+  'NULL',
+  'CTE',
+  'USING',
+];
+
+// Читає ті самі поля і в джерелі, і в перекладі. SQL сюди не входить навмисно:
+// у перекладі його немає, і якщо його тут почати читати, замок упаде на всіх
+// темах одразу.
+const proseOf = (topic) => {
+  const parts = [topic.subtitle ?? '', topic.summary];
+  (topic.summaryBlocks ?? []).forEach((b) => (Array.isArray(b) ? parts.push(...b) : parts.push(b)));
+  (topic.examples ?? []).forEach((e) => parts.push(e.label, e.result));
+  (topic.cases ?? []).forEach((c) =>
+    parts.push(c.title, c.about, c.whenNeeded, c.question, ...c.steps, c.reading, ...c.watchOut)
+  );
+  (topic.pitfalls ?? []).forEach((p) => parts.push(p.title, p.text));
+  (topic.tips ?? []).forEach((tip) => parts.push(tip.text));
+  return parts.filter(Boolean).join(' ');
+};
+
+const sqlWordsIn = (text) =>
+  [...new Set(SQL_WORDS.filter((word) => text.includes(word)))].sort().join(' ');
+
+topics.forEach((topic) => {
+  const expected = sqlWordsIn(proseOf(topic));
+  Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+    const text = dict[topic.level];
+    if (!text) return;
+    check(
+      `${lang}: тема ${topic.level} — ті самі конструкції SQL у тексті`,
+      sqlWordsIn(proseOf(text)) === expected
+    );
+  });
+});
 
 console.log(
   failures === 0 ? '\nУсі перевірки теорії пройдено.' : `\n${failures} перевірок провалено.`

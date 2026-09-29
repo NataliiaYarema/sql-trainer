@@ -8,6 +8,9 @@ import {
 } from '../tasks/fixtures.js';
 import { ANALYTICS_SQL } from '../tasks/analyticsFixtures.js';
 import { dedent } from '../utils/dom.js';
+import { levelNameIn } from '../i18n/index.js';
+import enTheory from '../i18n/en/theory.js';
+import esTheory from '../i18n/es/theory.js';
 
 // Теорія працює на тих самих таблицях, що й практика, але свідомо іншими
 // запитами: tests/verifyTheory.mjs звіряє кожен приклад з банком referenceSql
@@ -1430,6 +1433,57 @@ const topics = [
 ];
 
 export default topics;
+
+// Український текст лишається тут, поряд зі своїм SQL і записаними результатами
+// прогону — з тієї самої причини, що в банку завдань: саме сусідність тексту й
+// запиту не дає їм розійтися. Переклад лежить у теках мов і накладається поверх.
+const TOPIC_TEXT = { en: enTheory, es: esTheory };
+
+// Тема з текстом потрібної мови. Немає перекладу — лишається український текст.
+//
+// SQL, setupSql, keywords і записані результати кейсів беруться з джерела
+// завжди: вони мовно незалежні, а результат кейса ще й звірений прогоном.
+export function topicsFor(lang) {
+  const dict = TOPIC_TEXT[lang];
+  if (!dict) return topics;
+
+  return topics.map((topic) => {
+    const text = dict[topic.level];
+    if (!text) return topic;
+
+    return {
+      ...topic,
+      // Назва теми — це назва рівня, і тільки вона: два переклади одного й того
+      // самого рано чи пізно розійшлися б, а verifyTheory вимагає їхньої рівності.
+      title: levelNameIn(lang, topic.level),
+      ...(topic.subtitle ? { subtitle: text.subtitle } : {}),
+      summary: text.summary,
+      ...(topic.summaryBlocks ? { summaryBlocks: text.summaryBlocks } : {}),
+      ...(topic.examples
+        ? {
+            examples: topic.examples.map((example, i) => ({
+              ...example,
+              label: text.examples[i].label,
+              result: text.examples[i].result,
+            })),
+          }
+        : {}),
+      // Розсипання безпечне саме тому, що тест забороняє sql і result у перекладі
+      // кейса: інакше вони перетерли б дані з джерела.
+      ...(topic.cases
+        ? { cases: topic.cases.map((item, i) => ({ ...item, ...text.cases[i] })) }
+        : {}),
+      pitfalls: topic.pitfalls.map((pitfall, i) => ({
+        ...pitfall,
+        title: text.pitfalls[i].title,
+        text: text.pitfalls[i].text,
+      })),
+      ...(topic.tips
+        ? { tips: topic.tips.map((tip, i) => ({ ...tip, text: text.tips[i].text })) }
+        : {}),
+    };
+  });
+}
 
 export function topicByLevel(level) {
   return topics.find((topic) => topic.level === level);

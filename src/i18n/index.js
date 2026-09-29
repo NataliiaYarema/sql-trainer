@@ -59,7 +59,16 @@ export function t(key, vars = {}) {
 
 // Обгортка, щоб ключ рівня не збирався рядком у п'яти місцях.
 export function levelName(level) {
-  return t(`level.${level}.name`);
+  return levelNameIn(current, level);
+}
+
+// Назва рівня заданою мовою, без огляду на поточну. Потрібна там, де мова
+// приходить аргументом, а не зі стану: topicsFor(lang) складає тему саме тією
+// мовою, і взяти назву з поточної означало б зібрати тему з двох мов водночас.
+export function levelNameIn(lang, level) {
+  const key = `level.${level}.name`;
+  const dict = DICTS[lang] ?? DICTS[DEFAULT_LANG];
+  return dict[key] ?? DICTS[DEFAULT_LANG][key] ?? key;
 }
 
 // Десятковий роздільник теж залежить від мови: 1.5 англійською, 1,5

@@ -6,6 +6,8 @@ import {
   setLanguage,
   getLanguage,
   formatNumber,
+  levelName,
+  levelNameIn,
   LANGS,
   LANG_NAMES,
   DEFAULT_LANG,
@@ -130,6 +132,17 @@ setLanguage('uk');
 check('множина українською: 1 рядок', t('result.rows', { count: 1 }) === '1 рядок');
 check('множина українською: 3 рядки', t('result.rows', { count: 3 }) === '3 рядки');
 check('множина українською: 5 рядків', t('result.rows', { count: 5 }) === '5 рядків');
+
+// levelNameIn не залежить від поточної мови — інакше topicsFor(lang) зібрала б
+// тему з двох мов: назву з поточної, решту з переданої.
+setLanguage('uk');
+check(
+  'levelNameIn віддає англійську назву при українській поточній',
+  levelNameIn('en', 5) === 'Window functions'
+);
+check('levelNameIn віддає іспанську назву', levelNameIn('es', 5) === 'Funciones de ventana');
+check('levelName іде за поточною мовою', levelName(5) === 'Віконні функції');
+check('невідома мова падає на англійську', levelNameIn('xx', 5) === 'Window functions');
 
 // Десятковий роздільник теж мовний: 1.5 англійською, 1,5 українською.
 setLanguage('en');

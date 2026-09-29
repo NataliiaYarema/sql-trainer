@@ -19,7 +19,7 @@ import { computeMetrics } from './analytics/metrics.js';
 import { skillsForLevel } from './tasks/skills.js';
 import { renderDashboard } from './ui/dashboard.js';
 import { renderLevelComplete } from './ui/levelComplete.js';
-import topics, { topicByLevel } from './theory/topics.js';
+import { topicsFor } from './theory/topics.js';
 import { renderTheoryList } from './ui/theoryList.js';
 import { renderTheoryTopic } from './ui/theoryTopic.js';
 import { renderResultTable, clearResultTable } from './ui/resultTable.js';
@@ -66,6 +66,14 @@ let localizedTasks = tasksFor(getLanguage());
 
 function levelTasksOf(level) {
   return localizedTasks.filter((task) => task.level === level);
+}
+
+// Теорія тією самою мовою. Поки тема не перекладена, лишається український
+// текст — так само, як у завданнях (див. topicsFor).
+let localizedTopics = topicsFor(getLanguage());
+
+function topicOfLevel(level) {
+  return localizedTopics.find((topic) => topic.level === level);
 }
 const eventLog = new EventLog();
 
@@ -195,6 +203,7 @@ function applyLanguage(lang) {
   setLanguage(lang);
   saveLang(getLanguage());
   localizedTasks = tasksFor(getLanguage());
+  localizedTopics = topicsFor(getLanguage());
   // Відкритий рівень тримає власний зріз банку — без цього рядка картка
   // лишилася б попередньою мовою до наступного переходу між завданнями.
   if (activeLevel !== null) levelTasks = levelTasksOf(activeLevel);
@@ -534,7 +543,7 @@ function showLevelSelect() {
     })),
     openLevel
   );
-  renderTheoryList(roots.theory, topics, showTheory);
+  renderTheoryList(roots.theory, localizedTopics, showTheory);
   repaint = () => showLevelSelect();
 }
 
@@ -551,7 +560,7 @@ function showTheory(level) {
 
   renderProgress(roots.progress, { showBack: true }, navHandlers);
   bindBackHome(roots.progress, showLevelSelect);
-  renderTheoryTopic(roots.taskCard, topicByLevel(level), {
+  renderTheoryTopic(roots.taskCard, topicOfLevel(level), {
     onToPractice: () => openLevel(level),
     onToHome: showLevelSelect,
     onRunInSandbox: showSandboxWithQuery,
