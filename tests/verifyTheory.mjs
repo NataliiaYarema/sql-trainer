@@ -545,6 +545,19 @@ const TRANSLATIONS = { en: enTheory, es: esTheory };
 // стан, поки етап у роботі, так само як у банку завдань між рівнями. Повноту
 // вимагає окремий замок, доданий у кінці етапу.
 
+// Етап 3 завершено, тому кожна тема має текст у кожній мові. Без цього нова
+// тема показала б англомовному користувачу український текст без жодної
+// помилки: topicsFor свідомо падає на джерело.
+Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
+  const missing = topics
+    .filter((topic) => dict[topic.level] === undefined)
+    .map((topic) => topic.level);
+  check(
+    `${lang}: перекладено всі теми (бракує: ${missing.join(', ') || 'нічого'})`,
+    missing.length === 0
+  );
+});
+
 // Ключ, якого немає серед рівнів, — описка.
 const topicLevels = new Set(topics.map((topic) => String(topic.level)));
 Object.entries(TRANSLATIONS).forEach(([lang, dict]) => {
