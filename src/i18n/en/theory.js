@@ -520,7 +520,7 @@ export default {
           '136 buyers are divided into five segments with different spending patterns. The average monetary value is 610.87 for Loyal and 96.05 for Lost.',
         watchOut: [
           'A split by money alone is not RFM. Someone who spent a lot a year ago and has not returned is different from someone who buys every month. Distinguishing recency, frequency, and monetary value is the point of the method.',
-          'Recency is calculated from the end of the data, not from today. On a historical dataset, using CURRENT_DATE would make the scores depend on when the query is run, which is why the reference date is fixed explicitly here.',
+          'Recency is calculated from the end of the data, not from today. On a historical dataset, using CURRENT_DATE would make the scores depend on when the query is run, which is why the reference date is fixed explicitly here. The direction of the sort matters too: days_since is smaller for more recent purchases, so ORDER BY days_since DESC is what puts recent buyers into the higher NTILE values. Without DESC the relationship would be reversed, and every segment name would mean its opposite.',
           'The order of the CASE branches determines the priority. The first matching condition wins, so changing the order can change the resulting segments.',
           'NTILE(4) creates groups with roughly equal numbers of participants, not groups containing equal amounts of revenue. “The top 25% of buyers” and “a quarter of the revenue” are different measurements. Ties can also be split across NTILE buckets, because NTILE divides rows rather than distinct values.',
         ],
