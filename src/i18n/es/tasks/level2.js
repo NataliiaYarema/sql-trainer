@@ -81,7 +81,7 @@ export default {
       'Plantilla: SELECT COUNT(DISTINCT country) AS country_count FROM customers;',
     ],
     explanation:
-      'COUNT(country) contaría las filas con país no vacío, es decir ocho clientes en lugar de seis países. DISTINCT dentro de un agregado quita primero las repeticiones y solo después cuenta: es el mismo DISTINCT que en SELECT, pero actuando dentro de una única función. Confundir «cuántos registros» con «cuántos valores distintos» es una fuente de cifras infladas en los informes.',
+      'COUNT(country) contaría las filas en las que country no es NULL, es decir ocho clientes en lugar de seis países. DISTINCT dentro de un agregado quita primero las repeticiones y solo después cuenta: es el mismo DISTINCT que en SELECT, pero actuando dentro de una única función. Confundir «cuántos registros» con «cuántos valores distintos» es una fuente de cifras infladas en los informes.',
   },
 
   'L2-second-half-revenue': {

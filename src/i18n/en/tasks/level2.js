@@ -14,9 +14,8 @@ export default {
       'Skeleton: SELECT category, COUNT(*) AS product_count FROM products GROUP BY category;',
     ],
     explanation:
-      'GROUP BY splits the table into groups by a column value, and an aggregate function computes one number for each group. The rule: everything in SELECT that is not inside an aggregate has to be listed in GROUP BY.',
+      'GROUP BY splits the rows into groups based on a column value, and an aggregate function computes one value for each group. The rule: everything in SELECT that is not inside an aggregate has to be listed in GROUP BY.',
   },
-
   'L2-orders-per-customer': {
     title: 'How many orders each customer has',
     context: 'A manager is segmenting the customer base by buying activity.',
@@ -27,9 +26,8 @@ export default {
       'Skeleton: SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id;',
     ],
     explanation:
-      'The same technique, but the grouping goes by a numeric identifier. Note: only customers with at least one order make it into the result — those absent from orders simply do not exist here.',
+      'The same technique, but the grouping goes by a numeric identifier. Note: only customers with at least one order make it into the result — customers with no orders simply do not appear in the result.',
   },
-
   'L2-avg-price-by-category': {
     title: 'Average price by category',
     context: 'An analyst is comparing the price levels of different parts of the catalogue.',
@@ -40,22 +38,20 @@ export default {
       'Skeleton: SELECT category, AVG(price) AS avg_price FROM products GROUP BY category;',
     ],
     explanation:
-      'AVG works inside a group exactly like COUNT: every category gets its own average. If GROUP BY were removed, the result would be one average across the whole catalogue — an entirely different metric.',
+      'AVG is calculated separately within each group, just like COUNT. If GROUP BY were removed, the result would be one average across the whole catalogue — an entirely different metric.',
   },
-
   'L2-revenue-by-customer': {
     title: 'Revenue by customer',
     context: 'Sales want to know how much money each customer has brought in over all time.',
     taskText: 'Calculate the total amount of each customer’s orders.',
     hints: [
-      'You need a sum of sums: all the orders of one customer are added together.',
+      'You need the sum of all order amounts within each customer group.',
       'SUM(amount) with GROUP BY customer_id gives the total for each customer.',
       'Skeleton: SELECT customer_id, SUM(amount) AS total_spent FROM orders GROUP BY customer_id;',
     ],
     explanation:
-      'This is the basic LTV calculation — the lifetime value of a customer. The pattern “group by an entity, add up a metric” is the backbone of most analytical reports: revenue by region, by channel, by period.',
+      'This is a simple lifetime-spend calculation: the total amount a customer has spent so far. The pattern “group by an entity, add up a metric” is the backbone of many analytical reports: revenue by region, by channel, by period.',
   },
-
   'L2-salary-range-by-department': {
     title: 'The salary range inside a department',
     context: 'HR is preparing a compensation review and wants to see the spread inside each unit.',
@@ -66,9 +62,8 @@ export default {
       'Skeleton: SELECT department, MIN(salary) AS min_salary, MAX(salary) AS max_salary FROM employees GROUP BY department;',
     ],
     explanation:
-      'A single SELECT can hold as many aggregates as you like — they are all computed in one pass over the same groups. Note the empty department in the result: GROUP BY gathers all the NULL values into one shared group, even though in WHERE a NULL value does not equal even itself. These are different comparison mechanisms, and mixing them up is a classic mistake.',
+      'A single SELECT can hold as many aggregates as you like — they are all computed in one pass over the same groups. Note the NULL department in the result: GROUP BY gathers all NULL values into one shared group, even though in a WHERE comparison, NULL = NULL does not evaluate to TRUE. These are different comparison mechanisms, and mixing them up is a classic mistake.',
   },
-
   'L2-country-count': {
     title: 'How many countries are in the database',
     context:
@@ -80,9 +75,8 @@ export default {
       'Skeleton: SELECT COUNT(DISTINCT country) AS country_count FROM customers;',
     ],
     explanation:
-      'COUNT(country) would count the rows with a non-empty country, that is eight customers rather than six countries. DISTINCT inside an aggregate removes the repeats first and only then counts — it is the same DISTINCT as in SELECT, but it acts inside a single function. Confusing “how many records” with “how many different values” is a source of inflated numbers in reports.',
+      'COUNT(country) would count the rows where country is not NULL, that is eight customers rather than six countries. DISTINCT inside an aggregate counts each distinct non-NULL value once — it is the same DISTINCT as in SELECT, but it acts inside a single function. Confusing “how many records” with “how many different values” is a source of inflated numbers in reports.',
   },
-
   'L2-second-half-revenue': {
     title: 'Customer spending from April onwards',
     context:
@@ -96,7 +90,6 @@ export default {
     explanation:
       "The execution order decides everything: WHERE works with individual rows before grouping, so only the orders of the period you want get into the sum. Had the same condition been put into HAVING, it would apply to ready-made groups and would make no sense at all — a group has no date of its own. Writing DATE '2024-04-01' says explicitly that this is a date, not a piece of text.",
   },
-
   'L2-rounded-avg-salary': {
     title: 'Average salary in round numbers',
     context:
@@ -108,9 +101,8 @@ export default {
       'Skeleton: SELECT department, ROUND(AVG(salary), 0) AS avg_salary FROM employees GROUP BY department;',
     ],
     explanation:
-      'ROUND wraps the already computed average rather than the individual salaries — rounding first and averaging afterwards would mean a different, less accurate result. The second argument of ROUND sets the number of digits, and zero here is not the same as leaving it out: ROUND(x) also gives a whole number, but an explicit zero precision reads unambiguously.',
+      'ROUND wraps the already computed average rather than the individual salaries — rounding first and averaging afterwards would produce a different result and can introduce rounding error. The second argument of ROUND sets the number of digits. ROUND(x) also gives a whole number, but specifying zero makes the intended precision explicit.',
   },
-
   'L2-catalog-size': {
     title: 'The size of the range',
     context: 'A manager asks for one figure: how many items there are in the catalogue at all.',
@@ -123,7 +115,6 @@ export default {
     explanation:
       'An aggregate function without GROUP BY squeezes the whole table into one row — that is, the entire table counts as a single group. COUNT(*) counts rows regardless of their contents; if you write COUNT(column), rows with NULL in that column are left out — a difference people stumble over often.',
   },
-
   'L2-total-revenue': {
     title: 'Total revenue',
     context: 'The finance director wants one bottom-line sales figure for the whole period.',
@@ -134,9 +125,8 @@ export default {
       'Skeleton: SELECT SUM(amount) AS total_revenue FROM orders;',
     ],
     explanation:
-      'SUM adds up the values of a column over all the rows that passed the WHERE filter. It simply ignores NULL values rather than turning them into zeros — which is why a sum over a column with gaps may turn out smaller than you expect.',
+      'SUM adds up the non-NULL values of a column across all the rows that passed the WHERE filter. It simply ignores NULL values rather than turning them into zeros — which is why a sum over a column with gaps may turn out smaller than you expect.',
   },
-
   'L2-premium-categories': {
     title: 'Categories with an expensive range',
     context:
@@ -148,9 +138,8 @@ export default {
       'Skeleton: SELECT category, AVG(price) AS avg_price FROM products GROUP BY category HAVING AVG(price) > 100;',
     ],
     explanation:
-      'The execution order is this: WHERE drops rows → GROUP BY builds the groups → HAVING throws finished groups away. That is why a condition on AVG cannot go into WHERE: by the time it runs, the average does not exist yet.',
+      'The logical processing order is: WHERE drops rows → GROUP BY builds the groups → HAVING filters the finished groups. That is why a condition on AVG cannot go into WHERE: the average is calculated at the grouping stage, after WHERE has already filtered the rows.',
   },
-
   'L2-frequent-customers': {
     title: 'Customers who buy regularly',
     context: 'The loyalty programme starts with those who already have four or more orders.',
@@ -161,9 +150,8 @@ export default {
       'Skeleton: SELECT customer_id, COUNT(*) AS order_count FROM orders GROUP BY customer_id HAVING COUNT(*) >= 4;',
     ],
     explanation:
-      'HAVING filters groups by their aggregates. In PostgreSQL you cannot refer to a SELECT alias inside HAVING, so the aggregate function is written a second time — that is not duplication but a requirement of the standard.',
+      'HAVING filters groups by their aggregates. In PostgreSQL, you cannot refer to a SELECT alias inside HAVING, so the aggregate expression has to be written again.',
   },
-
   'L2-top-categories-by-value': {
     title: 'The three most valuable categories in the warehouse',
     context:
@@ -172,13 +160,12 @@ export default {
       'Calculate the value of the stock of each category as the sum of price × stock and show the three largest.',
     hints: [
       'First compute the total for each category, then line the categories up by that total and take the start of the list.',
-      'ORDER BY may refer to an alias given in SELECT, and LIMIT cuts the tail off an already ordered result.',
+      'ORDER BY may refer to an alias given in SELECT, and LIMIT keeps only the first rows of an already ordered result.',
       'Skeleton: SELECT category, SUM(price * stock) AS stock_value FROM products GROUP BY category ORDER BY stock_value DESC LIMIT 3;',
     ],
     explanation:
       'An alias from SELECT can be used in ORDER BY, because sorting happens after the result columns have been computed. In HAVING it cannot: HAVING runs earlier, so the aggregate has to be written again there. This asymmetry is what confuses people most often. Note also that the multiplication sits inside SUM: SUM(price) * SUM(stock) would give an entirely different number.',
   },
-
   'L2-big-and-pricey': {
     title: 'Big and expensive categories',
     context:
@@ -191,9 +178,8 @@ export default {
       'Skeleton: SELECT category, COUNT(*) AS product_count, AVG(price) AS avg_price FROM products GROUP BY category HAVING AVG(price) > 100 AND COUNT(*) > 5;',
     ],
     explanation:
-      'The closing task of the level: HAVING takes as many conditions as you like and combines different aggregates. The data is picked to test understanding: there are categories with a high average price but few items — and the second condition is exactly what has to filter them out.',
+      'The closing task of the level: HAVING can combine multiple conditions, including conditions on different aggregate expressions. The data is picked to test understanding: there are categories with a high average price but few items — and the second condition is exactly what has to filter them out.',
   },
-
   'L2-loyal-and-valuable': {
     title: 'Steady customer–manager pairs',
     context:
@@ -206,6 +192,6 @@ export default {
       'Skeleton: SELECT customer_id, manager_id, COUNT(*) AS order_count, SUM(amount) AS total_spent FROM orders GROUP BY customer_id, manager_id HAVING COUNT(*) >= 2 AND SUM(amount) > 300;',
     ],
     explanation:
-      'The closing task of the level: GROUP BY over two columns creates a group for every combination of values that actually occurs, not separate groups for each column. That is why one customer can land in several result rows — one per manager they worked with. And here is where the classic misreading of such reports hides: the total_spent column no longer adds up to the customer’s revenue, because their orders are scattered across different rows.',
+      'The closing task of the level: GROUP BY over two columns creates a group for every combination of values that actually occurs, not separate groups for each column. That is why one customer can land in several result rows — one per manager they worked with. And here is where the classic misreading of such reports hides: the total_spent column represents spending for one customer–manager pair, not the customer’s total revenue.',
   },
 };
