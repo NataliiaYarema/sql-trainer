@@ -84,7 +84,7 @@ export default {
       'Plantilla: SELECT product_name, stock FROM products WHERE stock < 20;',
     ],
     explanation:
-      "Los operadores de comparación >, <, >=, <=, = y <> funcionan en WHERE igual que en matemáticas. Fíjate en que los números se escriben sin comillas: PostgreSQL es estricto con los tipos y a stock < '20' responde con un error de tipos incompatibles.",
+      "Los operadores de comparación >, <, >=, <=, = y <> funcionan en WHERE igual que en matemáticas. Los números se escriben sin comillas. Con stock < '20' PostgreSQL no protesta y convierte '20' en número por su cuenta, pero solo porque ese literal no tiene tipo propio: un texto de verdad, como '20'::text, falla con «operator does not exist: integer < text».",
   },
 
   'L1-price-desc': {
