@@ -23,7 +23,7 @@ export default {
   },
   'L8-funnel-steps': {
     title: 'The funnel steps',
-    context: 'The team wants to see how many events occur at each step of a purchase funnel.',
+    context: 'The team wants to see how many people reach each step of a purchase funnel.',
     taskText: 'Count the number of events of each type, from the most frequent to the rarest.',
     hints: [
       'Count how many times each user action occurred in the app and sort the result from the most common action to the rarest.',
@@ -117,7 +117,7 @@ export default {
   'L8-step-conversion': {
     title: 'Conversion step by step',
     context:
-      'A product analyst wants to identify where event volume drops between funnel steps rather than looking only at the overall counts.',
+      'A product analyst wants to identify the funnel transition where the app loses the most people rather than looking only at the overall counts.',
     taskText:
       'Count the number of events of each type and, for every step except the first, calculate what percentage of the previous step it represents, rounded to one decimal place.',
     hints: [
