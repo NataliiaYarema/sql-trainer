@@ -14,9 +14,8 @@ export default {
       'Skeleton: SELECT o.order_id, c.name, o.amount FROM orders o JOIN customers c ON c.customer_id = o.customer_id;',
     ],
     explanation:
-      'INNER JOIN matches the rows of two tables by the condition in ON and keeps only the pairs where a match was found. The aliases o and c shorten the query and remove the ambiguity when both tables have columns with the same name.',
+      'INNER JOIN matches rows from two tables using the condition in ON and keeps only the pairs where a match is found. The aliases o and c shorten the query and remove ambiguity when both tables have columns with the same name.',
   },
-
   'L3-items-with-products': {
     title: 'Order lines with product names',
     context:
@@ -28,9 +27,8 @@ export default {
       'Skeleton: SELECT oi.order_id, p.product_name, oi.quantity FROM order_items oi JOIN products p ON p.product_id = oi.product_id;',
     ],
     explanation:
-      'A classic “facts plus reference book” pair: order_items stores the sales events, products the descriptions. JOIN pulls human names up to technical identifiers. That is how most schemas in data warehouses are built.',
+      'A classic “facts plus reference book” pair: order_items stores the sales events, while products stores the descriptions. JOIN brings human-readable names together with technical identifiers. This is how many schemas are structured: transactional data is kept separate from reference data.',
   },
-
   'L3-all-customers-orders': {
     title: 'All customers and their orders',
     context:
@@ -43,9 +41,8 @@ export default {
       'Skeleton: SELECT c.name, o.order_id FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id;',
     ],
     explanation:
-      'LEFT JOIN keeps all the rows of the left table regardless of whether a match is found on the right. The order of the tables is decisive here: customers has to be on the left, otherwise “keep everyone” gets applied to the wrong data.',
+      'LEFT JOIN keeps all the rows of the left table regardless of whether a match is found on the right. The order of the tables is decisive here: customers has to be on the left, otherwise the “keep everyone” rule would apply to the wrong table.',
   },
-
   'L3-never-sold': {
     title: 'Products that were never bought',
     context: 'Purchasing is reviewing the range and looking for items without a single sale.',
@@ -56,9 +53,8 @@ export default {
       'Skeleton: SELECT p.product_name, p.category FROM products p LEFT JOIN order_items oi ON ... WHERE oi.order_item_id IS NULL;',
     ],
     explanation:
-      'The anti-join pattern: LEFT JOIN plus WHERE ... IS NULL. Recognise it by the words “never”, “not once”, “missing from”. The check has to go through IS NULL — a comparison = NULL never works.',
+      'The anti-join pattern: LEFT JOIN plus WHERE ... IS NULL. Recognise it by words such as “never”, “not once” and “missing from”. The check has to go through IS NULL — a comparison with = NULL does not evaluate to TRUE.',
   },
-
   'L3-join-using': {
     title: 'A shorter way to write a join',
     context: 'An analyst is rewriting a long query and wants to drop the extra noise from it.',
@@ -70,9 +66,8 @@ export default {
       'Skeleton: SELECT order_id, name, amount FROM orders JOIN customers USING (customer_id);',
     ],
     explanation:
-      'USING works only when the column has the same name on both sides. Unlike ON, the shared column lands in the result once and stops belonging to a particular table — which is why you can no longer write o.customer_id after USING. It is both a convenience and a limitation: the moment the keys are named differently, you are back to ON.',
+      'USING works when the join column has the same name on both sides. Unlike ON, it returns the shared column once rather than keeping a separate copy for each table — which is why you cannot write o.customer_id after USING. It is both a convenience and a limitation: when the join columns have different names, you need ON.',
   },
-
   'L3-orders-from-customer-side': {
     title: 'The same join from the other side',
     context:
@@ -85,9 +80,8 @@ export default {
       'Skeleton: SELECT c.name, o.order_id FROM orders o RIGHT JOIN customers c ON c.customer_id = o.customer_id;',
     ],
     explanation:
-      'The result here is exactly the same as in the task “All customers and their orders”: RIGHT JOIN is a LEFT JOIN with the tables swapped. That is precisely why RIGHT JOIN is rarely written in practice: when a query has three or four joins, holding one direction in your head is far easier than tracking which side is kept in each line.',
+      'The result here is exactly the same as in the task “All customers and their orders”: RIGHT JOIN is equivalent to a LEFT JOIN with the table order reversed. That is precisely why RIGHT JOIN is less common in practice: when a query has several joins, keeping the table you want to preserve on the left can make the query easier to read.',
   },
-
   'L3-manager-subordinate': {
     title: 'Who reports to whom',
     context:
@@ -100,9 +94,8 @@ export default {
       'Skeleton: SELECT e.first_name AS employee, m.first_name AS manager FROM employees e JOIN employees m ON m.employee_id = e.manager_id;',
     ],
     explanation:
-      'In a self-join the aliases stop being a convenience and become a necessity: without them employees.employee_id would not say which of the two copies of the table is meant. Note that INNER JOIN dropped the top managers by itself — their manager_id is empty, so no pair was found for them. If they had to be kept, a LEFT JOIN would be needed.',
+      'In a self-join the aliases stop being a convenience and become a necessity: without them, employees.employee_id would not make it clear which copy of the table is meant. Note that INNER JOIN drops the top managers because their manager_id is NULL, so no matching manager row is found for them. If they had to be kept, a LEFT JOIN would be needed.',
   },
-
   'L3-orders-per-customer-join': {
     title: 'How many orders everyone has, zero included',
     context:
@@ -111,13 +104,12 @@ export default {
       'For each customer, show the number of their orders. Customers without orders have to show 0.',
     hints: [
       'First we keep every customer, then we count — but what has to be counted is orders, not rows.',
-      'After a LEFT JOIN a customer without orders still has a row, just with empty columns on the right.',
+      'After a LEFT JOIN a customer without orders still has a row, just with NULL values on the right.',
       'Skeleton: SELECT c.name, COUNT(o.order_id) AS order_count FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id GROUP BY c.customer_id, c.name;',
     ],
     explanation:
-      'Here hides the most common mistake of the LEFT JOIN plus COUNT pairing: COUNT(*) would give a customer without orders a one, because the row after the join does exist — it is simply empty. COUNT(o.order_id) counts only non-empty values and therefore honestly returns zero. We group by customer_id together with the name, because two customers could in theory be namesakes.',
+      'Here hides the most common mistake in the LEFT JOIN plus COUNT pattern: COUNT(*) would give a customer without orders a one, because the row after the join still exists — it simply has NULL values on the right. COUNT(o.order_id) counts only non-NULL values and therefore correctly returns zero. We group by customer_id together with the name because two customers could in theory have the same name.',
   },
-
   'L3-order-contents': {
     title: 'What is inside each order',
     context:
@@ -130,9 +122,8 @@ export default {
       'Skeleton: SELECT o.order_id, o.order_date, p.product_name, oi.quantity FROM orders o JOIN order_items oi ON ... JOIN products p ON ...;',
     ],
     explanation:
-      'order_items is a link table: it exists precisely because one order contains many products and one product appears in many orders. There is no direct link between orders and products, so two joins in a row are needed. There are more rows in the result than orders — that is not an error but the nature of a one-to-many join.',
+      'order_items is a link table: it exists precisely because one order can contain many products and one product can appear in many orders. There is no direct link between orders and products, so two joins in a row are needed. There are more rows in the result than orders — that is not an error but the nature of a one-to-many relationship.',
   },
-
   'L3-country-category-grid': {
     title: 'A “country × category” grid',
     context:
@@ -145,9 +136,8 @@ export default {
       'Skeleton: SELECT DISTINCT c.country, p.category FROM customers c CROSS JOIN products p;',
     ],
     explanation:
-      'CROSS JOIN deliberately builds a Cartesian product: six countries and five categories give 30 pairs. DISTINCT is needed here because countries and categories repeat inside the tables themselves. Such a frame is useful for reports where the zeros have to be visible too. But the same product also appears by accident — when ON is forgotten in a JOIN and the number of rows suddenly explodes; this is the right place to learn to recognise that picture, in its safe form.',
+      'CROSS JOIN deliberately builds a Cartesian product: every customer row is paired with every product row. DISTINCT then removes duplicate country–category pairs caused by repeated countries and categories in the source tables. This is useful when you need a complete grid of possible combinations, including combinations for which there are currently no sales. It is also the pattern you get accidentally when a regular JOIN is missing its ON condition. In that case, the number of rows can grow dramatically, so a sudden explosion in row count is often a sign that a join condition is missing.',
   },
-
   'L3-revenue-by-country': {
     title: 'Revenue by country',
     context:
@@ -159,9 +149,8 @@ export default {
       'Skeleton: SELECT c.country, SUM(o.amount) AS total_revenue FROM orders o JOIN customers c ON ... GROUP BY c.country;',
     ],
     explanation:
-      'JOIN and GROUP BY pair up beautifully: the joined set of rows is built first, and then it is grouped. Since INNER JOIN is used, countries without orders will not make it into the report — which is exactly what was wanted here.',
+      'JOIN and GROUP BY pair up beautifully: the joined set of rows is built first, and then it is grouped. Since INNER JOIN is used, countries with no matching orders will not make it into the report — which is exactly what was wanted here.',
   },
-
   'L3-revenue-by-category': {
     title: 'Revenue by category',
     context:
@@ -173,9 +162,8 @@ export default {
       'Skeleton: SELECT p.category, SUM(oi.quantity * p.price) AS revenue FROM order_items oi JOIN products p ON ... GROUP BY p.category;',
     ],
     explanation:
-      'An expression inside an aggregate function is computed for every row separately, and only then are the results added up. SUM(quantity) * price would give a gross error: the total quantity would be multiplied by the price of one arbitrary product.',
+      'An expression inside an aggregate function is computed for each row separately, and only then are the results added up. SUM(quantity) * price would be a different calculation: it would multiply the total quantity by one price value rather than calculating quantity × price for each order line before summing.',
   },
-
   'L3-customer-purchases': {
     title: 'What exactly the customer bought',
     context:
@@ -187,9 +175,8 @@ export default {
       'Skeleton: SELECT ... FROM orders o JOIN customers c ON ... JOIN order_items oi ON ... JOIN products p ON ...;',
     ],
     explanation:
-      'Joins are performed one after another: the result of the previous join is attached to the next table. Walking a normalised schema like this is an analyst’s daily work, because in real databases the data is deliberately laid out across separate entities.',
+      'Joins are built one after another: the result of the previous join becomes the input for the next join. Walking a normalised schema like this is common analyst work, because in real databases the data is often deliberately split across separate entities.',
   },
-
   'L3-managers-and-orders': {
     title: 'Nobody got lost',
     context:
@@ -198,13 +185,12 @@ export default {
       'Bring employees and orders together so that the result keeps both the employees who ran no orders and the orders that have no existing employee assigned to them.',
     hints: [
       'The unmatched rows have to be kept from both sides at once, not from one of them.',
-      'FULL JOIN keeps everything: what a LEFT JOIN would keep and what a RIGHT JOIN would keep.',
+      'FULL JOIN keeps every row from both tables: matched rows are combined, and unmatched rows are kept with NULLs on the other side — in other words, everything a LEFT JOIN would keep plus everything a RIGHT JOIN would keep.',
       'Skeleton: SELECT e.first_name, o.order_id, o.amount FROM employees e FULL JOIN orders o ON e.employee_id = o.manager_id;',
     ],
     explanation:
-      'A FULL OUTER JOIN is worth its name only when unmatched rows exist on both sides — otherwise it is no different from a LEFT JOIN. Here they do exist: nine employees run no orders, and one order is recorded against a manager who is no longer in the table. An empty name in a row is not a data glitch but exactly the orphan the query was written for: this is how broken references are found in real databases.',
+      'FULL OUTER JOIN keeps unmatched rows from both sides. Here that means an employee with no matching order still appears, and an order whose manager_id has no matching employee also appears. In the latter case, the employee columns are NULL; in the former, the order columns are NULL. This makes FULL JOIN useful for finding unmatched records on both sides of a relationship.',
   },
-
   'L3-department-pairs': {
     title: 'Pairs of colleagues from one department',
     context:
@@ -217,9 +203,8 @@ export default {
       'Skeleton: SELECT a.first_name AS employee_a, b.first_name AS employee_b, a.department FROM employees a JOIN employees b ON b.department = a.department AND b.employee_id > a.employee_id;',
     ],
     explanation:
-      'The condition b.employee_id > a.employee_id does two things at once: it removes the pair of a person with themselves and drops the mirror duplicate. Had it been <>, every pair would appear twice — once in the direct and once in the reverse order. The second detail: an employee without a department does not make it into the result, because NULL = NULL gives not truth but unknown.',
+      'The condition b.employee_id > a.employee_id does two things at once: it removes the pair of a person with themselves and drops the mirror duplicate. Had it been <>, every pair would appear twice — once in the direct and once in the reverse order. The second detail: an employee without a department does not make it into the result, because NULL = NULL evaluates to UNKNOWN rather than TRUE, so the join condition is not satisfied.',
   },
-
   'L3-big-orders-kept-customers': {
     title: 'Big orders, but all the customers',
     context:
@@ -232,9 +217,8 @@ export default {
       'Skeleton: SELECT c.name, o.order_id, o.amount FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.amount > 200;',
     ],
     explanation:
-      'This difference is one of the most important in the topic of joins. A condition in ON is applied during the join: the unmatched rows of the left table are kept anyway, simply with empty columns on the right. The same condition in WHERE would fire after the join and would throw them away, because NULL > 200 is not true — the LEFT JOIN would quietly turn into an INNER one. If rows suddenly disappeared after a LEFT JOIN, the first thing to look for is a condition on the right table in WHERE.',
+      'This difference is one of the most important in the topic of joins. A condition in ON is applied as part of the join: unmatched rows of the left table are kept anyway, simply with NULL values on the right. The same condition in WHERE is applied after the join and removes those rows, because NULL > 200 does not evaluate to TRUE. In this case, that makes the result behave like an INNER JOIN with respect to that condition. If rows suddenly disappear after a LEFT JOIN, the first thing to look for is a condition on the right table in WHERE.',
   },
-
   'L3-affordable-for-order': {
     title: 'What could have been upsold to the receipt',
     context:
@@ -243,13 +227,12 @@ export default {
       'For each order, pick the products whose price is between 80 and 100 per cent of its amount.',
     hints: [
       'Orders and products share no common key — it is the price condition itself that matches them.',
-      'ON can hold any condition that gives a “yes” or a “no”, a range through BETWEEN included.',
+      'ON can hold a condition that determines whether a pair matches, including a range expressed with BETWEEN.',
       'Skeleton: SELECT o.order_id, o.amount, p.product_name, p.price FROM orders o JOIN products p ON p.price BETWEEN o.amount * 0.8 AND o.amount;',
     ],
     explanation:
-      'ON does not have to hold an equality of keys — any condition that returns true or false will do. The price of that flexibility is practical: without an equality the database cannot use an index and effectively goes through the pairs one by one, so range joins on large tables are expensive. Note also that orders without a single suitable product do not make it into the result: this is an INNER JOIN.',
+      'ON does not have to contain an equality between keys — it can contain a range or another join condition. Range joins can be more expensive than simple equality joins, especially on large tables, because matching pairs may require more work. Note also that orders without a suitable product do not make it into the result: this is an INNER JOIN.',
   },
-
   'L3-diverse-buyers': {
     title: 'Customers with broad tastes',
     context:
@@ -262,9 +245,8 @@ export default {
       'Skeleton: SELECT c.name, COUNT(DISTINCT p.category) AS category_count FROM customers c JOIN orders o ON ... JOIN order_items oi ON ... JOIN products p ON ... GROUP BY c.customer_id, c.name HAVING COUNT(DISTINCT p.category) >= 3;',
     ],
     explanation:
-      'The closing task of the level brings everything together: a multi-table JOIN, grouping, DISTINCT inside an aggregate and a filter on it. The key detail is DISTINCT: a plain COUNT would count order lines, and a customer who bought from the same category five times would wrongly land in the report.',
+      'The closing task of the level brings everything together: a multi-table JOIN, grouping, DISTINCT inside an aggregate and a filter on it. The key detail is DISTINCT: a plain COUNT would count joined rows, so a customer who bought from the same category five times could be counted five times instead of once for that category.',
   },
-
   'L3-active-countries': {
     title: 'Markets where demand already exists',
     context:
@@ -277,9 +259,8 @@ export default {
       'Skeleton: SELECT c.country, COUNT(o.order_id) AS order_count, SUM(o.amount) AS revenue FROM customers c JOIN orders o ON ... GROUP BY c.country HAVING COUNT(o.order_id) >= 4;',
     ],
     explanation:
-      'Follow the whole pipeline: JOIN builds the extended set of rows, GROUP BY collapses it into countries, HAVING throws finished groups away. Italy is not in the result, and the reason is not HAVING: the only Italian customer has no orders at all, so INNER JOIN dropped them before grouping. If the task demanded showing countries with a zero too, a LEFT JOIN would be required — and then HAVING would have to be rewritten, because zero does not pass the “at least four” condition.',
+      'Follow the whole pipeline: JOIN builds the joined set of rows, GROUP BY groups it by country, and HAVING filters the finished groups. A country with customers but no orders does not appear because INNER JOIN removes unmatched customers before grouping. If the task demanded showing countries with zero orders too, a LEFT JOIN would be required — and then HAVING would still exclude those zero-order countries because they do not pass the “at least four” condition.',
   },
-
   'L3-category-reach': {
     title: 'Reach and money by category',
     context:
@@ -292,6 +273,6 @@ export default {
       'Skeleton: SELECT p.category, COUNT(DISTINCT c.customer_id) AS buyer_count, SUM(oi.quantity * p.price) AS revenue FROM order_items oi JOIN products p ON ... JOIN orders o ON ... JOIN customers c ON ... GROUP BY p.category;',
     ],
     explanation:
-      'The closing task of the level: two aggregates are computed over one and the same set of rows, yet they behave in opposite ways. SUM has to see every line separately, otherwise the revenue will be incomplete; COUNT(DISTINCT …), on the contrary, has to collapse the repeats, otherwise “the number of customers” turns into “the number of order lines”. That is exactly why DISTINCT goes inside a particular aggregate and not next to SELECT: there it would change the whole result row.',
+      'The closing task of the level: two aggregates are computed over the same joined set of rows, yet they behave in different ways. SUM has to see every order line separately, otherwise the revenue will be incomplete; COUNT(DISTINCT …), on the contrary, has to collapse repeated customer IDs, otherwise “the number of customers” turns into “the number of joined rows”. That is exactly why DISTINCT goes inside a particular aggregate and not next to SELECT: there it would change the whole result row.',
   },
 };

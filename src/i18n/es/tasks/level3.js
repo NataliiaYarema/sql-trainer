@@ -100,7 +100,7 @@ export default {
       'Plantilla: SELECT e.first_name AS employee, m.first_name AS manager FROM employees e JOIN employees m ON m.employee_id = e.manager_id;',
     ],
     explanation:
-      'En un self-join los alias dejan de ser una comodidad y se vuelven imprescindibles: sin ellos employees.employee_id no diría de cuál de las dos copias de la tabla se habla. Fíjate en que INNER JOIN descartó por sí solo a la dirección: su manager_id está vacío y no se encontró pareja para ellos. Si hubiera que conservarlos, haría falta un LEFT JOIN.',
+      'En un self-join los alias dejan de ser una comodidad y se vuelven imprescindibles: sin ellos employees.employee_id no diría de cuál de las dos copias de la tabla se habla. Fíjate en que INNER JOIN descartó por sí solo a la dirección: su manager_id es NULL y no se encontró pareja para ellos. Si hubiera que conservarlos, haría falta un LEFT JOIN.',
   },
 
   'L3-orders-per-customer-join': {
@@ -115,7 +115,7 @@ export default {
       'Plantilla: SELECT c.name, COUNT(o.order_id) AS order_count FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id GROUP BY c.customer_id, c.name;',
     ],
     explanation:
-      'Aquí se esconde el error más habitual de la pareja LEFT JOIN y COUNT: COUNT(*) daría un uno al cliente sin pedidos, porque la fila tras la unión existe, solo que vacía. COUNT(o.order_id) cuenta únicamente los valores no vacíos y por eso devuelve cero honestamente. Agrupamos por customer_id junto con el nombre porque dos clientes podrían, en teoría, llamarse igual.',
+      'Aquí se esconde el error más habitual de la pareja LEFT JOIN y COUNT: COUNT(*) daría un uno al cliente sin pedidos, porque la fila tras la unión existe, solo que vacía. COUNT(o.order_id) cuenta únicamente los valores que no son NULL y por eso devuelve cero honestamente. Agrupamos por customer_id junto con el nombre porque dos clientes podrían, en teoría, llamarse igual.',
   },
 
   'L3-order-contents': {
@@ -202,7 +202,7 @@ export default {
       'Plantilla: SELECT e.first_name, o.order_id, o.amount FROM employees e FULL JOIN orders o ON e.employee_id = o.manager_id;',
     ],
     explanation:
-      'Un FULL OUTER JOIN merece su nombre solo cuando hay filas sin pareja en los dos lados; si no, no se diferencia de un LEFT JOIN. Aquí las hay: nueve empleados no llevan pedidos y un pedido está registrado a nombre de un responsable que ya no está en la tabla. Un nombre vacío en una fila no es un fallo de los datos, sino justo el huérfano por el que se escribió la consulta: así se encuentran las referencias rotas en las bases reales.',
+      'Un FULL OUTER JOIN merece su nombre solo cuando hay filas sin pareja en los dos lados; si no, no se diferencia de un LEFT JOIN. Aquí las hay: nueve empleados no llevan pedidos y un pedido está registrado a nombre de un responsable que ya no está en la tabla. Un nombre vacío (NULL) en una fila no es un fallo de los datos, sino justo el huérfano por el que se escribió la consulta: así se encuentran las referencias rotas en las bases reales.',
   },
 
   'L3-department-pairs': {
@@ -232,7 +232,7 @@ export default {
       'Plantilla: SELECT c.name, o.order_id, o.amount FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.amount > 200;',
     ],
     explanation:
-      'Esta diferencia es una de las más importantes del tema de las uniones. Una condición en ON se aplica durante la unión: las filas sin pareja de la tabla izquierda se conservan igualmente, solo con las columnas de la derecha vacías. La misma condición en WHERE actuaría después de la unión y las tiraría, porque NULL > 200 no es verdadero, y el LEFT JOIN se convertiría en silencio en un INNER. Si después de un LEFT JOIN desaparecen filas de golpe, lo primero que hay que buscar es una condición sobre la tabla derecha en WHERE.',
+      'Esta diferencia es una de las más importantes del tema de las uniones. Una condición en ON se aplica durante la unión: las filas sin pareja de la tabla izquierda se conservan igualmente, solo con las columnas de la derecha vacías. La misma condición en WHERE actuaría después de la unión y las tiraría, porque NULL > 200 no es verdadero, y el LEFT JOIN se convertiría en silencio en un INNER JOIN. Si después de un LEFT JOIN desaparecen filas de golpe, lo primero que hay que buscar es una condición sobre la tabla derecha en WHERE.',
   },
 
   'L3-affordable-for-order': {
