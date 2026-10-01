@@ -93,7 +93,7 @@ export default {
       'Skeleton: SELECT product_name, price, RANK() OVER (ORDER BY price DESC) AS price_rank, DENSE_RANK() OVER (ORDER BY price DESC) AS dense_price_rank FROM products;',
     ],
     explanation:
-      'The difference shows up on ties. RANK leaves gaps after tied values, while DENSE_RANK does not: for example, 1, 2, 2, 4 versus 1, 2, 2, 3. Use RANK when the number represents a competition-style position, and DENSE_RANK when you want consecutive rank values.',
+      'The difference shows up on ties, and the data has them: two products cost 210, and two more cost 89. RANK leaves gaps after tied values, while DENSE_RANK does not: for example, 1, 2, 2, 4 versus 1, 2, 2, 3. Use RANK when the number represents a competition-style position, and DENSE_RANK when you want consecutive rank values.',
   },
   'L5-best-order-alongside': {
     title: 'The largest purchase next to every one',
@@ -160,7 +160,7 @@ export default {
       'Skeleton: SELECT first_name, salary, NTILE(4) OVER (ORDER BY salary DESC) AS quartile FROM employees;',
     ],
     explanation:
-      'NTILE divides the rows rather than the range of salary values: each group contains roughly the same number of employees, even if the salary values within a group vary considerably. The group sizes differ by at most one. When the rows cannot be divided evenly, the earlier groups receive the extra rows.',
+      'NTILE divides the rows rather than the range of salary values: each group contains roughly the same number of employees, even if the salary values within a group vary considerably. Twelve employees split into four groups of exactly three. The group sizes differ by at most one. When the rows cannot be divided evenly, the earlier groups receive the extra rows.',
   },
   'L5-moving-average': {
     title: 'Smoothed ticket dynamics',
@@ -202,6 +202,6 @@ export default {
       'Skeleton: WITH ranked AS (SELECT manager_id, order_id, amount, ROW_NUMBER() OVER (PARTITION BY manager_id ORDER BY amount DESC) AS rn FROM orders) SELECT manager_id, order_id, amount FROM ranked WHERE rn <= 2;',
     ],
     explanation:
-      'A common pattern for “top N within a group” is to number the rows with a window function and then filter that number in an outer query. Here ROW_NUMBER gives each manager’s orders a separate position, so a manager with only one order naturally contributes one row. If equal amounts should share a position and all tied orders should be included, RANK or DENSE_RANK may be more appropriate than ROW_NUMBER.',
+      'A common pattern for “top N within a group” is to number the rows with a window function and then filter that number in an outer query. Here ROW_NUMBER gives each manager’s orders a separate position, so a manager with only one order naturally contributes one row — which is why there are seven rows rather than eight. If equal amounts should share a position and all tied orders should be included, RANK or DENSE_RANK may be more appropriate than ROW_NUMBER.',
   },
 };
