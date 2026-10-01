@@ -201,7 +201,7 @@ export default {
       'Plantilla: WITH customer_orders AS (SELECT c.name, o.customer_id, o.order_id, o.order_date, o.amount FROM orders o JOIN customers c ON ...) SELECT name, order_date, amount, SUM(amount) OVER (PARTITION BY customer_id ORDER BY order_date, order_id) AS running_spend, LAG(amount) OVER (...) AS prev_amount FROM customer_orders;',
     ],
     explanation:
-      'Ejercicio de cierre del curso: varias funciones de ventana sobre una misma ventana más un CTE para preparar los datos. Así se calculan justamente las métricas de cohortes: ingresos acumulados, LTV en el tiempo, el paso hasta la siguiente compra. Fíjate en que las dos funciones describen la misma ventana: cuando hay muchas expresiones así, se saca a un bloque WINDOW aparte para no repetirse.',
+      'Aquí se combinan varias funciones de ventana sobre una misma ventana y un CTE para preparar los datos. Así se calculan justamente las métricas de cohortes: ingresos acumulados, LTV en el tiempo, el paso hasta la siguiente compra. Fíjate en que las dos funciones describen la misma ventana: cuando hay muchas expresiones así, se saca a un bloque WINDOW aparte para no repetirse.',
   },
 
   'L5-top-two-per-manager': {
@@ -216,6 +216,6 @@ export default {
       'Plantilla: WITH ranked AS (SELECT manager_id, order_id, amount, ROW_NUMBER() OVER (PARTITION BY manager_id ORDER BY amount DESC) AS rn FROM orders) SELECT manager_id, order_id, amount FROM ranked WHERE rn <= 2;',
     ],
     explanation:
-      'Una técnica universal para toda una clase de problemas del tipo «los primeros N dentro de un grupo»: numerar con una ventana y después filtrar el número sobre el resultado ya hecho. En WHERE no se puede hacer directamente, porque las funciones de ventana se calculan después de WHERE, y de ahí el CTE. Fíjate en que hay siete filas y no ocho: un responsable tiene un solo pedido y ROW_NUMBER no se inventa un segundo. Un «top 2» de un grupo de un elemento da honestamente una fila.',
+      'Una técnica universal para toda una clase de problemas del tipo «los primeros N dentro de un grupo»: numerar con una ventana y después filtrar el número sobre el resultado ya hecho. En WHERE no se puede hacer directamente, porque las funciones de ventana se calculan después de WHERE, y de ahí el CTE. Fíjate en que hay siete filas y no ocho: un responsable tiene un solo pedido y ROW_NUMBER no se inventa un segundo. Un «top 2» de un grupo de un elemento da honestamente una fila. Si los importes iguales deben compartir posición y hay que incluir todos los pedidos empatados, RANK o DENSE_RANK encajan mejor que ROW_NUMBER.',
   },
 };
