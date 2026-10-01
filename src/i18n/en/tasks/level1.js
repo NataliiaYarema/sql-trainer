@@ -16,7 +16,7 @@ export default {
       'Skeleton: SELECT * FROM customers;',
     ],
     explanation:
-      'SELECT * is handy when you need a quick look inside a table. Production queries avoid it: it pulls data you do not need and breaks the moment a new column appears. For exploring — yes; for a dashboard — no.',
+      'SELECT * is handy when you need a quick look at a table. In production queries, it is usually better to list the columns you need explicitly: * can return data you do not need, and adding a new column to the table can unexpectedly change the result.',
   },
   'L1-product-prices': {
     title: 'Just product names and prices',
@@ -24,12 +24,12 @@ export default {
       "A printed price list only needs product names and prices. The other fields aren't needed on paper.",
     taskText: 'Show the name and price of every product.',
     hints: [
-      'Instead of all the columns you need only two specific ones.',
+      'Instead of all the columns, you need only two specific ones.',
       'List the columns you need, separated by commas, right after SELECT.',
       'Skeleton: SELECT product_name, price FROM products;',
     ],
     explanation:
-      'Listing columns explicitly is the norm for production queries: you get exactly the data you asked for, and the result will not change if new fields are added to the table. The order of columns in SELECT sets the order in the result.',
+      'Listing columns explicitly is the norm for production queries: you get exactly the data you asked for, and the result will not change just because new columns are added to the table. The order of columns in SELECT determines their order in the result.',
   },
   'L1-departments': {
     title: 'Which departments does the company have?',
@@ -37,12 +37,12 @@ export default {
       'A new HR manager is mapping the company structure and starts with a list of its departments.',
     taskText: 'Show the list of unique departments, without duplicates.',
     hints: [
-      'The department repeats for every employee, but the list you need has no repeats.',
-      'DISTINCT drops identical result rows, keeping one from each group.',
+      'The department repeats for every employee, but the list you need has no duplicates.',
+      'DISTINCT removes duplicate result rows, keeping one occurrence of each distinct row.',
       'Skeleton: SELECT DISTINCT department FROM employees;',
     ],
     explanation:
-      'Notice the empty row in the result: one employee has no department, and DISTINCT treats NULL as a value of its own — unlike conditions in WHERE, where NULL equals nothing. The second thing to remember: DISTINCT works on the whole result row, not on a single column, so SELECT DISTINCT department, salary would give you every pair of values instead.',
+      'Notice the NULL in the result: one employee has no department. DISTINCT keeps a single NULL in the result because duplicate NULL values are treated as duplicates for DISTINCT. This is different from ordinary comparisons in WHERE, where NULL = NULL does not evaluate to true. Also remember that DISTINCT works on the whole result row, not on one column independently. So SELECT DISTINCT department, salary would return each distinct department-and-salary combination.',
   },
   'L1-top-managers': {
     title: 'Who reports to nobody?',
@@ -50,12 +50,12 @@ export default {
       'HR is putting together a list of top-level managers for an invitation to a strategy session.',
     taskText: 'Show the first and last names of employees who have no manager.',
     hints: [
-      'A missing manager is stored in the table not as a zero and not as an empty string, but as a special “unknown” value.',
-      'An empty value is checked with IS NULL, not with an equals sign.',
+      'A missing manager is stored in the table not as a zero and not as an empty string, but as the special NULL value.',
+      'A NULL value is checked with IS NULL, not with an equals sign.',
       'Skeleton: SELECT first_name, last_name FROM employees WHERE manager_id IS NULL;',
     ],
     explanation:
-      'NULL is not a value but the absence of one, so any comparison with it returns neither true nor false but “unknown”. That is why manager_id = NULL returns no rows and raises no error either — the query simply gives back an empty result. IS NULL exists for exactly this kind of check.',
+      'NULL represents the absence of a value. Comparisons involving NULL do not evaluate to true or false; they evaluate to UNKNOWN. That is why manager_id = NULL does not match rows, while manager_id IS NULL correctly checks for a missing value.',
   },
   'L1-category-filter': {
     title: 'Products from one category',
@@ -67,7 +67,7 @@ export default {
       "Skeleton: SELECT product_name, price FROM products WHERE category = '...';",
     ],
     explanation:
-      'WHERE throws rows away before the result is built. Equality is the simplest filter; remember that string comparison in SQL is case-sensitive, so Electronics and electronics are different values.',
+      "WHERE filters rows before the final result is returned. Equality is the simplest kind of filter. In PostgreSQL, ordinary text comparison is case-sensitive, so 'Electronics' and 'electronics' are different values.",
   },
   'L1-low-stock': {
     title: 'Products running low in the warehouse',
@@ -79,7 +79,7 @@ export default {
       'Skeleton: SELECT product_name, stock FROM products WHERE stock < 20;',
     ],
     explanation:
-      "The comparison operators >, <, >=, <=, = and <> behave in WHERE exactly as they do in maths. Note that numbers are written without quotes — PostgreSQL is strict about types and answers stock < '20' with an error about incompatible types.",
+      "The comparison operators >, <, >=, <=, = and <> work in WHERE as you would expect from mathematics. Write numbers without quotes. PostgreSQL will quietly convert stock < '20' to a number and the query still works, but only because '20' has no type of its own: an actual text value, such as '20'::text, fails with “operator does not exist: integer < text”.",
   },
   'L1-price-desc': {
     title: 'Price list from expensive to cheap',
@@ -88,11 +88,11 @@ export default {
       'Show the names and prices of all products, sorted from the most expensive to the cheapest.',
     hints: [
       'The result has to be ordered by price.',
-      'ORDER BY sets the sorting, and DESC flips it to descending.',
+      'ORDER BY sets the sorting, and DESC makes it descending.',
       'Skeleton: SELECT product_name, price FROM products ORDER BY price DESC;',
     ],
     explanation:
-      'Without ORDER BY the row order is not guaranteed — the database may return them in any order it likes. Sorting is ascending by default (ASC), DESC makes it descending. This is the only way to control the order of the result.',
+      'Without ORDER BY, the order of rows in a result is not guaranteed. ORDER BY sorts in ascending order by default (ASC); DESC sorts in descending order. If you need a specific row order, use ORDER BY explicitly.',
   },
   'L1-latest-orders': {
     title: 'The three newest orders',
@@ -101,11 +101,11 @@ export default {
       'Show the three most recent orders by date. If two orders have the same date, show the one with the higher order ID first.',
     hints: [
       'First put the rows in order, then cut off the extra ones.',
-      'LIMIT n keeps only the first n rows of an already sorted result.',
+      'LIMIT n keeps only the first n rows of the sorted result.',
       'Skeleton: SELECT order_id, order_date, amount FROM orders ORDER BY order_date DESC, order_id DESC LIMIT 3;',
     ],
     explanation:
-      'LIMIT is applied after sorting, so the order of operations matters: ORDER BY lines the rows up first, and only then does LIMIT cut off the tail. The second column in ORDER BY is not decoration here: two dates are identical, and without it the database is free to return those rows in any order — a “top N” report would become unpredictable.',
+      'LIMIT restricts the number of rows returned after the result has been ordered. The second column in ORDER BY matters here: if two orders have the same date, order_id DESC determines which one comes first. Without that tie-breaker, their relative order is not guaranteed.',
   },
   'L1-top-furniture': {
     title: 'The most expensive furniture',
@@ -113,11 +113,11 @@ export default {
     taskText: "Show the two most expensive items in the 'Furniture' category.",
     hints: [
       'Three actions come together here: filter, sort, cut.',
-      'The order of the query parts is fixed: WHERE, then ORDER BY, then LIMIT.',
+      'The query uses WHERE to filter, ORDER BY price DESC to sort, and LIMIT 2 to keep only two rows.',
       "Skeleton: SELECT product_name, price FROM products WHERE category = '...' ORDER BY price DESC LIMIT 2;",
     ],
     explanation:
-      'The writing order of query parts is rigid: SELECT → FROM → WHERE → ORDER BY → LIMIT. The execution order is different: WHERE throws rows away first, then they are sorted, and only at the end does LIMIT cut off the extra. That is exactly why the filter cannot “see” the result of the sorting.',
+      'The written order of the query clauses is fixed: SELECT → FROM → WHERE → ORDER BY → LIMIT. Conceptually, the filtering happens before the sorting, and LIMIT then keeps only the first two rows. That is why the query returns the two most expensive products within the furniture category.',
   },
   'L1-price-range': {
     title: 'Products inside a price range',
@@ -130,7 +130,7 @@ export default {
       'Skeleton: SELECT product_name, price FROM products WHERE price BETWEEN 50 AND 150;',
     ],
     explanation:
-      'BETWEEN includes both bounds: the form is equivalent to price >= 50 AND price <= 150. This is where the usual mistake hides — in everyday speech “from 50 to 150” often leaves the upper bound out, and then BETWEEN gives a few rows more than expected. The order of the bounds matters too: BETWEEN 150 AND 50 returns nothing.',
+      'BETWEEN includes both bounds: it is equivalent to price >= 50 AND price <= 150. The order of the bounds matters too: BETWEEN 150 AND 50 does not describe the intended range and will not match these prices.',
   },
   'L1-two-categories': {
     title: 'Two categories in one filter',
@@ -138,12 +138,12 @@ export default {
     taskText:
       "Show the products from the 'Kitchen' and 'Sports' categories, together with their prices.",
     hints: [
-      'It is not one specific category value that fits, but any of two.',
+      'It is not one specific category value that fits, but either of two.',
       "The IN operator checks membership in a list: category IN ('A', 'B').",
       "Skeleton: SELECT product_name, category, price FROM products WHERE category IN ('Kitchen', 'Sports');",
     ],
     explanation:
-      "IN is a shorter way of writing a chain of OR: category = 'Kitchen' OR category = 'Sports'. The gain is not only in length: with OR it is easy to forget the brackets and mix the conditions up, while IN stays one whole expression. Be careful with NOT IN when the list may contain NULL — such a condition returns no rows at all.",
+      "IN is a shorter way of writing a chain of OR conditions: category = 'Kitchen' OR category = 'Sports'. Be careful with NOT IN when the list or the value being tested can involve NULL. Because of SQL's three-valued logic, the condition can evaluate to UNKNOWN, so rows you might expect to keep can be excluded.",
   },
   'L1-name-search': {
     title: 'Search by part of the name',
@@ -151,12 +151,12 @@ export default {
       'A support agent is looking for a product, but the customer remembers only part of its name.',
     taskText: "Show the names and categories of products whose name contains the word 'Desk'.",
     hints: [
-      'The name must not equal the fragment but contain it — anywhere inside.',
+      'The name must not equal the fragment but contain it somewhere inside.',
       'LIKE compares against a pattern in which % means “any number of any characters”.',
       "Skeleton: SELECT product_name, category FROM products WHERE product_name LIKE '%Desk%';",
     ],
     explanation:
-      "In a LIKE pattern % stands for any sequence of characters and _ for exactly one. Without % the pattern works like plain equality: LIKE 'Desk' would find only a product named exactly “Desk”, and there is none. In PostgreSQL LIKE is case-sensitive, so '%desk%' will not find these products — for a search that ignores case there is ILIKE.",
+      "In a LIKE pattern, % stands for any sequence of characters and _ stands for exactly one character. Without %, LIKE 'Desk' matches only the exact string Desk. In PostgreSQL, LIKE is case-sensitive, so '%desk%' does not match Desk. If you want a case-insensitive pattern match, PostgreSQL provides ILIKE.",
   },
   'L1-sorted-catalog': {
     title: 'Catalogue by category and price',
@@ -165,12 +165,12 @@ export default {
     taskText:
       'Show the name, category, and stock value (price × stock) for every product. Sort by category, and within each category, from the most expensive product to the cheapest.',
     hints: [
-      'The sorting has two steps: first the groups, and only inside each one its own order.',
-      'ORDER BY takes several columns separated by commas, and DESC applies only to the one it follows.',
+      'The sorting has two steps: first the categories, and then the order within each category.',
+      'ORDER BY can contain several columns separated by commas, and DESC applies only to the column it follows.',
       'Skeleton: SELECT product_name, category, price * stock AS stock_value FROM products ORDER BY category, price DESC;',
     ],
     explanation:
-      'The second column in ORDER BY kicks in only where the first gave equal values — which is what orders the products inside a category. Note also that we sort by price although the result shows stock_value: ORDER BY is free to refer to table columns that are not in the output.',
+      'The second expression in ORDER BY is used when rows have the same value for the first one. Here, products are sorted by category first, and by price within each category. Notice that the result shows stock_value, but the query sorts by price. ORDER BY can use a column that is not included in the output.',
   },
   'L1-expensive-low-stock': {
     title: 'Expensive products that are running out',
@@ -183,7 +183,7 @@ export default {
       'Skeleton: SELECT product_name, price, stock FROM products WHERE stock < 50 ORDER BY price DESC LIMIT 5;',
     ],
     explanation:
-      'The closing task of the level: a business wording breaks down into three technical steps. What matters is that LIMIT is applied after the filter — if you first took the five most expensive products overall and then filtered by stock, fewer than five items would be left on the list.',
+      'The business wording breaks down into three technical steps: filter, sort, and limit. The filter must be applied before selecting the five most expensive products. Otherwise, you could take the five most expensive products overall and then discover that some of them do not meet the stock condition.',
   },
   'L1-restock-shortlist': {
     title: 'The urgent reorder shortlist',
@@ -193,10 +193,10 @@ export default {
       "Show the products with fewer than 50 in stock that do not belong to the 'Electronics' category and either cost more than 100 or have fewer than 10 in stock.",
     hints: [
       'There are three conditions, but the last one consists of two options, and one of them is enough.',
-      'AND requires both conditions, OR at least one, NOT flips a condition. Brackets say what is grouped with what.',
+      'AND requires both conditions, OR requires at least one, and NOT reverses a condition. Parentheses show which conditions belong together.',
       "Skeleton: SELECT product_name, category, price, stock FROM products WHERE stock < 50 AND NOT category = 'Electronics' AND (price > 100 OR stock < 10);",
     ],
     explanation:
-      'The brackets around OR are not decoration. AND binds more tightly than OR, so without them the condition would read as “(low in stock and not electronics and costing more than 100) or fewer than 10 left” — and the electronics we had just excluded would land in the result. When AND and OR meet in one condition, it is worth always adding brackets, even where they match the default behaviour: a query is read by people, not only by the database.',
+      "The parentheses around OR are important. AND has higher precedence than OR, so without the parentheses the condition would be interpreted differently: (stock < 50 AND NOT category = 'Electronics' AND price > 100) OR stock < 10. That could allow products with fewer than 10 in stock to pass without satisfying the other conditions. When AND and OR appear together, parentheses make the intended logic explicit and easier to read.",
   },
 };
