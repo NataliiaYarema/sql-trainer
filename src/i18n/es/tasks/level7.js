@@ -37,14 +37,15 @@ export default {
     title: 'Un departamento o una etiqueta',
     context:
       'En personal preparan un directorio general de empleados y quieren que la falta de departamento se vea de forma explícita y no como un campo vacío.',
-    taskText: "Muestra los empleados de forma que un departamento vacío ponga 'Not assigned'.",
+    taskText:
+      "Muestra los empleados de forma que, si el departamento es NULL, ponga 'Not assigned'.",
     hints: [
-      'Donde un empleado no tiene departamento indicado hay que poner un texto de relleno en lugar del valor vacío.',
+      'Donde un empleado no tiene departamento indicado hay que poner un texto de relleno en lugar del NULL.',
       'COALESCE comprueba sus argumentos de izquierda a derecha y devuelve el primero que no sea NULL.',
       "Plantilla: SELECT first_name, last_name, COALESCE(department, 'Not assigned') AS department FROM employees ORDER BY employee_id;",
     ],
     explanation:
-      'COALESCE devuelve el primer argumento no vacío de la lista. Sustituir esta lógica por una condición WHERE department = NULL no funciona: una comparación con NULL da siempre NULL y no falso, así que esa fila simplemente no pasa el filtro; para comprobar si algo está vacío existe el operador IS NULL.',
+      'COALESCE devuelve el primer argumento de la lista que no es NULL. Sustituir esta lógica por una condición WHERE department = NULL no funciona: una comparación con NULL da siempre NULL y no falso, así que esa fila simplemente no pasa el filtro; para comprobar si algo es NULL existe el operador IS NULL.',
   },
 
   'L7-large-orders-per-manager': {
@@ -163,7 +164,7 @@ export default {
       "Plantilla: SELECT customer_id, SUM(CASE WHEN order_date < DATE '2024-04-01' THEN amount ELSE 0 END) AS q1, SUM(CASE ...) AS q2 FROM orders GROUP BY customer_id;",
     ],
     explanation:
-      'SUM(CASE …) convierte filas en columnas: así se construyen las tablas cruzadas donde no hay un operador pivot propio. El ELSE 0 es intencionado: sin él, un cliente que no pidió en el primer trimestre tendría en q1 un valor vacío en lugar de un cero honesto.',
+      'SUM(CASE …) convierte filas en columnas: así se construyen las tablas cruzadas donde no hay un operador pivot propio. El ELSE 0 es intencionado: sin él, un cliente que no pidió en el primer trimestre tendría en q1 NULL en lugar de un cero honesto.',
   },
 
   'L7-small-per-large': {

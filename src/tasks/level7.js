@@ -91,8 +91,7 @@ export default [
       'HR готує загальний довідник співробітників і хоче, щоб відсутність департаменту в картці була видна явно, а не порожнім полем.',
     schemaDescription: EMPLOYEES_SCHEMA,
     setupSql: EMPLOYEES_SQL,
-    taskText:
-      "Виведи співробітників так, щоб замість порожнього департаменту стояло 'Not assigned'.",
+    taskText: "Виведи співробітників так, щоб замість NULL у департаменті стояло 'Not assigned'.",
     expectedOutputColumns: ['first_name', 'last_name', 'department'],
     orderMatters: false,
     referenceSql: `
@@ -104,12 +103,12 @@ export default [
       ORDER BY employee_id;
     `,
     hints: [
-      'Там, де в співробітника не вказано департамент, потрібно підставити текстову заглушку замість порожнього значення.',
+      'Там, де в співробітника не вказано департамент, потрібно підставити текстову заглушку замість NULL.',
       'COALESCE перевіряє аргументи зліва направо і повертає перший із них, який не є NULL.',
       "Скелет: SELECT first_name, last_name, COALESCE(department, 'Not assigned') AS department FROM employees ORDER BY employee_id;",
     ],
     explanation:
-      'COALESCE повертає перший непорожній аргумент зі списку. Замінити цю логіку умовою WHERE department = NULL не вийде: порівняння з NULL завжди дає NULL, а не хибу, тому такий рядок просто не проходить фільтр — для перевірки на порожнечу є оператор IS NULL.',
+      'COALESCE повертає перший аргумент зі списку, що не є NULL. Замінити цю логіку умовою WHERE department = NULL не вийде: порівняння з NULL завжди дає NULL, а не хибу, тому такий рядок просто не проходить фільтр — для перевірки на NULL є оператор IS NULL.',
   },
   {
     id: 'L7-large-orders-per-manager',
@@ -385,7 +384,7 @@ export default [
       "Скелет: SELECT customer_id, SUM(CASE WHEN order_date < DATE '2024-04-01' THEN amount ELSE 0 END) AS q1, SUM(CASE ...) AS q2 FROM orders GROUP BY customer_id;",
     ],
     explanation:
-      'SUM(CASE …) перетворює рядки на колонки — так будують зведені таблиці там, де окремого оператора pivot немає. ELSE 0 тут навмисний: без нього клієнт, який не замовляв у першому кварталі, отримав би в q1 порожнє значення замість чесного нуля.',
+      'SUM(CASE …) перетворює рядки на колонки — так будують зведені таблиці там, де окремого оператора pivot немає. ELSE 0 тут навмисний: без нього клієнт, який не замовляв у першому кварталі, отримав би в q1 NULL замість чесного нуля.',
   },
   {
     id: 'L7-small-per-large',
