@@ -381,7 +381,7 @@ export default {
       {
         label: 'COALESCE y NULLIF: dos acciones opuestas',
         result:
-          'Doce filas en las que se ven las dos acciones a la vez. A Bohdan le falta el departamento, y COALESCE muestra «No indicado». Para los empleados de IT, NULLIF hace lo contrario y devuelve NULL, porque su valor coincide con el que queremos convertir en NULL. A ese mismo Bohdan, hidden_it también le queda en NULL, pero por otra razón: NULLIF(NULL, IT) devuelve NULL.',
+          'Doce filas en las que se ven las dos acciones a la vez. A Bohdan le falta el departamento, y COALESCE muestra «Not stated». Para los empleados de IT, NULLIF hace lo contrario y devuelve NULL, porque su valor coincide con el que queremos convertir en NULL. A ese mismo Bohdan, hidden_it también le queda en NULL, pero por otra razón: NULLIF(NULL, IT) devuelve NULL.',
       },
       {
         label: 'UNION: combinar dos listas sin repeticiones',

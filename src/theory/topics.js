@@ -777,15 +777,15 @@ const topics = [
           SELECT
             first_name,
             department,
-            COALESCE(department, 'Не вказано') AS filled,
+            COALESCE(department, 'Not stated') AS filled,
             NULLIF(department, 'IT') AS hidden_it
           FROM employees
           ORDER BY employee_id;
         `),
         result:
           'Дванадцять рядків, у яких видно обидві дії поруч. У ' +
-          'Богдана департамент порожній, і COALESCE підставив «Не ' +
-          'вказано». У всіх айтішників NULLIF, навпаки, зробив ' +
+          'Богдана департамент порожній, і COALESCE підставив ' +
+          '«Not stated». У всіх айтішників NULLIF, навпаки, зробив ' +
           'порожньо — бо їхнє значення збіглося з тим, яке ми ' +
           'попросили сховати. У того ж Богдана hidden_it теж ' +
           "порожній, але з іншої причини: NULLIF(NULL, 'IT') сам " +
