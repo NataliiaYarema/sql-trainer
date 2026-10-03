@@ -4,13 +4,13 @@
 
 **[Open the trainer →](https://sql-trainer-zeta.vercel.app/)**
 
-![Trainer screen](public/og-cover.png)
-
 **[English](#english) · [Español](#español) · [Українська](#українська)**
 
 ---
 
 ## English
+
+![Trainer screen](screenshots/screen-en.png)
 
 ### About the trainer
 
@@ -26,7 +26,7 @@ No server is needed: the database starts right in the browser tab and is created
 
 The interface, all 125 tasks and the theory are available in three languages: English, Spanish and Ukrainian. Choose the language in the drop-down list in the top-right corner of the header — the page switches at once, without reloading, and your progress stays where it was.
 
-The trainer remembers your choice, and the language is also part of the address: `#/en/`, `#/es/`, `#/uk/`. A link like that can be shared, and it opens in the right language. On the very first visit the trainer opens in English. SQL, table and column names and the data itself are the same in every language.
+On the very first visit the trainer opens in English. SQL, table and column names and the data itself are the same in every language.
 
 ### Getting started
 
@@ -69,7 +69,7 @@ At the end of a level the “What you can do now” screen lists the skills gain
 
 ### Certificate
 
-Whoever completes the course gets a certificate that can be saved as a PDF. There are two certificates:
+Completing all levels of the trainer earns a certificate:
 
 - **Certificate** — at least 90% of the tasks on every level are solved (14 of 15, and 18 of 20 on level 3).
 - **Certificate with Distinction** — all 125 tasks are solved, and “Show answer” was never pressed.
@@ -135,6 +135,8 @@ Write queries in the PostgreSQL dialect: `DATE_TRUNC`, `EXTRACT`, `TO_CHAR` are 
 
 ## Español
 
+![Pantalla del entrenador](screenshots/screen-es.png)
+
 ### Sobre el entrenador
 
 Un entrenador web para practicar SQL: 125 ejercicios repartidos en 8 niveles, cada uno con un contexto de negocio y tres pistas. Tras la comprobación, el entrenador muestra un veredicto: correcto o no. También se puede ver una consulta de referencia con su explicación pulsando el botón «Ver la solución».
@@ -149,7 +151,7 @@ No hace falta servidor: la base de datos arranca en la propia pestaña del naveg
 
 La interfaz, los 125 ejercicios y la teoría están disponibles en tres idiomas: inglés, español y ucraniano. El idioma se elige en la lista desplegable de la esquina superior derecha de la cabecera: la página cambia al instante, sin recargarse, y el progreso se mantiene.
 
-El entrenador recuerda la elección, y el idioma también forma parte de la dirección: `#/en/`, `#/es/`, `#/uk/`. Un enlace así se puede compartir y se abre en el idioma correcto. En la primera visita el entrenador se abre en inglés. El SQL, los nombres de tablas y columnas y los propios datos son los mismos en todos los idiomas.
+En la primera visita el entrenador se abre en inglés. El SQL, los nombres de tablas y columnas y los propios datos son los mismos en todos los idiomas.
 
 ### Cómo empezar
 
@@ -192,7 +194,7 @@ Al final de un nivel, la pantalla «Lo que ya sabes hacer» enumera las habilida
 
 ### Certificado
 
-Quien completa el curso obtiene un certificado que se puede guardar en PDF. Hay dos certificados:
+Al completar todos los niveles del entrenador se puede obtener un certificado:
 
 - **Certificado**: resueltos al menos el 90 % de los ejercicios de cada nivel (14 de 15, y 18 de 20 en el nivel 3).
 - **Certificado con distinción**: resueltos los 125 ejercicios sin pulsar ni una vez «Ver la solución».
@@ -258,6 +260,8 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 
 ## Українська
 
+![Екран тренажера](screenshots/screen-uk.png)
+
 ### Про тренажер
 
 Веб-тренажер для практики SQL: 125 завдань, розкладених по 8 рівнях, з бізнес-контекстом і трьома підказками. Після перевірки тренажер демонструє вердикт — правильно чи ні. Варіант правильного запиту з поясненнями можна також переглянути, натиснувши кнопку «Показати відповідь».
@@ -272,7 +276,7 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 
 Інтерфейс, усі 125 завдань і теорія доступні трьома мовами: англійською, іспанською та українською. Мову обирають у випадному списку в правому верхньому куті шапки — сторінка перемикається одразу, без перезавантаження, а прогрес лишається на місці.
 
-Тренажер запам'ятовує вибір, а мова також видна в адресі: `#/en/`, `#/es/`, `#/uk/`. Таким посиланням можна поділитися — воно відкриється потрібною мовою. Під час першого відвідування тренажер відкривається англійською. SQL, назви таблиць і колонок та самі дані однакові в усіх мовах.
+Під час першого відвідування тренажер відкривається англійською. SQL, назви таблиць і колонок та самі дані однакові в усіх мовах.
 
 ### Як почати
 
@@ -323,7 +327,7 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 
 ### Сертифікат
 
-Хто пройде курс, отримує сертифікат, який можна зберегти в PDF. Сертифікатів два:
+У разі проходження усіх рівнів тренажеру можливе отримання сертифікату:
 
 - **Сертифікат** — розв'язано щонайменше 90 % завдань кожного рівня (14 із 15, на рівні 3 — 18 із 20).
 - **Сертифікат з відзнакою** — розв'язано всі 125 завдань, і жодного разу не натиснуто «Показати відповідь».
