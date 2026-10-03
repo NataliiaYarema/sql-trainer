@@ -168,7 +168,7 @@ export default {
   'certificate.notYet': 'Сертифіката ще немає',
   'certificate.rule':
     "Розв'яжи щонайменше 90 % завдань кожного рівня — і отримаєш сертифікат. Розв'яжи всі {total} без жодної підглянутої відповіді — і він буде з відзнакою.",
-  'certificate.levelsReady': 'Готово рівнів: {ready} з {total}',
+  'certificate.levelsReady': 'Пройдено рівнів: {ready} з {total}',
   'certificate.levelMissing': {
     one: 'ще {count} завдання',
     few: 'ще {count} завдання',
