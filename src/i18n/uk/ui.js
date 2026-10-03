@@ -174,7 +174,7 @@ export default {
     few: 'ще {count} завдання',
     many: 'ще {count} завдань',
   },
-  'certificate.fileTitle': 'Сертифікат SQL для дата-аналітика',
+  'certificate.fileTitle': 'Сертифікат SQL дата-аналітика',
   'certificate.levelDone': 'готово',
   'certificate.distinctionOpen': 'Відзнака ще досяжна: жодної підглянутої відповіді.',
   'certificate.distinctionLost': 'Відзнака вже недосяжна: у курсі є підглянуті відповіді.',

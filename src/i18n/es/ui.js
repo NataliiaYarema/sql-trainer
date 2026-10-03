@@ -181,7 +181,7 @@ export default {
     one: 'falta {count} ejercicio',
     other: 'faltan {count} ejercicios',
   },
-  'certificate.fileTitle': 'Certificado de SQL para analistas de datos',
+  'certificate.fileTitle': 'Certificado SQL de analista de datos',
   'certificate.levelDone': 'listo',
   'certificate.distinctionOpen':
     'La distinción aún es posible: no se ha consultado ninguna solución.',
