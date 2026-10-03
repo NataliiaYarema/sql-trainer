@@ -162,7 +162,7 @@ export default {
       'Skeleton: SELECT p.category, SUM(oi.quantity * p.price) AS revenue FROM order_items oi JOIN products p ON ... GROUP BY p.category;',
     ],
     explanation:
-      'An expression inside an aggregate function is computed for each row separately, and only then are the results added up. SUM(quantity) * price would be a different calculation: it would multiply the total quantity by one price value rather than calculating quantity × price for each order line before summing.',
+      'An expression inside an aggregate function is computed for each row separately, and only then are the results added up. SUM(quantity) * price would be a different calculation: it would multiply the total quantity by one price value rather than calculating quantity × price for each order line before summing. In fact, PostgreSQL would not even run that query: price would have to appear in GROUP BY or inside an aggregate.',
   },
   'L3-customer-purchases': {
     title: 'What exactly the customer bought',
