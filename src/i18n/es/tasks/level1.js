@@ -132,7 +132,7 @@ export default {
       'Plantilla: SELECT product_name, price FROM products WHERE price BETWEEN 50 AND 150;',
     ],
     explanation:
-      'BETWEEN incluye los dos límites: equivale a price >= 50 AND price <= 150. Por eso, si el enunciado dice «de 50 a 150, ambos incluidos», BETWEEN encaja exactamente con lo que se pide. El orden de los límites también importa: BETWEEN 150 AND 50 no devuelve ninguna fila.',
+      'BETWEEN incluye los dos límites: equivale a price >= 50 AND price <= 150. Aquí se esconde el error típico: en el habla corriente «de 50 a 150» suele dejar fuera el límite de arriba, y entonces BETWEEN devuelve unas filas más de las esperadas. El orden de los límites también importa: BETWEEN 150 AND 50 no devuelve ninguna fila.',
   },
   'L1-two-categories': {
     title: 'Dos categorías en un solo filtro',
