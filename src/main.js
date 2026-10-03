@@ -175,6 +175,7 @@ function flushPending() {
 // кнопка «назад» ходила б по вже показаних екранах замість виходу зі сторінки.
 function setRoute(screen) {
   currentScreenName = screen;
+  document.title = pageTitle();
   const route = routeFor(getLanguage(), screen);
   if (window.location.hash === route) return;
   window.history.replaceState(null, '', route);
@@ -194,9 +195,17 @@ function screenForRoute(screen) {
 // Текст, який лежить просто в index.html: його не малює жоден рендер, тому
 // після зміни мови його треба підмінити руками. Атрибут lang на <html> — теж
 // частина цього: за ним браузер вибирає переноси й голос читалки.
+// Заголовок вкладки браузер пропонує назвою файлу, коли сертифікат
+// зберігають у PDF, тому на екрані сертифіката він свій. Тримається в одній
+// функції: його ставить і setRoute (зміна екрана), і applyStaticText (зміна
+// мови), і розійтися вони не можуть.
+function pageTitle() {
+  return t(currentScreenName === 'certificate' ? 'certificate.fileTitle' : 'app.title');
+}
+
 function applyStaticText() {
   document.documentElement.lang = getLanguage();
-  document.title = t('app.title');
+  document.title = pageTitle();
   qs('#brand-title').textContent = t('app.brand');
   qs('#brand-subtitle').textContent = t('app.subtitle');
   qs('#editor-label').textContent = t('editor.label');
