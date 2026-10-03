@@ -1,6 +1,8 @@
 import { icon, escapeHtml, dedent } from '../utils/dom.js';
 import { highlightSql } from './sqlHighlight.js';
 import { t } from '../i18n/index.js';
+import { openLinkHtml } from './certificate.js';
+import { bindNav } from './progressBar.js';
 
 // Фрази беруться зі словника при кожному показі, а не один раз на завантаження
 // модуля: інакше після зміни мови вікно перевірки лишалося б попередньою.
@@ -35,12 +37,19 @@ function solutionBlock(task) {
 // Вікно перевірки — це вирок, а не розбір: сама фраза й нічого більше.
 // Пояснення завдання й еталонний запит лишилися там, де користувач просить їх
 // свідомо: у renderGiveUp. Через це обидві функції не потребують task.
-export function renderSuccess(root) {
+//
+// Кнопка сертифіката — єдине, що може з'явитися під фразою, і лише в момент
+// видачі (onOpenCertificate приходить тільки тоді, коли registerSolved щойно
+// видав чи підвищив сертифікат).
+export function renderSuccess(root, { onOpenCertificate } = {}) {
   root.innerHTML = `
     <div class="feedback feedback--success">
       <div class="feedback__head">${icon('i-check')}${escapeHtml(pick(successPhrases()))}</div>
+      ${onOpenCertificate ? `<div class="feedback__action">${openLinkHtml(t('certificate.get'))}</div>` : ''}
     </div>
   `;
+  if (onOpenCertificate)
+    bindNav(root.querySelector('[data-action="certificate"]'), onOpenCertificate);
 }
 
 export function renderFailure(root) {

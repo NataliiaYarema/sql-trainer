@@ -129,7 +129,7 @@ export function fitCertificateLevels(root) {
 }
 
 // Посилання, а не кнопка: як пункти шапки, його можна відкрити новою вкладкою.
-function openLinkHtml(label) {
+export function openLinkHtml(label) {
   return `
     <a class="btn btn--primary" href="${routeFor(getLanguage(), 'certificate')}" data-action="certificate">
       ${icon('i-award')}${escapeHtml(label)}

@@ -1,14 +1,17 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 import { t } from '../i18n/index.js';
+import { certificateProgressHtml } from './certificate.js';
+import { bindNav } from './progressBar.js';
 
-// levels: [{ level, name, total, solved, noteCount }]
-export function levelSelectHtml(levels) {
+// levels: [{ level, name, total, solved, noteCount }]; certificate: { status, record } | undefined
+export function levelSelectHtml(levels, certificate) {
   return `
     <div class="level-select">
       <h2 class="level-select__title">${escapeHtml(t('levelSelect.title'))}</h2>
       <div class="level-select__grid">
         ${levels.map(levelCardHtml).join('')}
       </div>
+      ${certificate ? certificateProgressHtml({ ...certificate, compact: true }) : ''}
     </div>
   `;
 }
@@ -36,11 +39,13 @@ function levelCardHtml({ level, name, total, solved, noteCount }) {
 // Обробники приходять об'єктом, а не позиційними аргументами: кнопок на екрані
 // вже три, і четвертий поспіль колбек читався б як загадка.
 // Кнопки «Мій прогрес» і «Мої нотатки» переїхали в шапку, тож тут лишився
-// єдиний обробник — вибір рівня.
-export function renderLevelSelect(root, levels, onPick) {
-  root.innerHTML = levelSelectHtml(levels);
+// єдиний обробник — вибір рівня. Картка сертифіката — ще один необов'язковий
+// вхід, тому onOpenCertificate теж приходить об'єктом, а не позиційно.
+export function renderLevelSelect(root, levels, onPick, { certificate, onOpenCertificate } = {}) {
+  root.innerHTML = levelSelectHtml(levels, certificate);
 
   root.querySelectorAll('[data-level]').forEach((card) => {
     card.addEventListener('click', () => onPick(Number(card.dataset.level)));
   });
+  bindNav(root.querySelector('[data-action="certificate"]'), () => onOpenCertificate?.());
 }

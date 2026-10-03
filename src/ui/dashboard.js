@@ -1,6 +1,8 @@
 import { icon, escapeHtml } from '../utils/dom.js';
 import { askConfirm } from './confirmDialog.js';
 import { t, formatNumber } from '../i18n/index.js';
+import { certificateProgressHtml } from './certificate.js';
+import { bindNav } from './progressBar.js';
 
 function panelHtml(title, body) {
   return `
@@ -156,7 +158,7 @@ function hardTasksHtml(hardTasks) {
   return panelHtml(t('dashboard.hardTasks'), `<ul class="hard-task-list">${rows}</ul>`);
 }
 
-export function dashboardHtml(metrics) {
+export function dashboardHtml(metrics, certificate) {
   // Кнопки немає, коли очищати нічого. Крім розв'язаних дивимося й на дні
   // активності: відкрите завдання лишає слід у журналі ще до розв'язання,
   // тож написана чернетка не зникне з-під кнопки непомітно.
@@ -169,6 +171,7 @@ export function dashboardHtml(metrics) {
       </div>
       <h2 class="dashboard__title">${escapeHtml(t('dashboard.title'))}</h2>
       ${summaryHtml(metrics.summary, metrics.lastActivity)}
+      ${certificate ? certificateProgressHtml({ ...certificate, compact: false }) : ''}
       ${masteredSkillsHtml(metrics.masteredSkills)}
       ${errorTopicsHtml(metrics.errorTopics)}
       ${hardTasksHtml(metrics.hardTasks)}
@@ -191,7 +194,7 @@ export function dashboardHtml(metrics) {
 }
 
 export function renderDashboard(root, metrics, handlers) {
-  root.innerHTML = dashboardHtml(metrics);
+  root.innerHTML = dashboardHtml(metrics, handlers.certificate);
 
   // Одне прив'язування на всі кнопки переходу: «Продовжити», «потренувати» й
   // «Перейти» роблять те саме — відкривають конкретне завдання.
@@ -212,4 +215,6 @@ export function renderDashboard(root, metrics, handlers) {
   });
 
   root.querySelector('[data-action="to-home"]').addEventListener('click', handlers.onToHome);
+
+  bindNav(root.querySelector('[data-action="certificate"]'), () => handlers.onOpenCertificate?.());
 }

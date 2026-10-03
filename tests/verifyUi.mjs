@@ -1161,6 +1161,30 @@ check(
   !screenNotYet.includes('cert-sheet') && screenNotYet.includes(t('certificate.notYet'))
 );
 
+// --- Точки входу: головна, дашборд, вікно успіху ---
+const certData = { status: notYetStatus, record: null };
+check('головна: картка сертифіката', levelSelectHtml([], certData).includes('cert-card'));
+check('головна без даних — без картки', !levelSelectHtml([]).includes('cert-card'));
+check('головна: картка компактна', !levelSelectHtml([], certData).includes('cert-card__levels'));
+const dashWithCert = dashboardHtml(
+  {
+    summary: { solved: 0, total: 125, activeDays: 0 },
+    lastActivity: null,
+    masteredSkills: [],
+    errorTopics: [],
+    hardTasks: [],
+  },
+  certData
+);
+check('дашборд: детальна картка сертифіката', dashWithCert.includes('cert-card__levels'));
+
+const okRoot = fakeRoot();
+renderSuccess(okRoot);
+check(
+  'успіх без сертифіката — без кнопки',
+  !okRoot.innerHTML.includes('data-action="certificate"')
+);
+
 check('маршрут сертифіката збирається', routeFor('es', 'certificate') === '#/es/certificate');
 check('маршрут сертифіката розбирається', parseRoute('#/en/certificate').screen === 'certificate');
 

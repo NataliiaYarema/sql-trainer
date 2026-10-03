@@ -236,6 +236,10 @@ const navHandlers = {
   onPickLanguage: applyLanguage,
 };
 
+function certificateData() {
+  return { status: gameState.certificateStatus(), record: gameState.certificate };
+}
+
 function pickStartIndex() {
   const firstUnsolved = levelTasks.findIndex((t) => !gameState.isSolved(t.id));
   return firstUnsolved === -1 ? 0 : firstUnsolved;
@@ -386,8 +390,10 @@ async function handleCheck() {
     if (!gameState.isSolved(task.id)) {
       eventLog.record('solved', task.id, { ms: Date.now() - taskOpenedAt });
     }
-    gameState.registerSolved(task);
-    if (currentIndex === startedAt) renderSuccess(roots.feedback);
+    const award = gameState.registerSolved(task);
+    if (currentIndex === startedAt) {
+      renderSuccess(roots.feedback, award ? { onOpenCertificate: showCertificate } : {});
+    }
   } else {
     eventLog.record('attempt', task.id, { r: comparison.code });
     if (currentIndex === startedAt) renderFailure(roots.feedback);
@@ -555,7 +561,8 @@ function showLevelSelect() {
       solved: gameState.solvedCountForLevel(level),
       noteCount: gameState.notedCountForLevel(level),
     })),
-    openLevel
+    openLevel,
+    { certificate: certificateData(), onOpenCertificate: showCertificate }
   );
   renderTheoryList(roots.theory, localizedTopics, showTheory);
   repaint = () => showLevelSelect();
@@ -695,6 +702,8 @@ function showDashboard() {
       showDashboard();
     },
     onToHome: showLevelSelect,
+    certificate: certificateData(),
+    onOpenCertificate: showCertificate,
   });
   repaint = () => showDashboard();
 }
