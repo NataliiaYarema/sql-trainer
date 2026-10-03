@@ -4,6 +4,7 @@ import {
   nextCertificate,
   localDateString,
   isCertificateRecord,
+  isPeeked,
 } from './certificate.js';
 
 // Чернетки лежать у тому самому ключі localStorage, що й прогрес. Без обмеження
@@ -112,9 +113,12 @@ export class GameState {
 
   // Слід підглядання не стирається розв'язанням: інакше «спершу подивитися
   // відповідь, потім ввести її» нічим не відрізнялося б від самостійного
-  // розв'язання, і сертифікат з відзнакою нічого б не означав.
+  // розв'язання, і сертифікат з відзнакою нічого б не означав. isPeeked
+  // враховує й легасі записи { status: 'revealed' } без явного peeked —
+  // такі збереглися з часів до появи цього прапорця.
   registerSolved(task, today = localDateString()) {
-    const peeked = this.data.solved[task.id]?.peeked === true;
+    const prev = this.data.solved[task.id];
+    const peeked = isPeeked(prev);
     this.data.solved[task.id] = { status: 'solved', level: task.level, ...(peeked && { peeked }) };
     const change = this.updateCertificate(today);
     this.persist();

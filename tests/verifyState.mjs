@@ -286,6 +286,32 @@ check('зламаний запис сертифіката відкидаєтьс
 store['sqlTrainer:v1:state'] = JSON.stringify({ schemaVersion: 1, solved: {} });
 check('старий стан без сертифіката завантажується', new GameState(tasks).certificate === null);
 
+// Легасі запис { status: 'revealed' } без прапорця peeked — зі сховища,
+// заповненого до появи цього прапорця. registerSolved мусить розпізнати
+// в ньому підглядання і через statusOf/status === 'revealed', а не лише
+// через record.peeked, інакше розв'язання такого завдання виглядало б
+// самостійним і давало б право на відзнаку.
+store['sqlTrainer:v1:state'] = JSON.stringify({
+  schemaVersion: 1,
+  solved: { A1: { status: 'revealed', level: 1 } },
+});
+const legacyRevealed = new GameState(tasks);
+check(
+  'легасі "revealed" без peeked зі сховища читається як є',
+  legacyRevealed.data.solved.A1.peeked === undefined
+);
+legacyRevealed.registerSolved(tasks[0], '2026-10-01');
+check(
+  'розв\'язання легасі "revealed" ставить peeked',
+  legacyRevealed.data.solved.A1.peeked === true
+);
+legacyRevealed.registerSolved(tasks[1], '2026-10-01');
+const legacyAward = legacyRevealed.registerSolved(tasks[2], '2026-10-01');
+check(
+  "усе розв'язано, але легасі підглядання не дає відзнаки",
+  legacyAward === 'awarded' && legacyRevealed.certificate.tier === 'basic'
+);
+
 delete globalThis.localStorage;
 
 console.log(

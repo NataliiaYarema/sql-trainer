@@ -1,6 +1,6 @@
 import { escapeHtml, icon } from '../utils/dom.js';
 import { t, levelName, getLanguage } from '../i18n/index.js';
-import { routeFor, bindNav } from './progressBar.js';
+import { routeFor } from './progressBar.js';
 
 // Аркуш верстається в розмірі A4 альбомно при 96 dpi і на екрані лише
 // масштабується. Так підбір шрифту рівнів робиться один раз, і PDF збігається
@@ -228,11 +228,16 @@ function scaleSheet(root) {
   stage.style.setProperty('--cert-scale', String(stage.clientWidth / SHEET_WIDTH));
 }
 
+// Один спостерігач на модуль: кожен renderCertificateScreen перемальовує
+// .cert-stage новим вузлом, і без disconnect() старі спостерігачі лишалися б
+// висіти на вже викинутих з DOM елементах і накопичувалися б із кожним
+// переходом на екран сертифіката.
+let stageResizeObserver = null;
+
 // Ім'я на аркуші оновлюється без перерендеру: перемальований input втратив
 // би фокус і курсор посеред набору (та сама причина, що на екрані нотаток).
 export function renderCertificateScreen(root, data, handlers) {
   root.innerHTML = certificateScreenHtml(data);
-  bindNav(root.querySelector('[data-action="certificate"]'), () => handlers.onOpen?.());
 
   const input = root.querySelector('[data-action="cert-name"]');
   if (!input) return;
@@ -247,5 +252,7 @@ export function renderCertificateScreen(root, data, handlers) {
   fitCertificateLevels(root);
   // Шрифти доїжджають асинхронно, і до того ширина тексту інша.
   document.fonts?.ready.then(() => fitCertificateLevels(root));
-  new ResizeObserver(() => scaleSheet(root)).observe(root.querySelector('.cert-stage'));
+  stageResizeObserver?.disconnect();
+  stageResizeObserver = new ResizeObserver(() => scaleSheet(root));
+  stageResizeObserver.observe(root.querySelector('.cert-stage'));
 }

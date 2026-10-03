@@ -736,7 +736,7 @@ function showCertificate() {
       name: loadCertName(),
       lang: getLanguage(),
     },
-    { onNameChange: saveCertName, onOpen: showCertificate }
+    { onNameChange: saveCertName }
   );
   repaint = () => showCertificate();
 }

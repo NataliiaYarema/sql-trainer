@@ -3,6 +3,7 @@ import {
   nextCertificate,
   localDateString,
   isCertificateRecord,
+  isPeeked,
 } from '../src/game/certificate.js';
 
 let failures = 0;
@@ -57,6 +58,27 @@ const revealedOnly = {
 };
 s = certificateStatus(tasks, revealedOnly);
 check("лише підглянуте не рахується розв'язаним", s.perLevel[0].solved === 14);
+
+// Легасі запис «подивився відповідь» зберігався до появи прапорця peeked
+// лише як { status: 'revealed' }. isPeeked і certificateStatus мусять
+// визнавати його підглядом і без явного peeked — інакше стара відмітка
+// мовчки відкривала б відзнаку.
+check(
+  'isPeeked визнає легасі revealed без прапорця',
+  isPeeked({ status: 'revealed', level: 1 }) === true
+);
+check('isPeeked не плутає новий "new" запис із підгляданням', isPeeked({ status: 'new' }) !== true);
+check('isPeeked на відсутньому записі — не підглянуто', isPeeked(undefined) !== true);
+
+const legacyRevealedNoFlag = {
+  ...solvedOf([...first('a', 15), ...first('b', 20)]),
+  a0: { status: 'revealed', level: 1 },
+};
+s = certificateStatus(tasks, legacyRevealedNoFlag);
+check(
+  'легасі "revealed" без peeked теж робить відзнаку недосяжною',
+  s.distinctionPossible === false
+);
 
 const solvedUnknown = { zz: { status: 'solved', level: 1 } };
 check('записи поза банком ігноруються', certificateStatus(tasks, solvedUnknown).solvedTotal === 0);

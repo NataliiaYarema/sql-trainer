@@ -32,7 +32,8 @@ export function certificateStatus(tasks, solved) {
   const total = perLevel.reduce((sum, l) => sum + l.total, 0);
   // Підглянуте рахується й тоді, коли завдання потім розв'язали: слід
   // підглядання лишається в записі назавжди (див. GameState.registerSolved).
-  const distinctionPossible = !tasks.some((task) => solved[task.id]?.peeked);
+  // isPeeked ще й визнає легасі { status: 'revealed' } без прапорця peeked.
+  const distinctionPossible = !tasks.some((task) => isPeeked(solved[task.id]));
 
   let tier = null;
   if (solvedTotal === total && total > 0 && distinctionPossible) tier = 'distinction';
@@ -54,6 +55,14 @@ export function nextCertificate(current, tier, today) {
 export function localDateString(date = new Date()) {
   const pad = (n) => String(n).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+// Легасі записи «подивився відповідь» зберігалися лише як { status: 'revealed' },
+// без поля peeked — воно з'явилося пізніше. Рахуємо їх підглянутими й тут,
+// і при повторному розв'язанні (GameState.registerSolved): інакше стара
+// відмітка непомітно давала б право на відзнаку, хоча відповідь уже бачили.
+export function isPeeked(record) {
+  return record?.peeked === true || record?.status === 'revealed';
 }
 
 export function isCertificateRecord(value) {
