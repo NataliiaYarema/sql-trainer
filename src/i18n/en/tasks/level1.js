@@ -130,7 +130,7 @@ export default {
       'Skeleton: SELECT product_name, price FROM products WHERE price BETWEEN 50 AND 150;',
     ],
     explanation:
-      'BETWEEN includes both bounds: it is equivalent to price >= 50 AND price <= 150. The order of the bounds matters too: BETWEEN 150 AND 50 does not describe the intended range and will not match these prices.',
+      'BETWEEN includes both bounds: it is equivalent to price >= 50 AND price <= 150. This is where a typical mistake hides: in everyday speech “from 50 to 150” often leaves out the upper bound, and then BETWEEN returns a few more rows than expected. The order of the bounds matters too: BETWEEN 150 AND 50 does not describe the intended range and will not match these prices.',
   },
   'L1-two-categories': {
     title: 'Two categories in one filter',
