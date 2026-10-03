@@ -7,13 +7,20 @@ import { isLang, getLanguage, t, LANGS, LANG_NAMES } from '../i18n/index.js';
 // Мова — перший сегмент: посиланням на конкретну мову можна поділитися, і
 // перезавантаження її не губить. Другий сегмент — екран, і назви лишилися ті
 // самі, що були до появи мови, тому стара закладка виду #/notes не ламається.
-const SEGMENTS = { home: '', sandbox: 'sandbox', dashboard: 'progress', notes: 'notes' };
+const SEGMENTS = {
+  home: '',
+  sandbox: 'sandbox',
+  dashboard: 'progress',
+  notes: 'notes',
+  certificate: 'certificate',
+};
 
 const SCREEN_BY_SEGMENT = {
   '': 'home',
   sandbox: 'sandbox',
   progress: 'dashboard',
   notes: 'notes',
+  certificate: 'certificate',
 };
 
 export function routeFor(lang, screen) {

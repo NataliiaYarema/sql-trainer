@@ -3,6 +3,7 @@ import './styles/main.css';
 // на сертифікаті впало б на системний шрифт. @font-face браузер вантажить лише
 // тоді, коли шрифт ужито, тож на інших екранах файли не тягнуться.
 import '@fontsource/montserrat/500.css';
+import '@fontsource/montserrat/500-italic.css';
 import '@fontsource/montserrat/700.css';
 import '@fontsource/montserrat/800.css';
 import '@fontsource/marck-script/400.css';
@@ -26,6 +27,7 @@ import { renderNotesScreen } from './ui/notesScreen.js';
 import { computeMetrics } from './analytics/metrics.js';
 import { skillsForLevel } from './tasks/skills.js';
 import { renderDashboard } from './ui/dashboard.js';
+import { renderCertificateScreen } from './ui/certificate.js';
 import { renderLevelComplete } from './ui/levelComplete.js';
 import { topicsFor } from './theory/topics.js';
 import { renderTheoryList } from './ui/theoryList.js';
@@ -39,6 +41,8 @@ import {
   clearSandboxSql,
   loadLang,
   saveLang,
+  loadCertName,
+  saveCertName,
 } from './game/persistence.js';
 import {
   renderSuccess,
@@ -180,6 +184,7 @@ function setRoute(screen) {
 // тому невідомий hash так само веде на головну. Мову з адреси розбирає
 // parseRoute; сюди приходить уже лише назва екрана.
 function screenForRoute(screen) {
+  if (screen === 'certificate') return showCertificate;
   if (screen === 'sandbox') return showSandbox;
   if (screen === 'dashboard') return showDashboard;
   if (screen === 'notes') return showNotes;
@@ -227,6 +232,7 @@ const navHandlers = {
   onOpenDashboard: () => showDashboard(),
   onOpenNotes: () => showNotes(),
   onOpenSandbox: () => showSandbox(),
+  onOpenCertificate: () => showCertificate(),
   onPickLanguage: applyLanguage,
 };
 
@@ -691,6 +697,31 @@ function showDashboard() {
     onToHome: showLevelSelect,
   });
   repaint = () => showDashboard();
+}
+
+// За зразком showDashboard: та сама панель, робоча панель схована.
+function showCertificate() {
+  flushPending();
+  setRoute('certificate');
+  activeLevel = null;
+  levelTasks = [];
+  clearTaskPanels();
+  roots.workPanel.hidden = true;
+  roots.layout.classList.add('layout--single');
+
+  renderProgress(roots.progress, { showBack: true }, navHandlers);
+  bindBackHome(roots.progress, showLevelSelect);
+  renderCertificateScreen(
+    roots.taskCard,
+    {
+      status: gameState.certificateStatus(),
+      record: gameState.certificate,
+      name: loadCertName(),
+      lang: getLanguage(),
+    },
+    { onNameChange: saveCertName, onOpen: showCertificate }
+  );
+  repaint = () => showCertificate();
 }
 
 // На відміну від нотаток і дашборда, робоча панель лишається видимою: саме в

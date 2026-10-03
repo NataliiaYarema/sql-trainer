@@ -1,5 +1,6 @@
-import { escapeHtml } from '../utils/dom.js';
-import { t, levelName } from '../i18n/index.js';
+import { escapeHtml, icon } from '../utils/dom.js';
+import { t, levelName, getLanguage } from '../i18n/index.js';
+import { routeFor, bindNav } from './progressBar.js';
 
 // Аркуш верстається в розмірі A4 альбомно при 96 dpi і на екрані лише
 // масштабується. Так підбір шрифту рівнів робиться один раз, і PDF збігається
@@ -125,4 +126,126 @@ export function fitCertificateLevels(root) {
     else hi = mid;
   }
   levels.style.fontSize = `${lo}px`;
+}
+
+// Посилання, а не кнопка: як пункти шапки, його можна відкрити новою вкладкою.
+function openLinkHtml(label) {
+  return `
+    <a class="btn btn--primary" href="${routeFor(getLanguage(), 'certificate')}" data-action="certificate">
+      ${icon('i-award')}${escapeHtml(label)}
+    </a>
+  `;
+}
+
+// Одна картка на три місця: головний екран (compact), дашборд і екран
+// сертифіката без виконаної умови.
+export function certificateProgressHtml({ status, record, compact }) {
+  if (record) {
+    return `
+      <section class="panel cert-card cert-card--ready">
+        <h3 class="panel__title">${icon('i-award')}${escapeHtml(t('certificate.ready'))}</h3>
+        ${openLinkHtml(t('certificate.open'))}
+      </section>
+    `;
+  }
+
+  const ready = status.perLevel.filter((l) => l.missing === 0).length;
+  const rows = compact
+    ? ''
+    : `<ul class="cert-card__levels">
+        ${status.perLevel
+          .map(
+            (l) => `
+          <li>
+            <span>${escapeHtml(levelName(l.level))}</span>
+            <span class="${l.missing === 0 ? 'cert-card__done' : ''}">${escapeHtml(
+              l.missing === 0
+                ? t('certificate.levelDone')
+                : t('certificate.levelMissing', { count: l.missing })
+            )}</span>
+          </li>`
+          )
+          .join('')}
+      </ul>
+      <p class="cert-card__note">${escapeHtml(
+        t(
+          status.distinctionPossible ? 'certificate.distinctionOpen' : 'certificate.distinctionLost'
+        )
+      )}</p>`;
+
+  return `
+    <section class="panel cert-card">
+      <h3 class="panel__title">${icon('i-award')}${escapeHtml(t('nav.certificate'))}</h3>
+      <p class="cert-card__rule">${escapeHtml(t('certificate.rule', { total: status.total }))}</p>
+      <p class="cert-card__ready">${escapeHtml(
+        t('certificate.levelsReady', { ready, total: status.perLevel.length })
+      )}</p>
+      ${rows}
+    </section>
+  `;
+}
+
+export function certificateScreenHtml({ status, record, name, lang }) {
+  if (!record) {
+    return `
+      <div class="cert-screen">
+        <h2 class="dashboard__title">${escapeHtml(t('certificate.notYet'))}</h2>
+        ${certificateProgressHtml({ status, record, compact: false })}
+      </div>
+    `;
+  }
+
+  return `
+    <div class="cert-screen">
+      <div class="cert-controls">
+        <label class="cert-controls__label">
+          ${escapeHtml(t('certificate.nameLabel'))}
+          <input class="cert-controls__input" data-action="cert-name" maxlength="80"
+                 value="${escapeHtml(name)}" placeholder="${escapeHtml(t('certificate.namePlaceholder'))}">
+        </label>
+        <button class="btn btn--primary" data-action="cert-print">
+          ${escapeHtml(t('certificate.save'))}
+        </button>
+      </div>
+      <div class="cert-stage">
+        ${certificateSheetHtml({
+          tier: record.tier,
+          name,
+          date: record.date,
+          lang,
+          perLevel: status.perLevel,
+          solvedTotal: status.solvedTotal,
+          total: status.total,
+        })}
+      </div>
+    </div>
+  `;
+}
+
+function scaleSheet(root) {
+  const stage = root.querySelector('.cert-stage');
+  if (!stage) return;
+  stage.style.setProperty('--cert-scale', String(stage.clientWidth / SHEET_WIDTH));
+}
+
+// Ім'я на аркуші оновлюється без перерендеру: перемальований input втратив
+// би фокус і курсор посеред набору (та сама причина, що на екрані нотаток).
+export function renderCertificateScreen(root, data, handlers) {
+  root.innerHTML = certificateScreenHtml(data);
+  bindNav(root.querySelector('[data-action="certificate"]'), () => handlers.onOpen?.());
+
+  const input = root.querySelector('[data-action="cert-name"]');
+  if (!input) return;
+  const nameEl = root.querySelector('.cert-name');
+  input.addEventListener('input', () => {
+    nameEl.textContent = input.value;
+    handlers.onNameChange(input.value);
+  });
+  root.querySelector('[data-action="cert-print"]').addEventListener('click', () => window.print());
+
+  scaleSheet(root);
+  fitCertificateLevels(root);
+  // Шрифти доїжджають асинхронно, і до того ширина тексту інша.
+  document.fonts?.ready.then(() => fitCertificateLevels(root));
+  new ResizeObserver(() => scaleSheet(root)).observe(root.querySelector('.cert-stage'));
 }

@@ -10,7 +10,12 @@ import { renderHints } from '../src/ui/hintPanel.js';
 import { renderResultTable, resultTableHtml } from '../src/ui/resultTable.js';
 import { progressHtml, routeFor, parseRoute, languageSelectHtml } from '../src/ui/progressBar.js';
 import { t, setLanguage, levelName, formatNumber, LANGS } from '../src/i18n/index.js';
-import { certificateSheetHtml, formatCertificateDate } from '../src/ui/certificate.js';
+import {
+  certificateSheetHtml,
+  formatCertificateDate,
+  certificateProgressHtml,
+  certificateScreenHtml,
+} from '../src/ui/certificate.js';
 import { notePanelHtml, saveButtonLabel } from '../src/ui/notePanel.js';
 import { notesScreenHtml } from '../src/ui/notesScreen.js';
 import { sandboxControlsHtml, sandboxSchemaHtml } from '../src/ui/sandbox.js';
@@ -1079,6 +1084,86 @@ check(
 );
 check('аркуш: немає номера й VERIFIED', !/VERIFIED|№/.test(distinctionSheet + basicSheet));
 
+// --- Картка прогресу й екран сертифіката ---
+const notYetStatus = {
+  tier: null,
+  perLevel: LEVELS.map((level) => ({
+    level,
+    solved: 3,
+    total: 15,
+    need: 14,
+    missing: level === 1 ? 0 : 11,
+  })),
+  solvedTotal: 24,
+  total: 125,
+  distinctionPossible: true,
+};
+const progressNotYet = certificateProgressHtml({
+  status: notYetStatus,
+  record: null,
+  compact: false,
+});
+check('прогрес: є правило', progressNotYet.includes(t('certificate.rule', { total: 125 })));
+check(
+  'прогрес: готові рівні',
+  progressNotYet.includes(t('certificate.levelsReady', { ready: 1, total: LEVELS.length }))
+);
+check(
+  'прогрес: скільки бракує',
+  progressNotYet.includes(t('certificate.levelMissing', { count: 11 }))
+);
+check('прогрес: відзнака ще досяжна', progressNotYet.includes(t('certificate.distinctionOpen')));
+check(
+  'прогрес без сертифіката — без посилання',
+  !progressNotYet.includes('data-action="certificate"')
+);
+const compactNotYet = certificateProgressHtml({
+  status: notYetStatus,
+  record: null,
+  compact: true,
+});
+check(
+  'компактна картка без переліку рівнів',
+  !compactNotYet.includes(t('certificate.levelMissing', { count: 11 }))
+);
+const progressReady = certificateProgressHtml({
+  status: { ...notYetStatus, tier: 'basic' },
+  record: { tier: 'basic', date: '2026-10-03' },
+  compact: true,
+});
+check(
+  'отримано: «готовий» і посилання',
+  progressReady.includes(t('certificate.ready')) &&
+    progressReady.includes('data-action="certificate"')
+);
+check('посилання веде на маршрут сертифіката', progressReady.includes('/certificate"'));
+
+const screenReady = certificateScreenHtml({
+  status: { ...notYetStatus, tier: 'basic' },
+  record: { tier: 'basic', date: '2026-10-03' },
+  name: 'Ada',
+  lang: 'uk',
+});
+check(
+  'екран: поле імені й кнопка друку',
+  screenReady.includes('data-action="cert-name"') &&
+    screenReady.includes('data-action="cert-print"')
+);
+check('екран: аркуш на місці', screenReady.includes('cert-sheet'));
+const screenNotYet = certificateScreenHtml({
+  status: notYetStatus,
+  record: null,
+  name: '',
+  lang: 'uk',
+});
+check(
+  'екран без сертифіката — без аркуша',
+  !screenNotYet.includes('cert-sheet') && screenNotYet.includes(t('certificate.notYet'))
+);
+
+check('маршрут сертифіката збирається', routeFor('es', 'certificate') === '#/es/certificate');
+check('маршрут сертифіката розбирається', parseRoute('#/en/certificate').screen === 'certificate');
+
 // Замок на забутий літерал. Перелічені розмітки складаються лише з підписів
 // інтерфейсу — ні умов завдань, ні текстів теорії в них немає, тому жодної
 // кирилиці в англійському та іспанському прогоні бути не може.
@@ -1143,6 +1228,14 @@ const withoutLangSelect = (html) => html.replace(/<select[\s\S]*?<\/select>/g, '
     ['смужка завдань', taskNavHtml([{ index: 0, status: 'new', hasNote: false }], 0)],
     ['аркуш з відзнакою', certificateSheetHtml({ ...sheetArgs('distinction', 'Ada'), lang })],
     ['звичайний аркуш', certificateSheetHtml({ ...sheetArgs('basic', 'Ada'), lang })],
+    [
+      'прогрес сертифіката',
+      certificateProgressHtml({ status: notYetStatus, record: null, compact: false }),
+    ],
+    [
+      'екран без сертифіката',
+      certificateScreenHtml({ status: notYetStatus, record: null, name: '', lang }),
+    ],
   ].forEach(([where, html]) => {
     const found = html.match(CYRILLIC);
     check(`${lang}: ${where} без української${found ? ` (${found[0]})` : ''}`, found === null);

@@ -198,9 +198,88 @@
   right: 67px;
   bottom: 40px;
   font-size: 15px;
+  font-weight: 500;
   color: #5b6478;
 }
 
 .cert-date b {
   color: var(--navy);
+}
+
+.cert-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cert-controls {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.cert-controls__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text-muted);
+  flex: 1 1 260px;
+}
+
+.cert-controls__input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font: inherit;
+}
+
+.cert-card__levels {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  display: grid;
+  gap: 4px;
+}
+
+.cert-card__levels li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cert-card__done {
+  color: var(--success);
+}
+
+.cert-card__note,
+.cert-card__rule {
+  color: var(--text-muted);
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .cert-sheet,
+  .cert-sheet * {
+    visibility: visible;
+  }
+
+  .cert-sheet {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
