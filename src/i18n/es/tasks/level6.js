@@ -10,28 +10,26 @@ export default {
       'En personal preparan un informe del ritmo de contratación por año para planificar el presupuesto de selección del año que viene.',
     taskText: 'Cuenta cuántos empleados se contrataron cada año.',
     hints: [
-      'Hay que agrupar a los empleados no por la fecha exacta de contratación, sino por el año que se ve en ella.',
-      'EXTRACT(YEAR FROM ...) saca de una fecha solo el año como número, y por él sí se puede agrupar.',
+      'Hay que agrupar a los empleados no por la fecha exacta de contratación, sino por el año que aparece en ella.',
+      'EXTRACT(YEAR FROM ...) extrae de una fecha solo el año como número, y por él sí se puede agrupar.',
       'Plantilla: SELECT EXTRACT(YEAR FROM hire_date) AS hire_year, COUNT(*) AS hired FROM employees GROUP BY hire_year ORDER BY hire_year;',
     ],
     explanation:
-      'EXTRACT(YEAR FROM ...) convierte una fecha en un número: el año. Agrupar directamente por hire_date no tiene sentido: cada fecha es única, así que GROUP BY hire_date daría tantos grupos como filas y no saldría ningún total real por año.',
+      'EXTRACT(YEAR FROM ...) convierte una fecha en un número: el año. Agrupar directamente por hire_date no tiene sentido para este objetivo: en estos datos cada fecha de contratación es única, así que GROUP BY hire_date daría tantos grupos como filas y no obtendríamos un total por año.',
   },
-
   'L6-orders-by-weekday': {
     title: 'Días de la semana de los pedidos',
     context:
       'Un responsable de almacén quiere saber en qué días de la semana caen más pedidos para planificar los turnos del personal.',
     taskText: 'Cuenta el número de pedidos de cada día de la semana.',
     hints: [
-      'Hay que contar los pedidos no por una fecha concreta, sino por qué día de la semana es.',
+      'Hay que contar los pedidos no por una fecha concreta, sino por el día de la semana al que corresponde.',
       'EXTRACT(DOW FROM ...) devuelve el número del día de la semana de una fecha.',
       'Plantilla: SELECT EXTRACT(DOW FROM order_date) AS weekday, COUNT(*) AS orders_count FROM orders GROUP BY weekday ORDER BY weekday;',
     ],
     explanation:
-      'EXTRACT(DOW FROM ...) numera los días de la semana de cero a seis. La trampa es que el cero significa domingo y no lunes, como se espera de forma intuitiva, y por eso esta columna se malinterpreta a menudo en los informes y el fin de semana se atribuye a los días equivocados.',
+      'EXTRACT(DOW FROM ...) numera los días de la semana de cero a seis. La particularidad es que el cero significa domingo y no lunes, como se podría esperar intuitivamente, por lo que hay que tenerlo en cuenta al interpretar esta columna en un informe.',
   },
-
   'L6-revenue-by-month': {
     title: 'Ingresos por mes',
     context:
@@ -43,9 +41,8 @@ export default {
       "Plantilla: SELECT DATE_TRUNC('month', order_date) AS month, SUM(amount) AS revenue FROM orders GROUP BY month ORDER BY month;",
     ],
     explanation:
-      "DATE_TRUNC('month', ...) pone a cero todo lo más pequeño que un mes, así que el 3 y el 17 de enero se convierten en el mismo 2024-01-01 y caen en un solo grupo. Agrupar directamente por order_date no tiene sentido: casi siempre es única y GROUP BY no comprimiría nada.",
+      "DATE_TRUNC('month', ...) recorta la fecha al comienzo del mes, así que el 3 y el 17 de enero se convierten en el mismo 2024-01-01 y caen en un solo grupo. Agrupar directamente por order_date no permite obtener un total mensual, porque las fechas de distintos días formarían grupos distintos, y aquí las fechas de los pedidos son casi todas diferentes.",
   },
-
   'L6-trim-names': {
     title: 'Quitar los espacios de más',
     context:
@@ -57,9 +54,8 @@ export default {
       'Plantilla: SELECT contact_id, TRIM(raw_name) AS clean_name FROM raw_contacts ORDER BY contact_id;',
     ],
     explanation:
-      'TRIM quita espacios solo del principio y del final de la cadena y no toca lo que hay dentro. El contacto con id 3 tiene un espacio doble entre las palabras: TRIM no lo ve y en el resultado «Olena  Shevchenko» conserva sus dos espacios en medio.',
+      'TRIM quita espacios solo del principio y del final de la cadena y no modifica lo que hay dentro. El contacto con id 3 tiene un espacio doble entre las palabras, así que en el resultado «Olena  Shevchenko» conserva los dos espacios del medio.',
   },
-
   'L6-lower-emails': {
     title: 'El correo en un solo tipo de letra',
     context:
@@ -71,9 +67,8 @@ export default {
       'Plantilla: SELECT contact_id, LOWER(raw_email) AS email FROM raw_contacts ORDER BY contact_id;',
     ],
     explanation:
-      "La comparación de cadenas en SQL distingue mayúsculas: 'ANNA.K@Example.COM' = 'anna.k@example.com' devuelve falso, aunque para una persona sea la misma dirección. Por eso, antes de comparar o de buscar duplicados, las direcciones se llevan a un mismo caso, y LOWER es el recurso estándar.",
+      "En PostgreSQL la comparación de textos distingue mayúsculas y minúsculas: 'ANNA.K@Example.COM' = 'anna.k@example.com' devuelve falso, aunque para una persona sea la misma dirección. Para comparar direcciones ignorando esas diferencias, se pueden llevar primero todas a un mismo caso. LOWER es una forma habitual de normalizar el texto antes de comparar o buscar duplicados.",
   },
-
   'L6-contact-code': {
     title: 'Un código de contacto de ancho fijo',
     context:
@@ -86,9 +81,8 @@ export default {
       "Plantilla: SELECT LPAD(contact_id::TEXT, 4, '0') AS contact_code, LENGTH(TRIM(raw_name)) AS name_length FROM raw_contacts ORDER BY contact_id;",
     ],
     explanation:
-      'LPAD solo trabaja con texto, así que el número contact_id se pasa primero a texto con ::TEXT; si no, LPAD falla por tipos. LENGTH cuenta exactamente los caracteres, y si los espacios no se quitan antes con TRIM, también entran en el recuento de la longitud.',
+      'LPAD trabaja con texto, así que el número contact_id se convierte primero a texto con ::TEXT. LENGTH cuenta los caracteres de la cadena y, si los espacios no se eliminan antes con TRIM, también forman parte de la longitud.',
   },
-
   'L6-contact-signature': {
     title: 'La firma para el envío',
     context:
@@ -96,13 +90,12 @@ export default {
     taskText: 'Construye para cada contacto una firma de la forma «Nombre <correo>».',
     hints: [
       'Hay que armar un único campo de texto con el nombre ya limpio y la dirección de correo entre corchetes angulares.',
-      'El operador || pega cadenas en una sola.',
+      'El operador || concatena cadenas en una sola.',
       "Plantilla: SELECT contact_id, TRIM(raw_name) || ' <' || LOWER(raw_email) || '>' AS signature FROM raw_contacts ORDER BY contact_id;",
     ],
     explanation:
-      'El operador || va pegando todos sus operandos en una sola cadena. La trampa es que cualquier NULL entre los operandos convierte en NULL el resultado completo y no solo su parte, y por eso la concatenación de campos sin limpiar, donde puede haber valores vacíos, se suele asegurar con COALESCE.',
+      'El operador || va concatenando todos sus operandos en una sola cadena. Si alguno de ellos es NULL, el resultado completo también será NULL. Cuando los datos pueden contener valores NULL y se quiere evitar ese comportamiento, se puede recurrir a COALESCE.',
   },
-
   'L6-month-label': {
     title: 'El mes como etiqueta de texto',
     context:
@@ -110,14 +103,13 @@ export default {
     taskText:
       'Muestra los ingresos de cada mes etiquetando el mes con su nombre y el año, en orden cronológico.',
     hints: [
-      'El mes hay que etiquetarlo no con un número, sino con una palabra del estilo «January 2024», y las filas tienen que salir en orden de tiempo y no por alfabeto del nombre.',
-      "TO_CHAR(..., 'FMMonth YYYY') formatea una fecha como etiqueta de texto con el nombre del mes; el prefijo FM quita los espacios de relleno de más.",
+      'El mes hay que etiquetarlo no con un número, sino con una palabra del estilo «January 2024», y las filas tienen que salir en orden de tiempo y no por orden alfabético del nombre.',
+      "TO_CHAR(..., 'FMMonth YYYY') formatea una fecha como etiqueta de texto con el nombre del mes; el prefijo FM evita los espacios de relleno.",
       "Plantilla: SELECT TO_CHAR(order_date, 'FMMonth YYYY') AS month_label, SUM(amount) AS revenue FROM orders GROUP BY month_label ORDER BY MIN(order_date);",
     ],
     explanation:
-      'Sin el prefijo FM, TO_CHAR rellena el nombre del mes con espacios hasta una longitud igual, y FM lo evita. Ordenar por la propia etiqueta aquí no se puede: ORDER BY month_label daría orden alfabético —April, February, January—, así que las filas se ordenan por la fecha real con MIN(order_date).',
+      'Sin el prefijo FM, TO_CHAR puede rellenar el nombre del mes con espacios hasta una longitud fija, y FM evita ese relleno. Ordenar por la propia etiqueta daría un orden alfabético —April, February, January—, así que las filas se ordenan por la fecha real con MIN(order_date).',
   },
-
   'L6-quarter-summary': {
     title: 'Totales trimestrales',
     context:
@@ -125,13 +117,12 @@ export default {
     taskText: 'Para cada trimestre, muestra el número de pedidos y su importe total.',
     hints: [
       'Los pedidos hay que reducirlos al trimestre y no al mes, y calcular para cada uno tanto el número como la suma.',
-      "DATE_TRUNC('quarter', ...) recorta una fecha hasta el inicio del trimestre igual que 'month' la recorta hasta el inicio del mes.",
+      "DATE_TRUNC('quarter', ...) recorta una fecha hasta el inicio del trimestre, igual que 'month' la recorta hasta el inicio del mes.",
       "Plantilla: SELECT DATE_TRUNC('quarter', order_date) AS quarter, COUNT(*) AS orders_count, SUM(amount) AS revenue FROM orders GROUP BY quarter ORDER BY quarter;",
     ],
     explanation:
-      "DATE_TRUNC acepta distintas unidades de redondeo —'month', 'quarter', 'year', 'week'— y funciona con el mismo principio. El resultado para un trimestre no es un número del 1 al 4, sino una fecha: el primer día del primer mes del trimestre, así que el segundo trimestre de 2024 se etiqueta como 2024-04-01.",
+      "DATE_TRUNC acepta distintas unidades de redondeo —'month', 'quarter', 'year', 'week'— y funciona con el mismo principio. El resultado para un trimestre no es un número del 1 al 4, sino una fecha: el primer día del primer mes del trimestre. Por ejemplo, el segundo trimestre de 2024 se representa como 2024-04-01.",
   },
-
   'L6-return-deadline': {
     title: 'La fecha límite de devolución de un producto',
     context:
@@ -140,13 +131,12 @@ export default {
       'Para los pedidos a partir del 1 de junio de 2024 incluido, muestra el número, la fecha y la fecha en la que vence el plazo de devolución de 30 días.',
     hints: [
       'Para los pedidos no demasiado antiguos hay que mostrar su fecha y la fecha que llega 30 días después.',
-      "A una fecha se le puede sumar INTERVAL '30 days' y sale una fecha nueva 30 días más tarde.",
+      "A una fecha se le puede sumar INTERVAL '30 days' y se obtiene una fecha 30 días más tarde.",
       "Plantilla: SELECT order_id, order_date, order_date + INTERVAL '30 days' AS return_deadline FROM orders WHERE order_date >= DATE '2024-06-01' ORDER BY order_id;",
     ],
     explanation:
-      "A un DATE se le puede sumar un INTERVAL directamente: el resultado ya no es un DATE, sino una marca de tiempo, aunque la hora sea cero. La palabra DATE delante de un literal fija el tipo de forma explícita, y eso importa donde el tipo no puede deducirse de ningún sitio: '2024-6-1' > '2024-12-01' da verdadero, porque compara dos textos, mientras que DATE '2024-06-01' > '2024-12-01' da falso, porque aquí ya se comparan fechas.",
+      "A un DATE se le puede sumar un INTERVAL directamente. La expresión resultante es de tipo timestamp, aunque la hora sea cero. La palabra DATE delante de un literal fija explícitamente su tipo y evita tratarlo como texto, y eso importa donde el tipo no puede salir de ningún otro sitio: '2024-6-1' > '2024-12-01' da verdadero, porque se comparan dos textos, mientras que DATE '2024-06-01' > '2024-12-01' da falso, porque se comparan fechas.",
   },
-
   'L6-experience-at-date': {
     title: 'La antigüedad a cierre de año',
     context:
@@ -158,9 +148,8 @@ export default {
       "Plantilla: SELECT first_name, hire_date, AGE(DATE '2024-12-31', hire_date) AS experience FROM employees ORDER BY hire_date;",
     ],
     explanation:
-      "AGE con dos argumentos calcula la diferencia entre ellos, y con un solo argumento la diferencia entre ese y la fecha de hoy. La segunda forma no sirve para un informe: el resultado cambiaría cada día junto con la fecha actual, así que aquí la fecha de referencia se indica de forma explícita, DATE '2024-12-31'.",
+      "AGE con dos argumentos calcula la diferencia entre esas dos fechas, mientras que con un solo argumento calcula la diferencia entre la fecha indicada y la fecha actual. La segunda forma no sirve para un informe con una fecha de referencia fija: el resultado cambiaría con el paso del tiempo. Por eso aquí la fecha de referencia se indica explícitamente como DATE '2024-12-31'.",
   },
-
   'L6-source-parts': {
     title: 'El canal y el subcanal de la visita',
     context:
@@ -172,9 +161,8 @@ export default {
       "Plantilla: SELECT contact_id, SPLIT_PART(source, '/', 1) AS channel, SPLIT_PART(source, '/', 2) AS subchannel FROM raw_contacts ORDER BY contact_id;",
     ],
     explanation:
-      "SPLIT_PART numera las partes de una cadena desde uno y no desde cero. Si no existe una parte con ese número, la función devuelve una cadena vacía '' y no NULL, así que una comprobación IS NULL no encontrará esos valores «ausentes»: hay que buscarlos comparando con ''.",
+      "SPLIT_PART numera las partes de una cadena desde uno y no desde cero. Si no existe una parte con ese número, la función devuelve una cadena vacía '' y no NULL. Por eso una comprobación IS NULL no detectaría una parte inexistente: habría que compararla con ''.",
   },
-
   'L6-email-domain': {
     title: 'El dominio de una dirección de correo',
     context:
@@ -182,29 +170,27 @@ export default {
     taskText:
       'Extrae de cada dirección el dominio, todo lo que va después de la arroba, en minúsculas.',
     hints: [
-      'Hay que recortar de la dirección de correo la parte posterior al carácter @ y pasarla a minúsculas.',
-      'POSITION(subcadena IN cadena) encuentra el número del carácter en el que empieza la subcadena, y SUBSTRING(cadena FROM número) toma todo desde ese número hasta el final.',
+      'Hay que extraer de la dirección de correo la parte posterior al carácter @ y pasarla a minúsculas.',
+      'POSITION(subcadena IN cadena) encuentra la posición en la que empieza la subcadena, y SUBSTRING(cadena FROM número) toma todo desde ese número hasta el final.',
       "Plantilla: SELECT contact_id, LOWER(SUBSTRING(raw_email FROM POSITION('@' IN raw_email) + 1)) AS domain FROM raw_contacts ORDER BY contact_id;",
     ],
     explanation:
-      "POSITION devuelve el número del carácter desde uno y no desde cero, así que al resultado se le suma 1 para que SUBSTRING empiece a recortar justo después de la arroba y no en la arroba misma. Si en la cadena no hay carácter '@', POSITION devuelve 0 y SUBSTRING FROM 1 entrega en silencio la cadena original completa, sin error ni NULL.",
+      "POSITION devuelve la posición del carácter empezando por uno y no por cero, así que al resultado se le suma 1 para que SUBSTRING empiece justo después de la arroba. Si la cadena no contiene '@', POSITION devuelve 0 y SUBSTRING FROM 1 devuelve la cadena original completa. Por tanto, en ese caso no se obtiene NULL ni se produce un error.",
   },
-
   'L6-clean-contacts': {
     title: 'Limpieza completa de un contacto',
     context:
       'Antes de la carga en el CRM nuevo hay que llevar los contactos a un formato único y ordenado.',
     taskText:
-      'Ordena los contactos: el nombre sin espacios de más y con cada palabra en mayúscula inicial, el correo en minúsculas.',
+      'Ordena los contactos: el nombre sin espacios de más y con cada palabra en mayúscula inicial, y el correo en minúsculas.',
     hints: [
-      'Al nombre hay que quitarle los espacios de más y poner cada palabra en mayúscula inicial a la vez, y el correo hay que pasarlo a minúsculas.',
-      'REPLACE quita los espacios repetidos, TRIM recorta los extremos e INITCAP pone cada palabra en mayúscula inicial; se pueden anidar una dentro de otra.',
+      'Al nombre hay que quitarle los espacios de más y poner cada palabra en mayúscula inicial, y el correo hay que pasarlo a minúsculas.',
+      'REPLACE puede sustituir los espacios repetidos, TRIM recorta los extremos e INITCAP pone cada palabra en mayúscula inicial; se pueden anidar unas funciones dentro de otras.',
       "Plantilla: SELECT contact_id, INITCAP(TRIM(REPLACE(raw_name, '  ', ' '))) AS clean_name, LOWER(TRIM(raw_email)) AS clean_email FROM raw_contacts ORDER BY contact_id;",
     ],
     explanation:
-      'Las funciones anidadas se ejecutan de dentro hacia fuera, y aquí el orden importa: si INITCAP se aplicara a la cadena sin limpiar, los espacios dobles entre palabras seguirían ahí. REPLACE busca exactamente parejas de espacios y las sustituye por uno; con tres espacios seguidos quedaría uno de más, y por eso en los datos de prueba hay dos a propósito y no tres.',
+      'Las funciones anidadas se ejecutan de dentro hacia fuera, y aquí el orden importa: primero se corrigen los espacios, después se recortan los extremos y finalmente INITCAP da formato a las palabras. REPLACE busca exactamente la cadena indicada; por eso, si se sustituyen pares de espacios por uno, una secuencia de tres espacios todavía puede dejar un espacio doble, y justo por eso en los datos de ejemplo hay dos espacios seguidos y no tres. Para eliminar cualquier cantidad de espacios consecutivos haría falta una estrategia distinta.',
   },
-
   'L6-monthly-customer-report': {
     title: 'Informe mensual por cliente',
     context:
@@ -217,6 +203,6 @@ export default {
       "Plantilla: SELECT TO_CHAR(o.order_date, 'YYYY-MM') AS month, UPPER(SPLIT_PART(c.name, ' ', 2)) || ', ' || INITCAP(SPLIT_PART(c.name, ' ', 1)) AS customer, SUM(o.amount) AS total FROM orders o JOIN customers c ON c.customer_id = o.customer_id GROUP BY month, customer ORDER BY month, customer;",
     ],
     explanation:
-      "PostgreSQL permite agrupar por los alias de las columnas calculadas (GROUP BY month, customer), así que las expresiones pesadas del SELECT no hay que repetirlas en GROUP BY. TO_CHAR(..., 'YYYY-MM') convierte una fecha en una etiqueta de texto con formato año-mes, por ejemplo 2026-08. Ese formato resulta cómodo para ordenar, porque mantiene el orden cronológico correcto, al contrario que los nombres de los meses en palabras, donde el orden alfabético y el cronológico pueden no coincidir. UPPER e INITCAP fijan por separado el formato de las dos mitades del nombre: el apellido sale en mayúsculas y el nombre con mayúscula inicial.",
+      "PostgreSQL permite agrupar por los alias de las columnas calculadas (GROUP BY month, customer), así que las expresiones del SELECT no tienen que repetirse en GROUP BY. TO_CHAR(..., 'YYYY-MM') convierte una fecha en una etiqueta de texto con formato año-mes, por ejemplo 2026-08. Ese formato resulta cómodo para ordenar, porque mantiene el orden cronológico correcto, al contrario que los nombres de los meses en palabras. UPPER e INITCAP fijan por separado el formato de las dos mitades del nombre: el apellido sale en mayúsculas y el nombre con mayúscula inicial.",
   },
 };
