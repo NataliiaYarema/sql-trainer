@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "node tests/verifyI18n.mjs && node tests/verifyPgResult.mjs && node tests/verifyEventLog.mjs && node tests/verifyPgHarness.mjs && node tests/verifyAnalytics.mjs && node tests/verifyTasks.mjs && node tests/verifyComparer.mjs && node tests/verifyState.mjs && node tests/verifyMetrics.mjs && node tests/verifySkills.mjs && node tests/verifyUi.mjs && node tests/verifySandbox.mjs && node tests/verifyTheory.mjs && node tests/verifyHighlight.mjs && node tests/verifyMeta.mjs"
+    "test": "node tests/verifyI18n.mjs && node tests/verifyPgResult.mjs && node tests/verifyEventLog.mjs && node tests/verifyPgHarness.mjs && node tests/verifyAnalytics.mjs && node tests/verifyTasks.mjs && node tests/verifyComparer.mjs && node tests/verifyState.mjs && node tests/verifyCertificate.mjs && node tests/verifyMetrics.mjs && node tests/verifySkills.mjs && node tests/verifyUi.mjs && node tests/verifySandbox.mjs && node tests/verifyTheory.mjs && node tests/verifyHighlight.mjs && node tests/verifyMeta.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
