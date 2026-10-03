@@ -173,7 +173,7 @@ export default {
       'Skeleton: SELECT e.first_name, e.last_name FROM employees e WHERE NOT EXISTS (SELECT 1 FROM employees m WHERE m.manager_id = e.employee_id);',
     ],
     explanation:
-      'This task highlights an important NULL trap. A query such as WHERE employee_id NOT IN (SELECT manager_id FROM employees) can behave unexpectedly when manager_id contains NULL. For example, x NOT IN (8, 3, NULL) is equivalent to checking x <> 8 AND x <> 3 AND x <> NULL; the last comparison is UNKNOWN, so the whole condition is not TRUE. NOT EXISTS avoids that problem because it checks whether a matching row exists rather than comparing values in a list.',
+      'This task highlights an important NULL trap. A query such as WHERE employee_id NOT IN (SELECT manager_id FROM employees) returns zero rows here — silently, without any error — because manager_id contains NULL. For example, x NOT IN (8, 3, NULL) is equivalent to checking x <> 8 AND x <> 3 AND x <> NULL; the last comparison is UNKNOWN, so the whole condition is not TRUE. NOT EXISTS avoids that problem because it checks whether a matching row exists rather than comparing values in a list.',
   },
   'L4-managers-above-average': {
     title: 'Managers who beat the average',

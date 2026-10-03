@@ -136,7 +136,7 @@ export default {
       'Skeleton: SELECT DISTINCT c.country, p.category FROM customers c CROSS JOIN products p;',
     ],
     explanation:
-      'CROSS JOIN deliberately builds a Cartesian product: every customer row is paired with every product row. DISTINCT then removes duplicate country–category pairs caused by repeated countries and categories in the source tables. This is useful when you need a complete grid of possible combinations, including combinations for which there are currently no sales. It is also the pattern you get accidentally when a regular JOIN is missing its ON condition. In that case, the number of rows can grow dramatically, so a sudden explosion in row count is often a sign that a join condition is missing.',
+      'CROSS JOIN deliberately builds a Cartesian product: every customer row is paired with every product row, and six countries and five categories give 30 pairs. DISTINCT then removes duplicate country–category pairs caused by repeated countries and categories in the source tables. This is useful when you need a complete grid of possible combinations, including combinations for which there are currently no sales. It is also the pattern you get accidentally when a regular JOIN is missing its ON condition. In that case, the number of rows can grow dramatically, so a sudden explosion in row count is often a sign that a join condition is missing.',
   },
   'L3-revenue-by-country': {
     title: 'Revenue by country',
@@ -189,7 +189,7 @@ export default {
       'Skeleton: SELECT e.first_name, o.order_id, o.amount FROM employees e FULL JOIN orders o ON e.employee_id = o.manager_id;',
     ],
     explanation:
-      'FULL OUTER JOIN keeps unmatched rows from both sides. Here that means an employee with no matching order still appears, and an order whose manager_id has no matching employee also appears. In the latter case, the employee columns are NULL; in the former, the order columns are NULL. This makes FULL JOIN useful for finding unmatched records on both sides of a relationship.',
+      'FULL OUTER JOIN keeps unmatched rows from both sides, and here there are both kinds: nine employees have no orders, and one order is recorded under a manager who is no longer in the table. The employees still appear, and so does that order. In the latter case, the employee columns are NULL; in the former, the order columns are NULL. This makes FULL JOIN useful for finding unmatched records on both sides of a relationship.',
   },
   'L3-department-pairs': {
     title: 'Pairs of colleagues from one department',
@@ -259,7 +259,7 @@ export default {
       'Skeleton: SELECT c.country, COUNT(o.order_id) AS order_count, SUM(o.amount) AS revenue FROM customers c JOIN orders o ON ... GROUP BY c.country HAVING COUNT(o.order_id) >= 4;',
     ],
     explanation:
-      'Follow the whole pipeline: JOIN builds the joined set of rows, GROUP BY groups it by country, and HAVING filters the finished groups. A country with customers but no orders does not appear because INNER JOIN removes unmatched customers before grouping. If the task demanded showing countries with zero orders too, a LEFT JOIN would be required — and then HAVING would still exclude those zero-order countries because they do not pass the “at least four” condition.',
+      'Follow the whole pipeline: JOIN builds the joined set of rows, GROUP BY groups it by country, and HAVING filters the finished groups. Italy is missing from the result, and the reason is not HAVING: the only Italian customer has no orders, so INNER JOIN removes them before grouping. If the task demanded showing countries with zero orders too, a LEFT JOIN would be required — and then HAVING would still exclude those zero-order countries because they do not pass the “at least four” condition.',
   },
   'L3-category-reach': {
     title: 'Reach and money by category',

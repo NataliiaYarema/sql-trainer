@@ -105,7 +105,7 @@ export default {
       'Skeleton: SELECT order_id, order_date, amount FROM orders ORDER BY order_date DESC, order_id DESC LIMIT 3;',
     ],
     explanation:
-      'LIMIT restricts the number of rows returned after the result has been ordered. The second column in ORDER BY matters here: if two orders have the same date, order_id DESC determines which one comes first. Without that tie-breaker, their relative order is not guaranteed.',
+      'LIMIT restricts the number of rows returned after the result has been ordered. The second column in ORDER BY matters here: two orders share the same date, and order_id DESC determines which one comes first. Without that tie-breaker, their relative order is not guaranteed.',
   },
   'L1-top-furniture': {
     title: 'The most expensive furniture',
@@ -156,7 +156,7 @@ export default {
       "Skeleton: SELECT product_name, category FROM products WHERE product_name LIKE '%Desk%';",
     ],
     explanation:
-      "In a LIKE pattern, % stands for any sequence of characters and _ stands for exactly one character. Without %, LIKE 'Desk' matches only the exact string Desk. In PostgreSQL, LIKE is case-sensitive, so '%desk%' does not match Desk. If you want a case-insensitive pattern match, PostgreSQL provides ILIKE.",
+      "In a LIKE pattern, % stands for any sequence of characters and _ stands for exactly one character. Without %, LIKE 'Desk' matches only a product named exactly Desk, and there is none. In PostgreSQL, LIKE is case-sensitive, so '%desk%' does not match Desk. If you want a case-insensitive pattern match, PostgreSQL provides ILIKE.",
   },
   'L1-sorted-catalog': {
     title: 'Catalogue by category and price',
@@ -183,7 +183,7 @@ export default {
       'Skeleton: SELECT product_name, price, stock FROM products WHERE stock < 50 ORDER BY price DESC LIMIT 5;',
     ],
     explanation:
-      'The business wording breaks down into three technical steps: filter, sort, and limit. The filter must be applied before selecting the five most expensive products. Otherwise, you could take the five most expensive products overall and then discover that some of them do not meet the stock condition.',
+      'The business wording breaks down into three technical steps: filter, sort, and limit. The filter must be applied before selecting the five most expensive products. Otherwise, you would take the five most expensive products overall, and after the stock check fewer than five would be left.',
   },
   'L1-restock-shortlist': {
     title: 'The urgent reorder shortlist',
@@ -197,6 +197,6 @@ export default {
       "Skeleton: SELECT product_name, category, price, stock FROM products WHERE stock < 50 AND NOT category = 'Electronics' AND (price > 100 OR stock < 10);",
     ],
     explanation:
-      "The parentheses around OR are important. AND has higher precedence than OR, so without the parentheses the condition would be interpreted differently: (stock < 50 AND NOT category = 'Electronics' AND price > 100) OR stock < 10. That could allow products with fewer than 10 in stock to pass without satisfying the other conditions. When AND and OR appear together, parentheses make the intended logic explicit and easier to read.",
+      "The parentheses around OR are important. AND has higher precedence than OR, so without the parentheses the condition would be interpreted differently: (stock < 50 AND NOT category = 'Electronics' AND price > 100) OR stock < 10. Then any product with fewer than 10 in stock would pass without satisfying the other conditions, and the electronics we have just excluded would get into the result. When AND and OR appear together, parentheses make the intended logic explicit and easier to read.",
   },
 };
