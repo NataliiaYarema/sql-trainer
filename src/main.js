@@ -203,6 +203,18 @@ function applyStaticText() {
   qs('#editor-hint').textContent = t('editor.hint');
 }
 
+// Банк під поточну мову: і стартове визначення мови з адреси, і перемикач у
+// шапці, і ручна зміна мови через hashchange мають приводити завдання й
+// теорію до тієї самої мови, що й решту інтерфейсу — інакше вони лишаються
+// тією мовою, якою зібрані при завантаженні модуля (англійська).
+function rebuildLocalizedBanks() {
+  localizedTasks = tasksFor(getLanguage());
+  localizedTopics = topicsFor(getLanguage());
+  // Відкритий рівень тримає власний зріз банку — без цього рядка картка
+  // лишилася б попередньою мовою до наступного переходу між завданнями.
+  if (activeLevel !== null) levelTasks = levelTasksOf(activeLevel);
+}
+
 // Мова змінюється в пам'яті, без перезавантаження: перезапуск сторінки означав
 // би ще ~1,2 с на завантаження wasm PGlite при кожному кліку по списку.
 //
@@ -215,11 +227,7 @@ function applyLanguage(lang) {
   flushPending();
   setLanguage(lang);
   saveLang(getLanguage());
-  localizedTasks = tasksFor(getLanguage());
-  localizedTopics = topicsFor(getLanguage());
-  // Відкритий рівень тримає власний зріз банку — без цього рядка картка
-  // лишилася б попередньою мовою до наступного переходу між завданнями.
-  if (activeLevel !== null) levelTasks = levelTasksOf(activeLevel);
+  rebuildLocalizedBanks();
   setRoute(currentScreenName);
   applyStaticText();
   repaint();
@@ -792,6 +800,11 @@ editor = createEditor(roots.editor, handleCheck, scheduleDraftSave);
 // дає DEFAULT_LANG — тому валідація живе в ньому, а не тут.
 const startRoute = parseRoute(window.location.hash);
 setLanguage(startRoute.lang ?? loadLang() ?? undefined);
+// localizedTasks/localizedTopics зібрані при завантаженні модуля (рядки 77 і
+// 85) ще до того, як тут визначилася мова з адреси чи сховища — перебудувати
+// банк під неї, інакше умови завдань і назви тем лишаться англійськими, поки
+// користувач не перемкне мову вручну.
+rebuildLocalizedBanks();
 applyStaticText();
 screenForRoute(startRoute.screen)();
 
@@ -803,6 +816,7 @@ window.addEventListener('hashchange', () => {
   if (route.lang && route.lang !== getLanguage()) {
     setLanguage(route.lang);
     saveLang(getLanguage());
+    rebuildLocalizedBanks();
     applyStaticText();
   }
   screenForRoute(route.screen)();
