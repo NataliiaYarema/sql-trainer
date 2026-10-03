@@ -150,4 +150,40 @@ export default {
   'case.about': 'De qué trata',
   'case.whenNeeded': 'Cuándo se necesita',
   'case.watchOut': 'A qué prestar atención',
+  'nav.certificate': 'Certificado',
+  'certificate.titleLead': 'Certificado',
+  'certificate.titleJoin': 'con',
+  'certificate.titleTail': 'distinción',
+  'certificate.ringDistinction': 'CERTIFICADO CON DISTINCIÓN',
+  'certificate.ringBasic': 'CERTIFICADO · SQL',
+  'certificate.lead': 'por completar con éxito el curso en línea',
+  'certificate.resultAll': {
+    one: '{count} ejercicio resuelto',
+    other: '{count} ejercicios resueltos',
+  },
+  'certificate.resultPart': '{solved} de {total} ejercicios resueltos',
+  'certificate.praiseDistinction':
+    'Un resultado impecable: todos los ejercicios resueltos de forma autónoma.',
+  'certificate.praiseBasic': 'Constancia y ganas de seguir mejorando, bien demostradas.',
+  'certificate.praiseEnd': '¡Excelente trabajo!',
+  'certificate.issued': 'Fecha de emisión:',
+  'certificate.nameLabel': 'Tu nombre',
+  'certificate.namePlaceholder': 'Nombre y apellidos',
+  'certificate.save': 'Guardar como PDF',
+  'certificate.ready': 'Tu certificado está listo',
+  'certificate.open': 'Abrir el certificado',
+  'certificate.get': 'Obtener el certificado',
+  'certificate.notYet': 'Todavía no hay certificado',
+  'certificate.rule':
+    'Resuelve al menos el 90 % de los ejercicios de cada nivel y obtendrás el certificado. Resuelve los {total} sin consultar ninguna solución y será con distinción.',
+  'certificate.levelsReady': 'Niveles listos: {ready} de {total}',
+  'certificate.levelMissing': {
+    one: 'falta {count} ejercicio',
+    other: 'faltan {count} ejercicios',
+  },
+  'certificate.levelDone': 'listo',
+  'certificate.distinctionOpen':
+    'La distinción aún es posible: no se ha consultado ninguna solución.',
+  'certificate.distinctionLost':
+    'La distinción ya no es posible: se consultaron algunas soluciones.',
 };
