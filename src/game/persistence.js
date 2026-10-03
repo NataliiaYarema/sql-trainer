@@ -99,3 +99,24 @@ export function clearSandboxSql() {
     // Сховище недоступне — отже й чистити нічого.
   }
 }
+
+// Ім'я для сертифіката — налаштування, а не прогрес, як і мова: «Почати
+// заново» його не скидає. Рядок короткий, тому пишемо на кожну зміну.
+const CERT_NAME_KEY = 'sqlTrainer:v1:certName';
+const MAX_CERT_NAME = 80;
+
+export function loadCertName() {
+  try {
+    return localStorage.getItem(CERT_NAME_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+export function saveCertName(name) {
+  try {
+    localStorage.setItem(CERT_NAME_KEY, String(name).slice(0, MAX_CERT_NAME));
+  } catch {
+    // Приватний режим може забороняти запис — ім'я просто не запам'ятається.
+  }
+}

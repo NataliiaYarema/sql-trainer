@@ -1,5 +1,5 @@
 import { GameState } from '../src/game/state.js';
-import { loadLang, saveLang } from '../src/game/persistence.js';
+import { loadLang, saveLang, loadCertName, saveCertName } from '../src/game/persistence.js';
 
 // У Node немає localStorage, але persistence.js ловить це в try/catch,
 // тому GameState стартує з порожнього стану і його можна перевіряти тут.
@@ -195,6 +195,55 @@ check(
   })()
 );
 
+// --- Позначка підглядання й сертифікат ---
+const certTasks = [
+  { id: 'C1', level: 1 },
+  { id: 'C2', level: 1 },
+];
+const cert = new GameState(certTasks);
+cert.registerGaveUp(certTasks[0]);
+check('підглядання ставить peeked', cert.data.solved.C1.peeked === true);
+cert.registerSolved(certTasks[0]);
+check("peeked переживає розв'язання", cert.data.solved.C1.peeked === true);
+check("статус після розв'язання — solved", cert.statusOf('C1') === 'solved');
+
+cert.registerSolved(certTasks[1]);
+check('на 2 з 2 сертифікат видано', cert.certificate !== null);
+check('на 2 з 2 з підгляданням — звичайний', cert.certificate.tier === 'basic');
+
+cert.registerGaveUp(certTasks[1]);
+check("підглядання розв'язаного теж ставить peeked", cert.data.solved.C2.peeked === true);
+check("підглядання розв'язаного не знімає solved", cert.statusOf('C2') === 'solved');
+check('отриманий сертифікат не зникає', cert.certificate.tier === 'basic');
+
+const clean = new GameState(certTasks);
+check(
+  "перше розв'язання — ще не сертифікат",
+  clean.registerSolved(certTasks[0], '2026-10-01') === null
+);
+check('останнє — видача', clean.registerSolved(certTasks[1], '2026-10-02') === 'awarded');
+check('без підглядань — відзнака', clean.certificate.tier === 'distinction');
+check('дата — день видачі', clean.certificate.date === '2026-10-02');
+check(
+  "повторне розв'язання нічого не видає",
+  clean.registerSolved(certTasks[1], '2026-10-05') === null
+);
+
+const upgrade = new GameState([
+  ...Array.from({ length: 10 }, (_, i) => ({ id: `U${i}`, level: 1 })),
+]);
+for (let i = 0; i < 9; i += 1) upgrade.registerSolved({ id: `U${i}`, level: 1 }, '2026-10-01');
+check('9 з 10 — звичайний', upgrade.certificate?.tier === 'basic');
+check(
+  'останнє — підвищення',
+  upgrade.registerSolved({ id: 'U9', level: 1 }, '2026-10-04') === 'upgraded'
+);
+check('підвищення з новою датою', upgrade.certificate.date === '2026-10-04');
+
+clean.resetProgress();
+check('«Почати заново» скидає сертифікат', clean.certificate === null);
+check('«Почати заново» скидає peeked', Object.keys(clean.data.solved).length === 0);
+
 const store = {};
 globalThis.localStorage = {
   getItem(key) {
@@ -216,6 +265,26 @@ const langState = new GameState(tasks);
 langState.saveNote('A1', 'нотатка');
 langState.resetProgress();
 check('очищення прогресу не скидає мову', loadLang() === 'es');
+
+saveCertName('Ada Lovelace');
+check("ім'я зберігається", loadCertName() === 'Ada Lovelace');
+langState.resetProgress();
+check("«Почати заново» не скидає ім'я", loadCertName() === 'Ada Lovelace');
+
+store['sqlTrainer:v1:state'] = JSON.stringify({
+  schemaVersion: 1,
+  solved: { A1: { status: 'solved', level: 1 } },
+  certificate: { tier: 'basic', date: '2026-10-03' },
+});
+check('сертифікат читається зі сховища', new GameState(tasks).certificate?.tier === 'basic');
+store['sqlTrainer:v1:state'] = JSON.stringify({
+  schemaVersion: 1,
+  solved: {},
+  certificate: { tier: 'x' },
+});
+check('зламаний запис сертифіката відкидається', new GameState(tasks).certificate === null);
+store['sqlTrainer:v1:state'] = JSON.stringify({ schemaVersion: 1, solved: {} });
+check('старий стан без сертифіката завантажується', new GameState(tasks).certificate === null);
 
 delete globalThis.localStorage;
 

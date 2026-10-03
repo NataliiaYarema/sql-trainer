@@ -1,4 +1,10 @@
 import { loadState, saveState } from './persistence.js';
+import {
+  certificateStatus,
+  nextCertificate,
+  localDateString,
+  isCertificateRecord,
+} from './certificate.js';
 
 // Чернетки лежать у тому самому ключі localStorage, що й прогрес. Без обмеження
 // одна вставлена величезна чернетка могла б вичерпати квоту сховища — saveState
@@ -7,11 +13,12 @@ const MAX_DRAFT_LENGTH = 10000;
 const MAX_NOTE_LENGTH = 10000;
 
 function emptyState() {
-  return { solved: {}, drafts: {}, notes: {} };
+  return { solved: {}, drafts: {}, notes: {}, certificate: null };
 }
 
-// Зі сховища беремо лише `solved`, `drafts` і `notes` — старі збереження містять поля
-// прибраної гейміфікації (бали, серія, відзнаки), і тягнути їх далі немає сенсу.
+// Зі сховища беремо лише `solved`, `drafts`, `notes` і `certificate` — старі збереження
+// містять поля прибраної гейміфікації (бали, серія, відзнаки), і тягнути їх далі немає
+// сенсу. `certificate` — запис отриманого сертифіката.
 //
 // Заразом відкидаємо записи, чиїх id більше немає в банку. Після
 // перенумерації завдань такі записи лишаються, і solvedCountForLevel
@@ -27,6 +34,7 @@ function normalize(loaded, knownIds) {
     solved: keepKnown(loaded.solved, knownIds),
     drafts: keepKnown(loaded.drafts ?? {}, knownIds),
     notes: keepKnown(loaded.notes ?? {}, knownIds),
+    certificate: isCertificateRecord(loaded.certificate) ? loaded.certificate : null,
   };
 }
 
@@ -102,21 +110,49 @@ export class GameState {
     return this.tasks.filter((task) => task.level === level && this.hasNote(task.id)).length;
   }
 
-  registerSolved(task) {
-    this.data.solved[task.id] = { status: 'solved', level: task.level };
+  // Слід підглядання не стирається розв'язанням: інакше «спершу подивитися
+  // відповідь, потім ввести її» нічим не відрізнялося б від самостійного
+  // розв'язання, і сертифікат з відзнакою нічого б не означав.
+  registerSolved(task, today = localDateString()) {
+    const peeked = this.data.solved[task.id]?.peeked === true;
+    this.data.solved[task.id] = { status: 'solved', level: task.level, ...(peeked && { peeked }) };
+    const change = this.updateCertificate(today);
+    this.persist();
+    return change;
+  }
+
+  // peeked ставиться й на вже розв'язаному: подивитися еталон після власного
+  // розв'язання — теж підглядання, і на майбутню відзнаку воно впливає.
+  registerGaveUp(task) {
+    const record = this.data.solved[task.id];
+    this.data.solved[task.id] = this.isSolved(task.id)
+      ? { ...record, peeked: true }
+      : { status: 'revealed', level: task.level, peeked: true };
     this.persist();
   }
 
-  registerGaveUp(task) {
-    if (!this.isSolved(task.id)) {
-      this.data.solved[task.id] = { status: 'revealed', level: task.level };
-    }
-    this.persist();
+  get certificate() {
+    return this.data.certificate;
+  }
+
+  certificateStatus() {
+    return certificateStatus(this.tasks, this.data.solved);
+  }
+
+  // Повертає, що сталося, — вікну успіху треба знати, чи показати кнопку
+  // «Отримати сертифікат».
+  updateCertificate(today) {
+    const before = this.data.certificate;
+    const after = nextCertificate(before, this.certificateStatus().tier, today);
+    if (after === before) return null;
+    this.data.certificate = after;
+    return before ? 'upgraded' : 'awarded';
   }
 
   // «Почати заново»: знімає проходження курсу, але лишає нотатки. Вони —
   // власні висновки користувача, а не прогрес, і відновити їх нізвідки,
-  // тоді як розв'язати завдання можна вдруге.
+  // тоді як розв'язати завдання можна вдруге. Сертифікат скидається разом
+  // із прогресом: новий прохід — новий сертифікат.
   resetProgress() {
     this.data = { ...emptyState(), notes: this.data.notes };
     this.persist();
