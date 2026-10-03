@@ -10,6 +10,7 @@ import { renderHints } from '../src/ui/hintPanel.js';
 import { renderResultTable, resultTableHtml } from '../src/ui/resultTable.js';
 import { progressHtml, routeFor, parseRoute, languageSelectHtml } from '../src/ui/progressBar.js';
 import { t, setLanguage, levelName, formatNumber, LANGS } from '../src/i18n/index.js';
+import { certificateSheetHtml, formatCertificateDate } from '../src/ui/certificate.js';
 import { notePanelHtml, saveButtonLabel } from '../src/ui/notePanel.js';
 import { notesScreenHtml } from '../src/ui/notesScreen.js';
 import { sandboxControlsHtml, sandboxSchemaHtml } from '../src/ui/sandbox.js';
@@ -1040,6 +1041,44 @@ const homeLabel = t('nav.home');
   check(`${where}: кожна кнопка «На головну» має гачок для кольору`, homeButtons === hooked);
 });
 
+// --- Аркуш сертифіката ---
+const certPerLevel = LEVELS.map((level) => ({
+  level,
+  solved: level === 3 ? 18 : 14,
+  total: level === 3 ? 20 : 15,
+  need: 0,
+  missing: 0,
+}));
+const sheetArgs = (tier, name) => ({
+  tier,
+  name,
+  date: '2026-10-03',
+  lang: 'uk',
+  perLevel: certPerLevel,
+  solvedTotal: 116,
+  total: 125,
+});
+const distinctionSheet = certificateSheetHtml(sheetArgs('distinction', 'Наталія'));
+const basicSheet = certificateSheetHtml(sheetArgs('basic', 'Наталія'));
+check("аркуш: ім'я на місці", distinctionSheet.includes('Наталія'));
+check('аркуш: зірки лише з відзнакою', distinctionSheet.includes('★') && !basicSheet.includes('★'));
+check(
+  'аркуш: рахунок рівнів на звичайному',
+  basicSheet.includes('14/15') && basicSheet.includes('18/20')
+);
+check('аркуш: галочки на відзнаці', (distinctionSheet.match(/✓/g) ?? []).length === LEVELS.length);
+check('аркуш: дата словами', distinctionSheet.includes(formatCertificateDate('2026-10-03', 'uk')));
+check('аркуш: рік у даті', formatCertificateDate('2026-10-03', 'uk').includes('2026'));
+check(
+  "аркуш: ім'я екранується",
+  !certificateSheetHtml(sheetArgs('basic', '<script>x</script>')).includes('<script>')
+);
+check(
+  "аркуш: порожнє ім'я не ламає розмітку",
+  certificateSheetHtml(sheetArgs('basic', '')).includes('cert-name')
+);
+check('аркуш: немає номера й VERIFIED', !/VERIFIED|№/.test(distinctionSheet + basicSheet));
+
 // Замок на забутий літерал. Перелічені розмітки складаються лише з підписів
 // інтерфейсу — ні умов завдань, ні текстів теорії в них немає, тому жодної
 // кирилиці в англійському та іспанському прогоні бути не може.
@@ -1102,6 +1141,8 @@ const withoutLangSelect = (html) => html.replace(/<select[\s\S]*?<\/select>/g, '
       }),
     ],
     ['смужка завдань', taskNavHtml([{ index: 0, status: 'new', hasNote: false }], 0)],
+    ['аркуш з відзнакою', certificateSheetHtml({ ...sheetArgs('distinction', 'Ada'), lang })],
+    ['звичайний аркуш', certificateSheetHtml({ ...sheetArgs('basic', 'Ada'), lang })],
   ].forEach(([where, html]) => {
     const found = html.match(CYRILLIC);
     check(`${lang}: ${where} без української${found ? ` (${found[0]})` : ''}`, found === null);

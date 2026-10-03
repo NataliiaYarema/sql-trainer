@@ -1,4 +1,12 @@
 import './styles/main.css';
+// Шрифти аркуша — файлами в проєкті, а не з Google Fonts: без інтернету ім'я
+// на сертифікаті впало б на системний шрифт. @font-face браузер вантажить лише
+// тоді, коли шрифт ужито, тож на інших екранах файли не тягнуться.
+import '@fontsource/montserrat/500.css';
+import '@fontsource/montserrat/700.css';
+import '@fontsource/montserrat/800.css';
+import '@fontsource/marck-script/400.css';
+import './styles/certificate.css';
 import tasks, { LEVELS, tasksByCaseStudy, tasksFor } from './tasks/index.js';
 import { executeUserQuery, executeReferenceQuery, SqlUserError } from './db/sqlEngine.js';
 import { compareResults } from './compare/resultComparer.js';

@@ -1,0 +1,206 @@
+.cert-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1123 / 794;
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+.cert-sheet {
+  --a1: #f0c25a;
+  --a2: #d6a531;
+  --navy: #1e2638;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1123px;
+  height: 794px;
+  transform-origin: 0 0;
+  transform: scale(var(--cert-scale, 1));
+  background: #fff;
+  overflow: hidden;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  color: var(--navy);
+}
+
+.cert-sheet--basic {
+  --a1: #4f9cf9;
+  --a2: #35c98b;
+}
+
+.cert-top {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 365px;
+  background: var(--navy);
+}
+
+.cert-wave {
+  position: absolute;
+  left: 0;
+  top: 357px;
+  width: 100%;
+  height: 95px;
+}
+
+.cert-title {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 48px;
+}
+
+.cert-title i {
+  font-family: 'Marck Script', cursive;
+  font-weight: 400;
+  font-size: 0.7em;
+  margin: 0 0.15em;
+}
+
+.cert-bars {
+  position: absolute;
+  top: 135px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  width: 517px;
+}
+
+.cert-bars span {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.cert-bars span:first-child {
+  background: linear-gradient(90deg, transparent, var(--a1));
+}
+
+.cert-bars span:last-child {
+  background: linear-gradient(90deg, var(--a2), transparent);
+}
+
+.cert-badge {
+  position: absolute;
+  left: 79px;
+  top: 159px;
+  width: 236px;
+  height: 236px;
+}
+
+.cert-badge svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cert-badge__ring {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.cert-badge__stars {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  fill: var(--a1);
+  letter-spacing: 4px;
+}
+
+.cert-badge__db {
+  stroke: var(--a1);
+}
+
+.cert-who {
+  position: absolute;
+  left: 382px;
+  right: 67px;
+  top: 191px;
+  text-align: center;
+  color: #fff;
+}
+
+.cert-name {
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1.15;
+  min-height: 1.15em;
+}
+
+.cert-lead {
+  color: #9aa6c2;
+  font-size: 14px;
+  margin-top: 12px;
+  font-weight: 500;
+}
+
+.cert-course {
+  font-size: 28px;
+  margin-top: 4px;
+  font-weight: 700;
+  color: var(--a1);
+  letter-spacing: 0.04em;
+}
+
+.cert-bottom {
+  position: absolute;
+  left: 79px;
+  right: 67px;
+  top: 492px;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 45px;
+  align-items: start;
+}
+
+.cert-result {
+  font-weight: 700;
+  font-size: 25px;
+}
+
+.cert-praise {
+  color: #5b6478;
+  font-style: italic;
+  font-size: 17px;
+  margin-top: 8px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.cert-levels {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  white-space: nowrap;
+  gap: 0.35em 1.2em;
+  color: #3b4252;
+  font-weight: 500;
+}
+
+.cert-levels b {
+  color: var(--a2);
+  display: inline-block;
+  min-width: 2.6em;
+  margin-right: 0.15em;
+  font-weight: 700;
+}
+
+.cert-sheet--basic .cert-levels b {
+  color: var(--a1);
+}
+
+.cert-date {
+  position: absolute;
+  right: 67px;
+  bottom: 40px;
+  font-size: 15px;
+  color: #5b6478;
+}
+
+.cert-date b {
+  color: var(--navy);
+}
