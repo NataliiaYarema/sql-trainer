@@ -8,11 +8,11 @@
 
 ![Trainer screen](screenshots/screen-en.png)
 
-**[Open the trainer →](https://sql-trainer-zeta.vercel.app/)**
+**[Open the trainer →](https://sql-trainer-zeta.vercel.app/#/en/)**
 
 ## About the trainer
 
-A web trainer for practising SQL: 125 tasks across 8 levels, each with a business context and three hints. After a check the trainer shows a verdict — correct or not. A reference query with an explanation is available too, behind the “Show answer” button.
+A web trainer for practising SQL: 125 tasks across 8 levels, each with a business context and three hints. After a check the trainer shows a verdict – correct or not. A reference query with an explanation is available too, behind the “Show answer” button.
 
 Queries run on real **PostgreSQL** right in the browser (via [PGlite](https://pglite.dev), compiled to WebAssembly). It is not an emulation or a simplified dialect but the same Postgres used in real projects: with `DATE_TRUNC`, `EXTRACT`, window functions and its own error messages.
 
@@ -22,13 +22,13 @@ No server is needed: the database starts right in the browser tab and is created
 
 ## Languages
 
-The interface, all 125 tasks and the theory are available in three languages: English, Spanish and Ukrainian. Choose the language in the drop-down list in the top-right corner of the header — the page switches at once, without reloading, and your progress stays where it was.
+The interface, all 125 tasks and the theory are available in three languages: English, Spanish and Ukrainian. Choose the language in the drop-down list in the top-right corner of the header – the page switches at once, without reloading, and your progress stays where it was.
 
 On the very first visit the trainer opens in English. SQL, table and column names and the data itself are the same in every language.
 
 ## Getting started
 
-Open the [trainer](https://sql-trainer-zeta.vercel.app/) and choose a level — all eight are available at once, no sign-up needed. The first query on the page takes longer than the next ones: the browser loads PostgreSQL and creates the tables.
+Open the [trainer](https://sql-trainer-zeta.vercel.app/#/en/) and choose a level – all eight are available at once, no sign-up needed. The first query on the page takes longer than the next ones: the browser loads PostgreSQL and creates the tables.
 
 ## Levels
 
@@ -51,7 +51,7 @@ Within every level the difficulty grows the same way: **Beginner → Intermediat
 
 The advanced task at the end of a level brings together everything before it. For example, on level 2 it is “categories whose average price is above 100 and that have more than 5 products at the same time”, and on level 5 it is a customer's spending accumulated from order to order together with the amount of the previous one.
 
-On level 8 four tasks (“User conversion analysis”) form a running case study: each next one builds on the conclusion of the previous, and the task card shows the badge “Case study: User conversion analysis — step N of 4”.
+On level 8 four tasks (“User conversion analysis”) form a running case study: each next one builds on the conclusion of the previous, and the task card shows the badge “Case study: User conversion analysis – step N of 4”.
 
 ## How it works
 
@@ -61,16 +61,16 @@ A level card shows the completion percentage, and detailed statistics are on the
 
 The “Sandbox” button in the header opens an editor: the same database, any query, no task and no check. That is where “Run query” from a theory page leads.
 
-The “My progress” button opens a dashboard with statistics: how many tasks are already solved, where you stopped last time (with a “Continue” button), which topics are already mastered, in which constructs the most mistakes happen — with a “practise” button next to them that leads straight to the right task — and which tasks are worth repeating. A topic counts as mastered only when all of its tasks on the level are solved.
+The “My progress” button opens a dashboard with statistics: how many tasks are already solved, where you stopped last time (with a “Continue” button), which topics are already mastered, in which constructs the most mistakes happen – with a “practise” button next to them that leads straight to the right task – and which tasks are worth repeating. A topic counts as mastered only when all of its tasks on the level are solved.
 
-At the end of a level the “What you can do now” screen lists the skills gained — a tick appears only where a topic has been fully worked through.
+At the end of a level the “What you can do now” screen lists the skills gained – a tick appears only where a topic has been fully worked through.
 
 ## Certificate
 
 Completing all levels of the trainer earns a certificate:
 
-- **Certificate** — at least 90% of the tasks on every level are solved (14 of 15, and 18 of 20 on level 3).
-- **Certificate with Distinction** — all 125 tasks are solved, and “Show answer” was never pressed.
+- **Certificate** – at least 90% of the tasks on every level are solved (14 of 15, and 18 of 20 on level 3).
+- **Certificate with Distinction** – all 125 tasks are solved, and “Show answer” was never pressed.
 
 The conditions, and how many tasks are still missing on each level, are visible on the home screen and on the dashboard. As soon as the condition is met, a “Get your certificate” button appears under the check result. On the certificate screen you can type your name and press “Save as PDF”. The certificate is saved in the interface language (English, Spanish or Ukrainian).
 
@@ -80,9 +80,9 @@ Progress is stored only in the browser, so the certificate is a personal recogni
 
 ## Database structure
 
-Five main tables — `employees`, `customers`, `orders`, `products`, `order_items` — are chosen to cover the training scenarios: there is an employee without a department (`IS NULL`), a customer without orders (`LEFT JOIN`), products nobody has bought (anti-join), and the `orders.manager_id` reference to a salesperson (self-join and reports by manager). They are joined by `raw_contacts` — a table of uncleaned contacts for exercises with string functions.
+Five main tables – `employees`, `customers`, `orders`, `products`, `order_items` – are chosen to cover the training scenarios: there is an employee without a department (`IS NULL`), a customer without orders (`LEFT JOIN`), products nobody has bought (anti-join), and the `orders.manager_id` reference to a salesperson (self-join and reports by manager). They are joined by `raw_contacts` – a table of uncleaned contacts for exercises with string functions.
 
-Three analytics tables — `app_users`, `app_events` and `app_purchases` (level 8) — are generated with `generate_series`, using `md5` as the source of pseudo-randomness.
+Three analytics tables – `app_users`, `app_events` and `app_purchases` (level 8) – are generated with `generate_series`, using `md5` as the source of pseudo-randomness.
 
 The `hire_date` and `order_date` columns have a real `DATE` type rather than text, so date arithmetic and `EXTRACT` work with them.
 
@@ -92,11 +92,11 @@ The trainer works locally. PostgreSQL runs in the browser, and progress, attempt
 
 If you clear the browser data or open the trainer on another device, progress starts from zero.
 
-A note for a task can be written right under the task and later edited in the list on the “My notes” screen — the text is edited in place there.
+A note for a task can be written right under the task and later edited in the list on the “My notes” screen – the text is edited in place there.
 
-You can also reset everything yourself: the “Clear” button on the dashboard erases progress, attempt history and drafts. Notes can be deleted too — each one separately or all at once with the “Delete all” button.
+You can also reset everything yourself: the “Clear” button on the dashboard erases progress, attempt history and drafts. Notes can be deleted too – each one separately or all at once with the “Delete all” button.
 
-The current architecture allows adding sign-in and syncing progress between devices if needed. For now it is deliberately a local application — no accounts, no server and no dependency on an internet connection.
+The current architecture allows adding sign-in and syncing progress between devices if needed. For now it is deliberately a local application – no accounts, no server and no dependency on an internet connection.
 
 ## Running locally
 
@@ -121,9 +121,9 @@ npm run preview   # preview the built version
 
 Tasks live in `src/tasks/level1.js` … `level8.js`. Copy a neighbouring object and replace the fields. Required: `id`, `level`, `tier` (`basic` / `medium` / `complex`), `title`, `context`, `schemaDescription`, `setupSql`, `taskText`, `expectedOutputColumns`, `referenceSql`, three `hints` and `explanation`.
 
-The task text in `level*.js` is Ukrainian — it is the source. The English and Spanish versions live in `src/i18n/en/tasks/` and `src/i18n/es/tasks/`, keyed by the task `id`, and a new task needs a translation in both.
+The task text in `level*.js` is Ukrainian – it is the source. The English and Spanish versions live in `src/i18n/en/tasks/` and `src/i18n/es/tasks/`, keyed by the task `id`, and a new task needs a translation in both.
 
-Take schema descriptions from [src/tasks/schemas.js](src/tasks/schemas.js) instead of writing them as a string — then a column change in the data will not require edits in dozens of tasks.
+Take schema descriptions from [src/tasks/schemas.js](src/tasks/schemas.js) instead of writing them as a string – then a column change in the data will not require edits in dozens of tasks.
 
 After adding a task, run `npm test`. It checks that the reference query runs against `setupSql`, returns at least one row, and that its column names exactly match `expectedOutputColumns`. It also checks that the level's composition matches `LEVEL_PLAN`, that difficulty does not decrease within a level, that every table mentioned in `referenceSql` is actually described in `schemaDescription`, and that the translations are complete.
 
@@ -135,7 +135,7 @@ Write queries in the PostgreSQL dialect: `DATE_TRUNC`, `EXTRACT`, `TO_CHAR` are 
 
 ![Pantalla del entrenador](screenshots/screen-es.png)
 
-**[Abrir el entrenador →](https://sql-trainer-zeta.vercel.app/)**
+**[Abrir el entrenador →](https://sql-trainer-zeta.vercel.app/#/es/)**
 
 ## Sobre el entrenador
 
@@ -155,7 +155,7 @@ En la primera visita el entrenador se abre en inglés. El SQL, los nombres de ta
 
 ## Cómo empezar
 
-Abre el [entrenador](https://sql-trainer-zeta.vercel.app/) y elige un nivel: los ocho están disponibles desde el principio y no hace falta registrarse. La primera consulta de la página tarda más que las siguientes: el navegador carga PostgreSQL y crea las tablas.
+Abre el [entrenador](https://sql-trainer-zeta.vercel.app/#/es/) y elige un nivel: los ocho están disponibles desde el principio y no hace falta registrarse. La primera consulta de la página tarda más que las siguientes: el navegador carga PostgreSQL y crea las tablas.
 
 ## Niveles
 
@@ -178,7 +178,7 @@ Dentro de cada nivel la dificultad crece de la misma manera: **Básico → Inter
 
 El ejercicio avanzado del final de un nivel reúne todo lo anterior. Por ejemplo, en el nivel 2 son «las categorías cuyo precio medio supera 100 y que a la vez tienen más de 5 productos», y en el nivel 5, el gasto acumulado de un cliente de pedido en pedido junto con el importe del anterior.
 
-En el nivel 8, cuatro ejercicios («Análisis de la conversión de usuarios») forman un caso continuo: cada uno se apoya en la conclusión del anterior, y la ficha del ejercicio muestra la insignia «Caso: Análisis de la conversión de usuarios — paso N de 4».
+En el nivel 8, cuatro ejercicios («Análisis de la conversión de usuarios») forman un caso continuo: cada uno se apoya en la conclusión del anterior, y la ficha del ejercicio muestra la insignia «Caso: Análisis de la conversión de usuarios – paso N de 4».
 
 ## Cómo funciona
 
@@ -188,7 +188,7 @@ La ficha de un nivel muestra el porcentaje completado, y las estadísticas detal
 
 El botón «Zona de pruebas» de la cabecera abre un editor: la misma base de datos, cualquier consulta, sin ejercicio ni comprobación. Ahí es adonde lleva «Ejecutar consulta» desde una página de teoría.
 
-El botón «Mi progreso» abre un panel con estadísticas: cuántos ejercicios están ya resueltos, dónde lo dejaste la última vez (con un botón «Continuar»), qué temas ya dominas, en qué construcciones aparecen más errores —junto a ellas hay un botón «practicar» que lleva directamente al ejercicio adecuado— y qué ejercicios conviene repetir. Un tema se considera dominado solo cuando están resueltos todos sus ejercicios del nivel.
+El botón «Mi progreso» abre un panel con estadísticas: cuántos ejercicios están ya resueltos, dónde lo dejaste la última vez (con un botón «Continuar»), qué temas ya dominas, en qué construcciones aparecen más errores –junto a ellas hay un botón «practicar» que lleva directamente al ejercicio adecuado– y qué ejercicios conviene repetir. Un tema se considera dominado solo cuando están resueltos todos sus ejercicios del nivel.
 
 Al final de un nivel, la pantalla «Lo que ya sabes hacer» enumera las habilidades conseguidas: la marca aparece solo donde un tema se ha trabajado por completo.
 
@@ -207,9 +207,9 @@ El progreso se guarda solo en el navegador, así que el certificado es un recono
 
 ## Estructura de la base de datos
 
-Cinco tablas principales —`employees`, `customers`, `orders`, `products`, `order_items`— están elegidas para cubrir los escenarios de práctica: hay un empleado sin departamento (`IS NULL`), un cliente sin pedidos (`LEFT JOIN`), productos que nadie ha comprado (anti-join) y la referencia `orders.manager_id` a un vendedor (self-join e informes por responsable). A ellas se suma `raw_contacts`, una tabla de contactos sin limpiar para los ejercicios con funciones de cadenas.
+Cinco tablas principales –`employees`, `customers`, `orders`, `products`, `order_items`– están elegidas para cubrir los escenarios de práctica: hay un empleado sin departamento (`IS NULL`), un cliente sin pedidos (`LEFT JOIN`), productos que nadie ha comprado (anti-join) y la referencia `orders.manager_id` a un vendedor (self-join e informes por responsable). A ellas se suma `raw_contacts`, una tabla de contactos sin limpiar para los ejercicios con funciones de cadenas.
 
-Tres tablas analíticas —`app_users`, `app_events` y `app_purchases` (nivel 8)— se generan con `generate_series`, usando `md5` como fuente de pseudoaleatoriedad.
+Tres tablas analíticas –`app_users`, `app_events` y `app_purchases` (nivel 8)– se generan con `generate_series`, usando `md5` como fuente de pseudoaleatoriedad.
 
 Las columnas `hire_date` y `order_date` tienen un tipo `DATE` real y no texto, así que con ellas funcionan la aritmética de fechas y `EXTRACT`.
 
@@ -262,11 +262,11 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 
 ![Екран тренажера](screenshots/screen-uk.png)
 
-**[Відкрити тренажер →](https://sql-trainer-zeta.vercel.app/)**
+**[Відкрити тренажер →](https://sql-trainer-zeta.vercel.app/#/uk/)**
 
 ## Про тренажер
 
-Веб-тренажер для практики SQL: 125 завдань, розкладених по 8 рівнях, з бізнес-контекстом і трьома підказками. Після перевірки тренажер демонструє вердикт — правильно чи ні. Варіант правильного запиту з поясненнями можна також переглянути, натиснувши кнопку «Показати відповідь».
+Веб-тренажер для практики SQL: 125 завдань, розкладених по 8 рівнях, з бізнес-контекстом і трьома підказками. Після перевірки тренажер демонструє вердикт – правильно чи ні. Варіант правильного запиту з поясненнями можна також переглянути, натиснувши кнопку «Показати відповідь».
 
 Запити виконуються справжнім **PostgreSQL** прямо в браузері (через [PGlite](https://pglite.dev), скомпільований у WebAssembly). Це не емуляція й не спрощений діалект, а той самий Postgres, який використовують у реальних проєктах: з `DATE_TRUNC`, `EXTRACT`, віконними функціями та його ж повідомленнями про помилки.
 
@@ -276,13 +276,13 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 
 ## Мови
 
-Інтерфейс, усі 125 завдань і теорія доступні трьома мовами: англійською, іспанською та українською. Мову обирають у випадному списку в правому верхньому куті шапки — сторінка перемикається одразу, без перезавантаження, а прогрес лишається на місці.
+Інтерфейс, усі 125 завдань і теорія доступні трьома мовами: англійською, іспанською та українською. Мову обирають у випадному списку в правому верхньому куті шапки – сторінка перемикається одразу, без перезавантаження, а прогрес лишається на місці.
 
 Під час першого відвідування тренажер відкривається англійською. SQL, назви таблиць і колонок та самі дані однакові в усіх мовах.
 
 ## Як почати
 
-Відкрийте [тренажер](https://sql-trainer-zeta.vercel.app/) і виберіть рівень — усі вісім доступні
+Відкрийте [тренажер](https://sql-trainer-zeta.vercel.app/#/uk/) і виберіть рівень – усі вісім доступні
 одразу, реєстрація не потрібна. Перший запит на сторінці відпрацьовує довше за наступні: браузер
 завантажує PostgreSQL і створює таблиці.
 
@@ -309,11 +309,11 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 Всередині кожного рівня складність зростає за однаковою схемою: **початкові завдання → середні →
 просунуті**. Тип показано позначкою на картці завдання.
 
-Просунуте завдання наприкінці рівня зводить разом усе, що було до нього. Наприклад, на рівні 2 це «категорії, де середня ціна понад 100 і водночас більше 5 товарів», а на рівні 5 — накопичена сума витрат клієнта від замовлення до замовлення разом із сумою попереднього.
+Просунуте завдання наприкінці рівня зводить разом усе, що було до нього. Наприклад, на рівні 2 це «категорії, де середня ціна понад 100 і водночас більше 5 товарів», а на рівні 5 – накопичена сума витрат клієнта від замовлення до замовлення разом із сумою попереднього.
 
 На рівні 8 чотири завдання («Аналіз конверсії користувачів») утворюють наскрізний кейс: кожне
 наступне будується на висновку з попереднього, а картка завдання показує бейдж
-«Кейс: Аналіз конверсії користувачів — крок N з 4».
+«Кейс: Аналіз конверсії користувачів – крок N з 4».
 
 ## Як це працює
 
@@ -323,16 +323,16 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 
 Кнопка «Пісочниця» в шапці відкриває редактор: та сама база, будь-який запит, без завдання й перевірки. Саме туди веде «Виконати запит» зі сторінки теорії.
 
-Кнопка «Мій прогрес» відкриває дашборд зі статистикою: скільки завдань уже розв'язано, де ви зупинилися минулого разу (із кнопкою «Продовжити»), які теми вже освоєні, у яких конструкціях виникає найбільше помилок — біля них є кнопка «потренувати», що веде просто до потрібного завдання, — і які завдання варто повторити. Тема вважається освоєною, лише коли розв'язані всі її завдання рівня.
+Кнопка «Мій прогрес» відкриває дашборд зі статистикою: скільки завдань уже розв'язано, де ви зупинилися минулого разу (із кнопкою «Продовжити»), які теми вже освоєні, у яких конструкціях виникає найбільше помилок – біля них є кнопка «потренувати», що веде просто до потрібного завдання, – і які завдання варто повторити. Тема вважається освоєною, лише коли розв'язані всі її завдання рівня.
 
-Наприкінці рівня екран «Ти тепер вмієш» перелічує здобуті вміння — відмітка стоїть лише там, де тема відпрацьована повністю.
+Наприкінці рівня екран «Ти тепер вмієш» перелічує здобуті вміння – відмітка стоїть лише там, де тема відпрацьована повністю.
 
 ## Сертифікат
 
 У разі проходження усіх рівнів тренажера можливе отримання сертифіката:
 
-- **Сертифікат** — розв'язано щонайменше 90 % завдань кожного рівня (14 із 15, на рівні 3 — 18 із 20).
-- **Сертифікат з відзнакою** — розв'язано всі 125 завдань, і жодного разу не натиснуто «Показати відповідь».
+- **Сертифікат** – розв'язано щонайменше 90 % завдань кожного рівня (14 із 15, на рівні 3 – 18 із 20).
+- **Сертифікат з відзнакою** – розв'язано всі 125 завдань, і жодного разу не натиснуто «Показати відповідь».
 
 Умови й те, скільки завдань ще бракує на кожному рівні, видно на головному екрані й у дашборді. Щойно умову виконано, у вікні перевірки з'являється кнопка «Отримати сертифікат». На екрані сертифіката можна вписати своє ім'я й натиснути «Зберегти як PDF». Сертифікат зберігається мовою інтерфейсу (англійською, іспанською чи українською).
 
@@ -342,13 +342,13 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 
 ## Структура бази даних
 
-П'ять основних таблиць — `employees`, `customers`, `orders`, `products`, `order_items` —
+П'ять основних таблиць – `employees`, `customers`, `orders`, `products`, `order_items` –
 підібрані так, щоб покривати навчальні сценарії: є співробітник без департаменту (`IS NULL`),
 клієнт без замовлень (`LEFT JOIN`), товари, яких ніхто не купував (anti-join), і посилання
 `orders.manager_id` на продавця (self-join та звіти по менеджерах). До них додається
-`raw_contacts` — таблиця з неочищеними контактами для вправ із рядковими функціями.
+`raw_contacts` – таблиця з неочищеними контактами для вправ із рядковими функціями.
 
-Три аналітичні таблиці — `app_users`, `app_events` і `app_purchases` (рівень 8) — генеруються
+Три аналітичні таблиці – `app_users`, `app_events` і `app_purchases` (рівень 8) – генеруються
 за допомогою `generate_series` і `md5` як джерела псевдовипадковості.
 
 Колонки `hire_date` і `order_date` мають справжній тип `DATE`, а не текст, тому з ними працює
@@ -362,14 +362,14 @@ Escribe las consultas en el dialecto de PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO
 Якщо очистити дані браузера або відкрити тренажер на іншому пристрої, прогрес почнеться з нуля.
 
 Нотатку до завдання можна написати під самим завданням, а потім виправити в списку на
-екрані «Мої нотатки» — текст там редагується на місці.
+екрані «Мої нотатки» – текст там редагується на місці.
 
 Скинути все можна й самостійно: кнопка «Очистити» на дашборді стирає прогрес, історію спроб і
-чернетки. Нотатки також можна видалити — як кожну окремо, так і всі разом через кнопку
+чернетки. Нотатки також можна видалити – як кожну окремо, так і всі разом через кнопку
 «Видалити всі».
 
 Поточна архітектура дозволяє за потреби додати авторизацію та синхронізацію прогресу між
-пристроями. Зараз це свідомо локальний застосунок — без акаунтів, сервера та залежності від
+пристроями. Зараз це свідомо локальний застосунок – без акаунтів, сервера та залежності від
 інтернет-з'єднання.
 
 ## Запуск локально
@@ -387,7 +387,7 @@ npm run dev
 ```bash
 npm test          # перевірки: завдання, звірка результатів, стан гри, UI
 npm run lint      # ESLint
-npm run format    # Prettier переписує файли (format:check — лише перевіряє)
+npm run format    # Prettier переписує файли (format:check – лише перевіряє)
 npm run build     # продакшн-збірка у dist/
 npm run preview   # перегляд зібраної версії
 ```
@@ -396,10 +396,10 @@ npm run preview   # перегляд зібраної версії
 
 Завдання лежать у `src/tasks/level1.js` … `level8.js`. Скопіюйте об'єкт-сусід і замініть поля. Обов'язкові: `id`, `level`, `tier` (`basic` / `medium` / `complex`), `title`, `context`, `schemaDescription`, `setupSql`, `taskText`, `expectedOutputColumns`, `referenceSql`, три `hints` і `explanation`.
 
-Текст завдань у `level*.js` — український, це джерело. Англійська та іспанська версії лежать у `src/i18n/en/tasks/` і `src/i18n/es/tasks/` за `id` завдання, і новому завданню потрібен переклад обома мовами.
+Текст завдань у `level*.js` – український, це джерело. Англійська та іспанська версії лежать у `src/i18n/en/tasks/` і `src/i18n/es/tasks/` за `id` завдання, і новому завданню потрібен переклад обома мовами.
 
-Описи схем беріть з [src/tasks/schemas.js](src/tasks/schemas.js), а не пишіть рядком — тоді зміна колонки в даних не потребуватиме правок у десятках завдань.
+Описи схем беріть з [src/tasks/schemas.js](src/tasks/schemas.js), а не пишіть рядком – тоді зміна колонки в даних не потребуватиме правок у десятках завдань.
 
 Після додавання запустіть `npm test`. Перевіряється, що еталонний запит виконується проти `setupSql`, повертає хоча б один рядок, а назви його колонок точно збігаються з `expectedOutputColumns`. Окремо звіряється, що склад рівня відповідає `LEVEL_PLAN`, що складність усередині рівня не спадає, що кожна таблиця, згадана в `referenceSql`, справді описана в `schemaDescription`, і що переклади повні.
 
-Запити пишіть діалектом PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO_CHAR` доступні, а `strftime` чи `julianday` із SQLite — ні. Тести виконують кожен еталонний запит справжнім Postgres, тож помилка діалекту не пройде непоміченою.
+Запити пишіть діалектом PostgreSQL: `DATE_TRUNC`, `EXTRACT`, `TO_CHAR` доступні, а `strftime` чи `julianday` із SQLite – ні. Тести виконують кожен еталонний запит справжнім Postgres, тож помилка діалекту не пройде непоміченою.
