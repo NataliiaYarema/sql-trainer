@@ -176,7 +176,7 @@ export default {
   'certificate.notYet': 'Todavía no hay certificado',
   'certificate.rule':
     'Resuelve al menos el 90 % de los ejercicios de cada nivel y obtendrás el certificado. Resuelve los {total} sin consultar ninguna solución y será con distinción.',
-  'certificate.levelsReady': 'Niveles listos: {ready} de {total}',
+  'certificate.levelsReady': 'Niveles superados: {ready} de {total}',
   'certificate.levelMissing': {
     one: 'falta {count} ejercicio',
     other: 'faltan {count} ejercicios',

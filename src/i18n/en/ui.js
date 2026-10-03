@@ -167,7 +167,7 @@ export default {
   'certificate.notYet': 'No certificate yet',
   'certificate.rule':
     'Solve at least 90% of the tasks on every level to earn a certificate. Solve all {total} without revealing a single answer to earn it with distinction.',
-  'certificate.levelsReady': 'Levels ready: {ready} of {total}',
+  'certificate.levelsReady': 'Levels completed: {ready} of {total}',
   'certificate.levelMissing': { one: '{count} more task', other: '{count} more tasks' },
   'certificate.levelDone': 'done',
   'certificate.distinctionOpen': 'Distinction is still possible: no answers revealed.',
